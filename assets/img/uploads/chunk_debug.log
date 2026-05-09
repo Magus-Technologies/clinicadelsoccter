@@ -1,0 +1,22 @@
+[05:29:40] chunk=0/4 fileId=f1778236179151urd5i8 fileName=WhatsApp Video 2025-08-24 at 7.46.40 PM (1).mp4
+[05:29:40] mkdir tmpDir=/tmp/ot_chunks_f1778236179151urd5i8/ ok=1
+[05:29:40] chunk saved=/tmp/ot_chunks_f1778236179151urd5i8/chunk_00000 moved=1 size=1048576
+[05:29:40] chunks recibidos=1 total=4
+[05:29:41] chunk=1/4 fileId=f1778236179151urd5i8 fileName=WhatsApp Video 2025-08-24 at 7.46.40 PM (1).mp4
+[05:29:41] chunk saved=/tmp/ot_chunks_f1778236179151urd5i8/chunk_00001 moved=1 size=1048576
+[05:29:41] chunks recibidos=2 total=4
+[05:29:41] chunk=2/4 fileId=f1778236179151urd5i8 fileName=WhatsApp Video 2025-08-24 at 7.46.40 PM (1).mp4
+[05:29:41] chunk saved=/tmp/ot_chunks_f1778236179151urd5i8/chunk_00002 moved=1 size=1048576
+[05:29:41] chunks recibidos=3 total=4
+[05:29:42] chunk=3/4 fileId=f1778236179151urd5i8 fileName=WhatsApp Video 2025-08-24 at 7.46.40 PM (1).mp4
+[05:29:42] chunk saved=/tmp/ot_chunks_f1778236179151urd5i8/chunk_00003 moved=1 size=66279
+[05:29:42] chunks recibidos=4 total=4
+[05:29:42] Ensamblando archivo...
+[05:29:42] Ensamblado: /tmp/ot_chunks_f1778236179151urd5i8/assembled.mp4 size=3212007
+[05:29:42] mkdir outDir=/var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/
+[05:29:42] ffmpeg=/usr/bin/ffmpeg
+[05:29:42] Ejecutando ffmpeg...
+[05:29:51] ffmpeg ret=0 outExists=1 outSize=2243170
+[05:29:51] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_69fdbb163c22f9.62085976.mp4 size=2243170
+[05:29:51] ERROR BD: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tipo_archivo' in 'where clause'
+[05:29:51] Respuesta: {"status":"complete","compressed":true,"original_size":3212007,"final_size":2243170,"saved_db":false,"db_error":"SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tipo_archivo' in 'where clause'","ruta":"ot\/temp\/vid_69fdbb163c22f9.62085976.mp4","duracion":20,"final_size_mb":2.14}

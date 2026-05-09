@@ -6,12 +6,6 @@
 <script>
 feather.replace();
 
-// Sidebar toggle
-document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-  document.getElementById('main-content').classList.toggle('expanded');
-});
-
 // Notificaciones de stock bajo
 fetch('<?= BASE_URL ?>modules/inventario/api_stock_alerts.php')
   .then(r => r.json()).then(data => {

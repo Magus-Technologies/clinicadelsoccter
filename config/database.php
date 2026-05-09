@@ -2,7 +2,7 @@
 // config/database.php — Conexión PDO con manejo de errores
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'techrepair');
+define('DB_NAME', 'r_scooter');
 define('DB_USER', 'root');
 define('DB_PASS', 'c4p1cu4$$');
 define('DB_CHARSET', 'utf8mb4');
@@ -10,7 +10,7 @@ define('DB_CHARSET', 'utf8mb4');
 // Auto-detectar dominio y protocolo (funciona en localhost Y en servidor real)
 $_protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $_host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$_script   = $_SERVER['SCRIPT_NAME'] ?? '/techrepair/index.php';
+$_script   = $_SERVER['SCRIPT_NAME'] ?? '/clinicadelscooter/index.php';
 
 // Obtener la carpeta raíz del proyecto (primer segmento del path, ej: "techrepair")
 $_parts = explode('/', trim($_script, '/'));

@@ -118,14 +118,6 @@
     <a href="<?= BASE_URL ?>modules/garantias/index.php" class="tr-nav-item">
       <i data-feather="shield"></i><span>Garantías</span>
     </a>
-    <a href="<?= BASE_URL ?>modules/estados/index.php"
-       class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'estados')!==false?'active':'' ?>">
-      <i data-feather="tag"></i><span>Estados OT</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/configuracion/plantilla_impresion.php"
-       class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'plantilla_impresion')!==false?'active':'' ?>">
-      <i data-feather="printer"></i><span>Plantilla impresión</span>
-    </a>
     <a href="<?= BASE_URL ?>modules/configuracion/index.php" class="tr-nav-item">
       <i data-feather="settings"></i><span>Configuración</span>
     </a>

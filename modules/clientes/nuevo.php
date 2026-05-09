@@ -35,21 +35,34 @@ require_once __DIR__ . '/../../includes/header.php';
       <div class="tr-card-body">
         <form method="POST">
           <div class="row g-3">
+
+            <!-- Tipo -->
             <div class="col-md-3">
               <label class="tr-form-label">Tipo *</label>
-              <select name="tipo" class="form-select">
+              <select name="tipo" id="campo-tipo" class="form-select">
                 <option value="persona">Persona</option>
                 <option value="empresa">Empresa</option>
               </select>
             </div>
-            <div class="col-md-9">
-              <label class="tr-form-label">Nombre / Razón social *</label>
-              <input type="text" name="nombre" class="form-control" required autofocus/>
-            </div>
+
+            <!-- DNI / RUC (ahora antes que nombre) -->
             <div class="col-md-4">
               <label class="tr-form-label">DNI / RUC</label>
-              <input type="text" name="ruc_dni" class="form-control" maxlength="20"/>
+              <div class="input-group">
+                <input type="text" name="ruc_dni" id="campo-doc" class="form-control" maxlength="11" inputmode="numeric" autocomplete="off"/>
+                <span class="input-group-text" id="doc-spinner" style="display:none;">
+                  <span class="spinner-border spinner-border-sm" role="status"></span>
+                </span>
+              </div>
+              <div id="doc-msg" class="form-text" style="min-height:1.2em;"></div>
             </div>
+
+            <!-- Nombre / Razón social -->
+            <div class="col-md-5">
+              <label class="tr-form-label">Nombre / Razón social *</label>
+              <input type="text" name="nombre" id="campo-nombre" class="form-control" required/>
+            </div>
+
             <div class="col-md-4">
               <label class="tr-form-label">Teléfono</label>
               <input type="text" name="telefono" class="form-control"/>
@@ -93,4 +106,63 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
   </div>
 </div>
+
+<script>
+(function () {
+  const campoDoc    = document.getElementById('campo-doc');
+  const campoNombre = document.getElementById('campo-nombre');
+  const campoTipo   = document.getElementById('campo-tipo');
+  const spinner     = document.getElementById('doc-spinner');
+  const msg         = document.getElementById('doc-msg');
+  let debounceTimer = null;
+
+  // Solo dígitos
+  campoDoc.addEventListener('keydown', function (e) {
+    const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter'];
+    if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+
+  campoDoc.addEventListener('input', function () {
+    // Limpiar no-dígitos por si acaso (paste)
+    this.value = this.value.replace(/\D/g, '');
+
+    clearTimeout(debounceTimer);
+    msg.textContent = '';
+    spinner.style.display = 'none';
+
+    const len = this.value.length;
+    if (len !== 8 && len !== 11) return;
+
+    debounceTimer = setTimeout(() => consultarDoc(this.value), 400);
+  });
+
+  function consultarDoc(doc) {
+    spinner.style.display = '';
+    msg.textContent = '';
+
+    fetch('api_documento.php?doc=' + encodeURIComponent(doc))
+      .then(r => r.json())
+      .then(data => {
+        spinner.style.display = 'none';
+        if (data.ok) {
+          campoNombre.value = data.nombre;
+          campoTipo.value   = data.tipo;
+          msg.textContent   = 'Encontrado';
+          msg.style.color   = 'green';
+        } else {
+          msg.textContent = 'No encontrado';
+          msg.style.color = 'red';
+        }
+      })
+      .catch(() => {
+        spinner.style.display = 'none';
+        msg.textContent = 'No encontrado';
+        msg.style.color = 'red';
+      });
+  }
+})();
+</script>
+
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

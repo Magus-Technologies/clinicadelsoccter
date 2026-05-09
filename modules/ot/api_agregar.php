@@ -9,7 +9,8 @@ $db     = getDB();
 $accion = $_POST['accion'] ?? '';
 $valor  = trim($_POST['valor'] ?? '');
 
-if (!$valor) { echo json_encode(['error'=>'Valor vacío']); exit; }
+$accionesNoRequierenValor = ['eliminar_tipo_equipo','eliminar_marca','eliminar_checklist_item'];
+if (!$valor && !in_array($accion, $accionesNoRequierenValor)) { echo json_encode(['error'=>'Valor vacío']); exit; }
 
 switch ($accion) {
     case 'tipo_equipo':
@@ -44,6 +45,51 @@ switch ($accion) {
             $id = $db->lastInsertId();
         }
         echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor]);
+        break;
+
+    case 'editar_tipo_equipo':
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
+        $db->prepare("UPDATE tipos_equipo SET nombre=? WHERE id=?")->execute([$valor, $id]);
+        echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor]);
+        break;
+
+    case 'eliminar_tipo_equipo':
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
+        $uso = $db->prepare("SELECT COUNT(*) FROM equipos WHERE tipo_equipo_id=?");
+        $uso->execute([$id]);
+        if ($uso->fetchColumn() > 0) { echo json_encode(['error'=>'No se puede eliminar: tiene equipos asociados']); exit; }
+        $db->prepare("DELETE FROM tipos_equipo WHERE id=?")->execute([$id]);
+        echo json_encode(['ok'=>true]);
+        break;
+
+    case 'editar_marca':
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
+        $db->prepare("UPDATE marcas_equipo SET nombre=? WHERE id=?")->execute([$valor, $id]);
+        echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor]);
+        break;
+
+    case 'eliminar_marca':
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
+        $db->prepare("DELETE FROM marcas_equipo WHERE id=?")->execute([$id]);
+        echo json_encode(['ok'=>true]);
+        break;
+
+    case 'editar_checklist_item':
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
+        $db->prepare("UPDATE checklist_items SET nombre=? WHERE id=?")->execute([$valor, $id]);
+        echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor]);
+        break;
+
+    case 'eliminar_checklist_item':
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
+        $db->prepare("DELETE FROM checklist_items WHERE id=?")->execute([$id]);
+        echo json_encode(['ok'=>true]);
         break;
 
     default:

@@ -1,11 +1,4 @@
 <?php
-// Aumentar límites en tiempo de ejecución (funciona si PHP-FPM lo permite)
-@ini_set('memory_limit', '256M');
-@set_time_limit(300);
-@ini_set('max_input_time', '300');
-ini_set('log_errors', 1);
-error_reporting(E_ALL);
-
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
 requireLogin();
@@ -53,31 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db->prepare("INSERT INTO historial_ot (ot_id,usuario_id,estado_nuevo,comentario) VALUES (?,?,?,?)")
        ->execute([$otId,$user['id'],'ingresado','OT creada']);
 
-    // Subir fotos
     if (!empty($_FILES['fotos']['name'][0])) {
         foreach ($_FILES['fotos']['name'] as $i => $fname) {
             if ($_FILES['fotos']['error'][$i] === 0) {
                 $ruta = uploadFoto(['name'=>$fname,'type'=>$_FILES['fotos']['type'][$i],'tmp_name'=>$_FILES['fotos']['tmp_name'][$i],'size'=>$_FILES['fotos']['size'][$i]],'ot/'.$otId);
-                if ($ruta) {
-                    // Intentar con columna tipo_archivo (si ya existe), sino sin ella
-                    try {
-                        $db->prepare("INSERT INTO fotos_ot (ot_id,ruta,tipo_archivo,tipo) VALUES (?,?,'foto','ingreso')")->execute([$otId,$ruta]);
-                    } catch (\Exception $e) {
-                        $db->prepare("INSERT INTO fotos_ot (ot_id,ruta,tipo) VALUES (?,?,'ingreso')")->execute([$otId,$ruta]);
-                    }
-                }
+                if ($ruta) $db->prepare("INSERT INTO fotos_ot (ot_id,ruta,tipo) VALUES (?,?,'ingreso')")->execute([$otId,$ruta]);
             }
-        }
-    }
-    // Videos: ya fueron subidos via chunk upload ANTES del submit del form
-    // Los IDs de videos pendientes vienen en campo oculto video_ot_ids[]
-    // El chunk endpoint ya los guardó en fotos_ot con ot_id=0, ahora los reasignamos
-    if (!empty($_POST['video_chunk_ids'])) {
-        $ids = array_filter(array_map('intval', explode(',', $_POST['video_chunk_ids'])));
-        foreach ($ids as $vidId) {
-            // ot_id IS NULL porque el FK no permite 0
-            $db->prepare("UPDATE fotos_ot SET ot_id=? WHERE id=? AND ot_id IS NULL")
-               ->execute([$otId, $vidId]);
         }
     }
 
@@ -235,32 +209,6 @@ require_once __DIR__ . '/../../includes/header.php';
           <input type="file" id="input-fotos" name="fotos[]" multiple accept="image/*" style="display:none"/>
         </div>
         <div class="foto-preview-grid mt-2" id="preview-fotos"></div>
-
-        <!-- ── VIDEOS (chunk upload — evita límite 2MB del servidor) ── -->
-        <hr class="my-3"/>
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div>
-            <i data-feather="video" style="width:16px;height:16px" class="me-1"></i>
-            <span class="fw-semibold small">Videos del equipo</span>
-          </div>
-          <span class="badge bg-info text-dark" style="font-size:10px">
-            🎬 Compresión automática · Sin límite de tamaño
-          </span>
-        </div>
-        <div class="video-drop-zone" id="video-drop"
-             style="border:2px dashed #c7d2fe;border-radius:10px;padding:20px;
-                    text-align:center;cursor:pointer;background:#f5f3ff;
-                    transition:border-color .2s,background .2s">
-          <i data-feather="film" style="width:28px;height:28px;color:#818cf8"></i>
-          <p class="mb-0 mt-2 small fw-semibold" style="color:#6366f1">Arrastra videos aquí o haz clic</p>
-          <p class="text-muted small mb-0" style="font-size:11px">MP4, MOV, AVI, MKV — cualquier tamaño</p>
-          <input type="file" id="input-videos" multiple
-                 accept="video/mp4,video/quicktime,video/avi,video/webm,.mp4,.mov,.avi,.mkv,.webm,.3gp"
-                 style="display:none"/>
-        </div>
-        <div id="preview-videos" class="mt-2"></div>
-        <!-- IDs de videos ya subidos via chunk (se envían con el form) -->
-        <input type="hidden" name="video_chunk_ids" id="video-chunk-ids" value=""/>
       </div>
     </div>
 
@@ -532,248 +480,7 @@ document.getElementById('form-nueva-ot').addEventListener('submit', function(e) 
 
 // ── Firma y fotos ────────────────────────────────────────
 initFirma('firma-canvas', 'firma_cliente');
-// ── FOTOS CON COMPRESIÓN CLIENT-SIDE (evita límite 2MB) ─────────────────
-(function() {
-  var dropZone   = document.getElementById('foto-drop');
-  var inputFotos = document.getElementById('input-fotos');
-  var preview    = document.getElementById('preview-fotos');
-  if (!dropZone || !inputFotos || !preview) return;
-
-  dropZone.addEventListener('click', function() { inputFotos.click(); });
-  dropZone.addEventListener('dragover', function(e) {
-    e.preventDefault(); dropZone.classList.add('dragover');
-  });
-  dropZone.addEventListener('dragleave', function() {
-    dropZone.classList.remove('dragover');
-  });
-  dropZone.addEventListener('drop', function(e) {
-    e.preventDefault(); dropZone.classList.remove('dragover');
-    procesarFotos(e.dataTransfer.files);
-  });
-  inputFotos.addEventListener('change', function() {
-    procesarFotos(this.files);
-    this.value = '';
-  });
-
-  // Comprimir foto con Canvas antes de adjuntarla al form
-  function comprimirFoto(file, callback) {
-    var MAX_W   = 1280;
-    var MAX_H   = 1280;
-    var QUALITY = 0.82;
-    var reader  = new FileReader();
-    reader.onload = function(e) {
-      var img = new Image();
-      img.onload = function() {
-        var w = img.width, h = img.height;
-        if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
-        if (h > MAX_H) { w = Math.round(w * MAX_H / h); h = MAX_H; }
-        var canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(function(blob) {
-          var newFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {type:'image/jpeg'});
-          callback(newFile, URL.createObjectURL(blob));
-        }, 'image/jpeg', QUALITY);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function procesarFotos(files) {
-    var allowed = ['jpg','jpeg','png','webp','gif','heic','heif'];
-    Array.from(files).forEach(function(file) {
-      var ext = file.name.split('.').pop().toLowerCase();
-      if (!allowed.includes(ext)) {
-        alert('Formato no soportado: ' + file.name); return;
-      }
-      comprimirFoto(file, function(compressed, previewUrl) {
-        // Agregar al input con DataTransfer
-        var dt = new DataTransfer();
-        // Copiar archivos ya existentes
-        Array.from(inputFotos.files).forEach(function(f) { dt.items.add(f); });
-        dt.items.add(compressed);
-        inputFotos.files = dt.files;
-
-        // Mostrar preview
-        var div = document.createElement('div');
-        div.className = 'foto-preview-item';
-        var szKB = Math.round(compressed.size / 1024);
-        div.innerHTML = '<img src="' + previewUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:7px">'
-          + '<div class="btn-remove" onclick="quitarFoto(this)" style="position:absolute;top:3px;right:3px;'
-          + 'width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;'
-          + 'display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">✕</div>'
-          + '<div style="position:absolute;bottom:3px;left:3px;font-size:9px;background:rgba(0,0,0,.5);'
-          + 'color:#fff;padding:1px 5px;border-radius:10px">' + szKB + 'KB</div>';
-        div.style.position = 'relative';
-        preview.appendChild(div);
-      });
-    });
-  }
-
-  window.quitarFoto = function(btn) {
-    var item = btn.closest('.foto-preview-item');
-    var idx  = Array.from(preview.children).indexOf(item);
-    if (idx >= 0) {
-      var dt = new DataTransfer();
-      Array.from(inputFotos.files).forEach(function(f, i) {
-        if (i !== idx) dt.items.add(f);
-      });
-      inputFotos.files = dt.files;
-    }
-    item.remove();
-  };
-})();
-
-// ── VIDEO UPLOAD — CHUNK MODE (evita límite upload_max_filesize) ──────────
-(function() {
-  var dropZone   = document.getElementById('video-drop');
-  var input      = document.getElementById('input-videos');
-  var previewDiv = document.getElementById('preview-videos');
-  var chunkIdsEl = document.getElementById('video-chunk-ids');
-  var submitBtn  = document.querySelector('#form-nueva-ot button[type="submit"]');
-
-  if (!dropZone || !input || !previewDiv) return;
-
-  var CHUNK_SIZE   = 1 * 1024 * 1024; // 1MB por chunk (bajo el límite de 2MB)
-  var uploadedIds  = [];   // IDs de fotos_ot insertadas por el servidor
-  var uploading    = 0;    // cuántos videos están subiendo
-
-  // Drag & drop
-  dropZone.addEventListener('click',    function() { input.click(); });
-  dropZone.addEventListener('dragover', function(e) {
-    e.preventDefault(); dropZone.style.borderColor='#6366f1'; dropZone.style.background='#eef2ff';
-  });
-  dropZone.addEventListener('dragleave', function() {
-    dropZone.style.borderColor='#c7d2fe'; dropZone.style.background='#f5f3ff';
-  });
-  dropZone.addEventListener('drop', function(e) {
-    e.preventDefault(); dropZone.style.borderColor='#c7d2fe'; dropZone.style.background='#f5f3ff';
-    uploadVideos(e.dataTransfer.files);
-  });
-  input.addEventListener('change', function() { uploadVideos(this.files); input.value=''; });
-
-  function uploadVideos(files) {
-    var validExts = ['mp4','mov','avi','mkv','webm','3gp','wmv','m4v'];
-    Array.from(files).forEach(function(file) {
-      var ext = file.name.split('.').pop().toLowerCase();
-      if (!validExts.includes(ext)) {
-        alert('Formato no válido: ' + file.name); return;
-      }
-      startChunkUpload(file);
-    });
-  }
-
-  function startChunkUpload(file) {
-    var fileId     = 'f' + Date.now() + Math.random().toString(36).substr(2,6);
-    var totalChunks= Math.ceil(file.size / CHUNK_SIZE);
-    var mb         = (file.size / 1024 / 1024).toFixed(1);
-
-    // Crear tarjeta de progreso
-    var card = document.createElement('div');
-    card.id  = 'vc_' + fileId;
-    card.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;'
-      + 'background:#f5f3ff;border:1px solid #c7d2fe;border-radius:8px;margin-bottom:8px';
-    card.innerHTML =
-      '<span style="font-size:22px">🎬</span>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div class="fw-semibold small text-truncate">' + esc(file.name) + '</div>'
-      + '<div style="font-size:11px;color:#6b7280" id="vstatus_'+fileId+'">Preparando...</div>'
-      + '<div class="progress mt-1" style="height:5px;border-radius:3px;background:#e0d9ff">'
-      + '<div id="vprog_'+fileId+'" class="progress-bar" style="width:0%;background:#6366f1;transition:width .3s"></div>'
-      + '</div></div>'
-      + '<span id="vcheck_'+fileId+'" style="font-size:18px;display:none">✅</span>'
-      + '<span id="verr_'+fileId+'"  style="font-size:18px;display:none;color:#dc2626">❌</span>';
-    previewDiv.appendChild(card);
-
-    uploading++;
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Esperando videos...'; }
-
-    uploadChunk(file, fileId, 0, totalChunks, mb);
-  }
-
-  function uploadChunk(file, fileId, chunkIndex, totalChunks, mb) {
-    var start  = chunkIndex * CHUNK_SIZE;
-    var end    = Math.min(start + CHUNK_SIZE, file.size);
-    var chunk  = file.slice(start, end);
-
-    var statusEl = document.getElementById('vstatus_' + fileId);
-    var progEl   = document.getElementById('vprog_'   + fileId);
-    var pct      = Math.round((chunkIndex / totalChunks) * 100);
-
-    if (statusEl) statusEl.textContent = 'Subiendo... ' + pct + '% (' + mb + ' MB)';
-    if (progEl)   progEl.style.width   = pct + '%';
-
-    var fd = new FormData();
-    fd.append('chunk',       chunk, file.name);
-    fd.append('chunkIndex',  chunkIndex);
-    fd.append('totalChunks', totalChunks);
-    fd.append('fileId',      fileId);
-    fd.append('fileName',    file.name);
-    fd.append('otId',        0); // 0 = no OT todavía, se reasignará al guardar
-
-    fetch(window.BASE_URL + 'modules/ot/upload_video_chunk.php', {
-      method: 'POST', body: fd
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.error) {
-        onVideoError(fileId, data.error); return;
-      }
-      if (data.status === 'chunk_ok') {
-        // Siguiente chunk
-        uploadChunk(file, fileId, chunkIndex + 1, totalChunks, mb);
-      } else if (data.status === 'complete') {
-        onVideoComplete(fileId, data, mb);
-      }
-    })
-    .catch(function(err) {
-      onVideoError(fileId, 'Error de red: ' + err.message);
-    });
-  }
-
-  function onVideoComplete(fileId, data, mb) {
-    var statusEl = document.getElementById('vstatus_' + fileId);
-    var progEl   = document.getElementById('vprog_'   + fileId);
-    var checkEl  = document.getElementById('vcheck_'  + fileId);
-
-    if (progEl)  progEl.style.width = '100%';
-    var finalMb = data.final_size_mb || mb;
-    var txt = data.compressed
-      ? '✓ Comprimido: ' + finalMb + ' MB'
-      : '✓ Guardado: ' + finalMb + ' MB';
-    if (statusEl) statusEl.textContent = txt;
-    if (checkEl)  checkEl.style.display = '';
-
-    // Guardar el ID del fotos_ot para reasignar al hacer submit
-    if (data.fotos_ot_id) {
-      uploadedIds.push(data.fotos_ot_id);
-      if (chunkIdsEl) chunkIdsEl.value = uploadedIds.join(',');
-    }
-
-    uploading--;
-    if (uploading <= 0) {
-      uploading = 0;
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Crear Orden de Trabajo'; }
-    }
-  }
-
-  function onVideoError(fileId, msg) {
-    var statusEl = document.getElementById('vstatus_' + fileId);
-    var errEl    = document.getElementById('verr_'    + fileId);
-    if (statusEl) { statusEl.textContent = 'Error: ' + msg; statusEl.style.color='#dc2626'; }
-    if (errEl)    errEl.style.display = '';
-    uploading--;
-    if (uploading <= 0) {
-      uploading = 0;
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Crear Orden de Trabajo'; }
-    }
-  }
-
-  function esc(s) {
-    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-})();
+initFotoDrop('foto-drop', 'preview-fotos', 'input-fotos');
 
 // ── Cargar servicio seleccionado → precargar repuestos ───
 function cargarServicio(id) {
@@ -855,9 +562,6 @@ function escHtmlOT(s) {
   const spinner   = document.getElementById('nuevo-doc-spinner');
   const msg       = document.getElementById('nuevo-doc-msg');
   let timer = null;
-
-  // Guard: elementos pueden no existir si el formulario cambia
-  if (!campoDni || !campoNom) return;
 
   campoDni.addEventListener('keydown', function(e) {
     const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter'];
