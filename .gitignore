@@ -1,0 +1,37 @@
+# Dependencies
+/vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Uploads (user data)
+assets/img/uploads/
+uploads/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer
+composer.phar
+
+# Cache
+cache/
+
+# Private certificates (keep placeholder reference)
+/storage/private/sunat/certificados/*.pem
+certificados/
+
+# Temporary files
+*.tmp
+*.bak

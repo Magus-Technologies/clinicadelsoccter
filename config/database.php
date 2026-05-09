@@ -4,8 +4,17 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'r_scooter');
 define('DB_USER', 'root');
-define('DB_PASS', 'c4p1cu4$$');
 define('DB_CHARSET', 'utf8mb4');
+
+// Auto-detectar entorno: LOCAL usa password vacío, PRODUCCIÓN usa password real
+$__host = $_SERVER['HTTP_HOST'] ?? gethostname();
+$__isLocal = (
+    str_contains($__host, 'localhost') ||
+    str_contains($__host, '127.0.0.1') ||
+    str_contains($__host, '.test') ||
+    str_contains($__host, '.local')
+);
+define('DB_PASS', $__isLocal ? '' : 'c4p1cu4$$');
 
 // Auto-detectar dominio y protocolo (funciona en localhost Y en servidor real)
 $_protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';

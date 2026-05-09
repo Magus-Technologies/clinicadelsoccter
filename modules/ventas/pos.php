@@ -25,8 +25,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $total = round($subtotal + $igv, 2);
 
         $codigo = generarCodigoVenta($db);
-        $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?)")
-           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$subtotal,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
+
+        // Obtener correlativo SUNAT si es boleta o factura
+        $serie = '';
+        $numero = 0;
+        if (in_array($tipoDoc, ['boleta','factura'], true)) {
+            $cor = null;
+            try {
+                $pdo = getDB();
+                $pdo->beginTransaction();
+                $st = $pdo->prepare("SELECT id, serie, numero FROM documentos_empresa WHERE empresa_id=1 AND tipo=? AND activo=1 ORDER BY id ASC LIMIT 1 FOR UPDATE");
+                $st->execute([$tipoDoc]);
+                $cor = $st->fetch();
+                if ($cor) {
+                    $numero = (int)$cor['numero'] + 1;
+                    $pdo->prepare("UPDATE documentos_empresa SET numero=? WHERE id=?")->execute([$numero, $cor['id']]);
+                    $serie = $cor['serie'];
+                }
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+            }
+        }
+
+        $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$subtotal,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
         $ventaId = $db->lastInsertId();
 
         foreach ($items as $item) {
@@ -57,8 +80,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
+        // Generar XML SUNAT para boletas/facturas
+        $sunatOk = false;
+        $sunatMsg = '';
+        if (in_array($tipoDoc, ['boleta','factura'], true) && $serie && $numero) {
+            require_once __DIR__ . '/../../includes/sunat/SunatService.php';
+            $sunat = new SunatService($db);
+            $res = $sunat->generarXml((int)$ventaId);
+            $sunatOk = $res['ok'];
+            $sunatMsg = $res['mensaje'] ?? '';
+        }
+
         header('Content-Type: application/json');
-        echo json_encode(['success'=>true,'codigo'=>$codigo,'total'=>$total,'venta_id'=>$ventaId]);
+        echo json_encode([
+            'success'=>true,
+            'codigo'=>$codigo,
+            'total'=>$total,
+            'venta_id'=>$ventaId,
+            'sunat_xml'=>$sunatOk,
+            'sunat_msg'=>$sunatMsg,
+            'serie'=>$serie,
+            'numero'=>$numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : '',
+        ]);
         exit;
     }
 }
@@ -190,6 +233,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <div class="fs-1">🎉</div>
         <div id="ticket-codigo" class="fw-bold fs-5 mt-2"></div>
         <div id="ticket-total" class="text-muted"></div>
+        <div id="sunat-info-ticket" class="mt-2"></div>
         <div class="d-flex gap-2 justify-content-center mt-3">
           <button class="btn btn-primary btn-sm" onclick="nuevaVenta()">Nueva venta</button>
           <a id="btn-imprimir-ticket" href="#" target="_blank" class="btn btn-outline-secondary btn-sm">Imprimir</a>
@@ -296,6 +340,14 @@ function procesarVenta() {
         document.getElementById('ticket-codigo').textContent=data.codigo;
         document.getElementById('ticket-total').textContent='Total: S/ '+parseFloat(data.total).toFixed(2);
         document.getElementById('btn-imprimir-ticket').href='ticket.php?id='+data.venta_id+'&print=1';
+        // Mostrar info SUNAT
+        const sunatDiv = document.getElementById('sunat-info-ticket');
+        if (data.sunat_xml) {
+          const serieNum = data.serie ? data.serie+'-'+data.numero : '';
+          sunatDiv.innerHTML = '<div class="mt-2 p-2 rounded" style="background:rgba(0,200,100,.1);font-size:11px"><i class="bi bi-check-circle" style="color:#00c864"></i> XML generado ' + serieNum + '<br><small class="text-muted">'+data.sunat_msg+'</small></div>';
+        } else {
+          sunatDiv.innerHTML = '<div class="mt-2 small text-muted">Sin comprobante SUNAT</div>';
+        }
         new bootstrap.Modal(document.getElementById('modal-ticket')).show();
         limpiarCarrito();
       }

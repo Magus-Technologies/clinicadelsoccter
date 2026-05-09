@@ -4,17 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?= BASE_URL ?>assets/js/app.js"></script>
 <script>
-feather.replace();
-
-// Notificaciones de stock bajo
-fetch('<?= BASE_URL ?>modules/inventario/api_stock_alerts.php')
-  .then(r => r.json()).then(data => {
-    if (data.count > 0) {
-      const badge = document.getElementById('badge-notif');
-      badge.textContent = data.count;
-      badge.style.display = 'inline';
-    }
-  }).catch(() => {});
+if (window.feather) feather.replace();
 </script>
 <?php if (isset($pageScripts)): ?>
 <?= $pageScripts ?>
