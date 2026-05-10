@@ -9,13 +9,19 @@ $user = currentUser();
 
 // Procesar venta
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'procesar_venta') {
-    $items     = json_decode($_POST['items'] ?? '[]', true);
-    $clienteId = (int)($_POST['cliente_id'] ?? 0) ?: null;
-    $metPago   = $_POST['metodo_pago'] ?? 'efectivo';
-    $tipoDoc   = $_POST['tipo_doc']    ?? 'boleta';
-    $descGlobal= (float)($_POST['descuento_global'] ?? 0);
+    try {
+        $items     = json_decode($_POST['items'] ?? '[]', true);
+        $clienteId = (int)($_POST['cliente_id'] ?? 0) ?: null;
+        $metPago   = $_POST['metodo_pago'] ?? 'efectivo';
+        $tipoDoc   = $_POST['tipo_doc']    ?? 'boleta';
+        $descGlobal= (float)($_POST['descuento_global'] ?? 0);
 
-    if (!empty($items)) {
+        if (empty($items)) {
+            header('Content-Type: application/json');
+            echo json_encode(['success'=>false,'error'=>'No hay productos']);
+            exit;
+        }
+
         $subtotal = 0;
         foreach ($items as $item) {
             $subtotal += (float)$item['precio'] * (float)$item['cantidad'];
@@ -26,11 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $codigo = generarCodigoVenta($db);
 
-        // Obtener correlativo SUNAT si es boleta o factura
         $serie = '';
         $numero = 0;
         if (in_array($tipoDoc, ['boleta','factura'], true)) {
-            $cor = null;
             try {
                 $pdo = getDB();
                 $pdo->beginTransaction();
@@ -45,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $pdo->commit();
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
+                $serie = '';
+                $numero = 0;
             }
         }
 
@@ -53,15 +59,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $ventaId = $db->lastInsertId();
 
         foreach ($items as $item) {
-            $pid      = (int)$item['id'];
-            $cant     = (float)$item['cantidad'];
-            $precio   = (float)$item['precio'];
+            $pid  = (int)$item['id'];
+            $cant = (float)$item['cantidad'];
+            $precio = (float)$item['precio'];
             $subtItem = $cant * $precio;
 
             $db->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
                ->execute([$ventaId,$pid,$cant,$precio,$subtItem]);
 
-            // Bajar stock + kardex
             $prod = $db->prepare("SELECT stock_actual FROM productos WHERE id=?");
             $prod->execute([$pid]);
             $antes = (float)$prod->fetchColumn();
@@ -71,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
         }
 
-        // Caja
         $caja = $db->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
         $caja->execute();
         $cajaId = $caja->fetchColumn();
@@ -80,15 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
-        // Generar XML SUNAT para boletas/facturas
         $sunatOk = false;
         $sunatMsg = '';
         if (in_array($tipoDoc, ['boleta','factura'], true) && $serie && $numero) {
-            require_once __DIR__ . '/../../includes/sunat/SunatService.php';
-            $sunat = new SunatService($db);
-            $res = $sunat->generarXml((int)$ventaId);
-            $sunatOk = $res['ok'];
-            $sunatMsg = $res['mensaje'] ?? '';
+            try {
+                require_once __DIR__ . '/../../includes/sunat/SunatService.php';
+                $sunat = new SunatService($db);
+                $res = $sunat->generarXml((int)$ventaId);
+                $sunatOk = $res['ok'];
+                $sunatMsg = $res['mensaje'] ?? '';
+            } catch (Throwable $e) {
+                $sunatMsg = 'SUNAT: ' . $e->getMessage();
+                $sunatOk = false;
+            }
         }
 
         header('Content-Type: application/json');
@@ -102,6 +110,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'serie'=>$serie,
             'numero'=>$numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : '',
         ]);
+        exit;
+
+    } catch (Throwable $e) {
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>false,'error'=>$e->getMessage()]);
         exit;
     }
 }

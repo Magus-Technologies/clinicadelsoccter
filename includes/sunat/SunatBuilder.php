@@ -2,11 +2,8 @@
 /**
  * SunatBuilder — Construye el payload para la API SUNAT.
  *
- * Genera el array estructurado que recibe la API api-sunat-laravel
- * en el endpoint POST /generar/comprobante
+ * COPIADO de DentalSys para mantener compatibilidad con api-sunat-laravel.
  */
-require_once __DIR__ . '/../../config/sunat.php';
-
 class SunatBuilder
 {
     /**
@@ -19,99 +16,99 @@ class SunatBuilder
      */
     public static function buildComprobante(array $pago, array $cliente, array $items): array
     {
-        $emisor   = sunat_emisor();
+        $emisor   = self::empresa();
         $modo     = sunat_modo();
 
         // Tipo documento: 01=Factura, 03=Boleta
         $tipoDoc  = ($pago['tipo_doc'] ?? 'boleta') === 'factura' ? '01' : '03';
-
-        // Moneda
-        $moneda   = $pago['moneda'] ?? 'PEN';
+        $documento = $tipoDoc === '01' ? 'factura' : 'boleta';
 
         // Fecha
-        $fecha    = !empty($pago['fecha']) ? date('Y-m-d', strtotime($pago['fecha'])) : date('Y-m-d');
-
-        // Subtotal (sin IGV)
-        $subtotal = (float)($pago['subtotal'] ?? 0);
-        $igv      = (float)($pago['igv'] ?? 0);
-        $total    = (float)($pago['total'] ?? 0);
-        $desc     = (float)($pago['descuento'] ?? 0);
+        $fecha = !empty($pago['fecha']) ? date('Y-m-d', strtotime($pago['fecha'])) : date('Y-m-d');
 
         // Serie y número
-        $serie    = $pago['serie'] ?? 'B001';
-        $numero   = str_pad((string)($pago['numero'] ?? 1), 8, '0', STR_PAD_LEFT);
+        $serie  = $pago['serie'] ?? 'B001';
+        $numero = (string)($pago['numero'] ?? 1);
 
-        // Cliente
-        $tipoDocCliente = match (strtolower($cliente['tipo_doc'] ?? 'dni')) {
-            'ruc'     => '6',
-            'dni'    => '1',
-            'carnet' => '4',
-            default  => '1',
-        };
-        $numDocCliente  = $cliente['num_doc'] ?? '';
-        $rzSocial       = ($tipoDoc === '01')
-            ? ($cliente['razon_social'] ?: trim(($cliente['nombre'] ?? '')))
-            : trim(($cliente['nombre'] ?? ''));
+        // Cliente - facturas requieren RUC, boletas usan DNI o "varios"
+        $rzSocial = trim(($cliente['nombre'] ?? '') . ' ' . ($cliente['apellido'] ?? ''));
+        $rzSocial = preg_replace('/\s+/', ' ', $rzSocial) ?: 'CLIENTE';
 
-        // Detalles
-        $detalles = [];
-        foreach ($items as $item) {
-            $cantidad     = (float)($item['cantidad'] ?? 1);
-            $precioUnit   = (float)($item['precio_unit'] ?? $item['precio'] ?? 0);
-            $baseIgv      = round($precioUnit / 1.18, 2);
-            $igvItem      = round($precioUnit - $baseIgv, 2);
-            $codProducto  = $item['codigo'] ?? ($item['producto_id'] ?? '');
-
-            $detalles[] = [
-                'cod_producto'      => (string)$codProducto,
-                'descripcion'       => $item['concepto'] ?? $item['nombre'] ?? 'Producto',
-                'cantidad'          => $cantidad,
-                'unidad'            => $item['unidad'] ?? 'NIU',
-                'mtoValorVenta'    => round($baseIgv * $cantidad, 2),
-                'mtoValorUnitario' => $baseIgv,
-                'mtoBaseIgv'       => round($baseIgv * $cantidad, 2),
-                'porcentajeIgv'    => 18.0,
-                'igv'              => round($igvItem * $cantidad, 2),
-                'tipAfeIgv'        => '10',
-                'totalImpuestos'   => round($igvItem * $cantidad, 2),
-                'mtoPrecioUnitario'=> $precioUnit,
-            ];
+        if ($tipoDoc === '01') {
+            // Factura → requiere RUC
+            $numDocCliente = $cliente['num_doc'] ?? '';
+            if (empty($numDocCliente) || strlen($numDocCliente) !== 11) {
+                throw new RuntimeException("La factura requiere RUC válido (11 dígitos).");
+            }
+            $tipoDocCliente = '6';
+        } else {
+            // Boleta → usa DNI o "varios"
+            $numDocCliente = $cliente['num_doc'] ?? '';
+            if (!empty($numDocCliente) && strlen($numDocCliente) === 8) {
+                $tipoDocCliente = '1';
+            } else {
+                $tipoDocCliente = '0';
+                $numDocCliente = '00000000';
+                $rzSocial = $rzSocial ?: 'CLIENTE VARIOS';
+            }
         }
 
-        $payload = [
-            'documento'      => ($tipoDoc === '01') ? 'factura' : 'boleta',
-            'ublVersion'     => '2.1',
-            'tipoOperacion'  => '0101',
-            'tipoDoc'        => $tipoDoc,
-            'serie'          => $serie,
-            'numero'         => $numero,
-            'fecha_emision'  => $fecha,
-            'tipoMoneda'     => $moneda,
-            'empresa'        => $emisor,
-            'cliente'        => [
+        return [
+            'endpoint'      => $modo,
+            'documento'     => $documento,
+            'empresa'       => $emisor,
+            'cliente'       => [
                 'tipo_doc'   => $tipoDocCliente,
                 'num_doc'    => $numDocCliente,
                 'rzn_social' => $rzSocial,
+                'direccion'  => $cliente['direccion'] ?? '-',
             ],
-            'detalles'       => $detalles,
-            'mtoOperGravadas'=> round($subtotal, 2),
-            'mtoIGV'         => round($igv, 2),
-            'totalImpuestos' => round($igv, 2),
-            'valorVenta'     => round($subtotal, 2),
-            'subTotal'       => round($total, 2),
-            'mtoImpVenta'    => round($total, 2),
-            'formaPago'      => [
-                'tipo' => 'contado',
-            ],
-            'endpoint'       => $modo,
+            'serie'         => $serie,
+            'numero'        => $numero,
+            'fecha_emision' => $fecha,
+            'moneda'        => 'PEN',
+            'forma_pago'    => 'contado',
+            'detalles'      => self::detalles($items),
+            'aplica_igv'    => true,
         ];
+    }
 
-        if ($desc > 0) {
-            $payload['descuentosGlobales'] = [[
-                'monto' => round($desc, 2),
-            ]];
+    /**
+     * Datos del emisor desde la configuración SUNAT.
+     */
+    private static function empresa(): array
+    {
+        return [
+            'ruc'             => sunat_get_config('empresa_ruc', '20000000001'),
+            'usuario'         => sunat_get_config('sunat_usuario_sol', 'MODDATOS'),
+            'clave'           => sunat_get_config('sunat_clave_sol', 'MODDATOS'),
+            'razon_social'    => sunat_get_config('empresa_nombre', 'EMPRESA DE PRUEBAS S.A.C.'),
+            'nombreComercial' => sunat_get_config('empresa_nombre', 'DentalSys'),
+            'direccion'       => sunat_get_config('empresa_direccion', 'AV. PRUEBA 123'),
+            'ubigueo'         => '150101',
+            'distrito'        => 'LIMA',
+            'provincia'       => 'LIMA',
+            'departamento'   => 'LIMA',
+        ];
+    }
+
+    /**
+     * Detalles del comprobante.
+     * El precio se envía CON IGV incluido (el servidor Greenter divide /1.18 internamente).
+     */
+    private static function detalles(array $items): array
+    {
+        $out = [];
+        foreach ($items as $i => $it) {
+            $out[] = [
+                'cod_producto' => (string)($it['id'] ?? ($i + 1)),
+                'unidad'       => 'NIU',
+                'descripcion'  => $it['concepto'] ?? $it['nombre'] ?? 'Producto',
+                'cantidad'     => (float)($it['cantidad'] ?? 1),
+                'precio'       => (float)($it['precio'] ?? $it['precio_unit'] ?? 0),
+                'tipo_igv'     => 'gravado',
+            ];
         }
-
-        return $payload;
+        return $out;
     }
 }

@@ -210,7 +210,7 @@ if ($accion === 'lista') {
                         <small class="text-muted"><?= sanitize($v['codigo']) ?></small>
                     </td>
                     <td>
-                        <strong><?= sanitize($v['cliente_nombre'] ?? 'Sin cliente') ?></strong>
+                        <strong><?= sanitize($v['cliente_nombre'] ?? 'Consumidor Final') ?></strong>
                         <?php if ($tc === 'factura' && !empty($v['num_doc'])): ?>
                             <br><small>RUC: <?= sanitize($v['num_doc']) ?></small>
                         <?php elseif (!empty($v['num_doc'])): ?>
@@ -222,23 +222,26 @@ if ($accion === 'lista') {
                     <td><span class="badge <?= $badgeClass ?>"><?= $se ? strtoupper($se) : 'SIN XML' ?></span></td>
                     <td>
                         <?php if (!empty($v['sunat_xml'])): ?>
-                            <a href="?accion=xml&id=<?= $v['id'] ?>" target="_blank" class="btn btn-outline-secondary btn-sm" title="Ver XML"><i data-feather="file-code" style="width:13px"></i></a>
+                            <a href="?accion=xml&id=<?= $v['id'] ?>" target="_blank" class="btn btn-outline-secondary btn-sm" title="Ver XML" style="padding:3px 6px"><i data-feather="code" style="width:13px;height:13px"></i></a>
+                            <a href="?accion=xml&id=<?= $v['id'] ?>&dl=1" class="btn btn-outline-secondary btn-sm" title="Descargar XML" style="padding:3px 6px"><i data-feather="download" style="width:13px;height:13px"></i></a>
+                        <?php else: ?>
+                            <span class="text-muted small">Sin XML</span>
+                        <?php endif; ?>
+                        <?php if (!empty($v['sunat_cdr'])): ?>
+                            <a href="?accion=cdr&id=<?= $v['id'] ?>" class="btn btn-success btn-sm" title="CDR" style="padding:3px 6px"><i data-feather="file-text" style="width:13px;height:13px"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($v['sunat_xml']) && $se !== 'aceptado'): ?>
                             <form method="POST" style="display:inline">
                                 <input type="hidden" name="accion" value="enviar_sunat"/>
                                 <input type="hidden" name="id" value="<?= $v['id'] ?>"/>
-                                <button type="submit" class="btn btn-primary btn-sm" title="Enviar a SUNAT"><i data-feather="send" style="width:13px"></i></button>
+                                <button type="submit" class="btn btn-primary btn-sm" title="Enviar a SUNAT" style="padding:3px 6px"><i data-feather="send" style="width:13px;height:13px"></i></button>
                             </form>
-                        <?php endif; ?>
-                        <?php if (!empty($v['sunat_cdr'])): ?>
-                            <a href="?accion=cdr&id=<?= $v['id'] ?>" class="btn btn-success btn-sm" title="Descargar CDR"><i data-feather="download" style="width:13px"></i></a>
                         <?php endif; ?>
                         <?php if (empty($v['sunat_xml']) || $se !== 'aceptado'): ?>
                             <form method="POST" style="display:inline">
                                 <input type="hidden" name="accion" value="regenerar"/>
                                 <input type="hidden" name="id" value="<?= $v['id'] ?>"/>
-                                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Regenerar XML"><i data-feather="refresh-cw" style="width:13px"></i></button>
+                                <button type="submit" class="btn btn-outline-warning btn-sm" title="Regenerar" style="padding:3px 6px"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button>
                             </form>
                         <?php endif; ?>
                     </td>
@@ -313,7 +316,7 @@ if ($accion === 'lista') {
                 <div class="row g-3">
                     <div class="col-md-6">
                         <small class="text-muted">Cliente</small>
-                        <div class="fw-semibold"><?= sanitize($venta['cliente_nombre'] ?? 'Sin cliente') ?></div>
+                        <div class="fw-semibold"><?= sanitize($venta['cliente_nombre'] ?? 'Consumidor Final') ?></div>
                         <?php if ($tc === 'factura' && !empty($venta['num_doc'])): ?>
                             <small>RUC: <?= sanitize($venta['num_doc']) ?></small>
                         <?php elseif (!empty($venta['num_doc'])): ?>
@@ -375,7 +378,7 @@ if ($accion === 'lista') {
                 <?php endif; ?>
                 <div class="d-grid gap-2">
                     <?php if (!empty($venta['sunat_xml'])): ?>
-                        <a href="?accion=xml&id=<?= $id ?>" target="_blank" class="btn btn-dk btn-sm"><i data-feather="file-code" style="width:13px"></i> Ver XML</a>
+                        <a href="?accion=xml&id=<?= $id ?>" target="_blank" class="btn btn-dk btn-sm"><i data-feather="code" style="width:13px"></i> Ver XML</a>
                         <a href="?accion=xml&id=<?= $id ?>&dl=1" class="btn btn-outline-secondary btn-sm"><i data-feather="download" style="width:13px"></i> Descargar XML</a>
                     <?php endif; ?>
                     <?php if (!empty($venta['sunat_xml']) && $se !== 'aceptado'): ?>
