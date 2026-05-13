@@ -206,6 +206,9 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
     </div>
     <div class="doc-title-right">
       <div class="doc-tipo"><?= $docLabel ?></div>
+      <?php if(!empty($venta['serie']) && !empty($venta['numero'])): ?>
+      <div class="doc-num" style="font-size:14px;font-weight:800;color:#1a1a2e"><?= htmlspecialchars($venta['serie']) ?>-<?= str_pad((string)$venta['numero'],8,'0',STR_PAD_LEFT) ?></div>
+      <?php endif; ?>
       <div class="doc-num"><?= htmlspecialchars($venta['codigo']) ?></div>
       <div class="doc-fecha"><?= date('d/m/Y H:i', strtotime($venta['created_at'])) ?></div>
       <div style="margin-top:6px">
@@ -329,7 +332,7 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
     <p>¡Gracias por su compra! Si tiene alguna consulta comuníquese con nosotros.</p>
     <?php if($empresaTel): ?><p>📞 <?= htmlspecialchars($empresaTel) ?></p><?php endif; ?>
     <p style="margin-top:6px;font-size:10px;color:#9ca3af">
-      <?= $docLabel ?> N° <?= htmlspecialchars($venta['codigo']) ?> — <?= date('d/m/Y H:i', strtotime($venta['created_at'])) ?>
+      <?= $docLabel ?><?php if(!empty($venta['serie']) && !empty($venta['numero'])): ?> <?= htmlspecialchars($venta['serie']) ?>-<?= str_pad((string)$venta['numero'],8,'0',STR_PAD_LEFT) ?><?php endif; ?> — <?= htmlspecialchars($venta['codigo']) ?> — <?= date('d/m/Y H:i', strtotime($venta['created_at'])) ?>
     </p>
   </div>
 

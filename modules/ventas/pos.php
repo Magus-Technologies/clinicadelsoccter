@@ -27,8 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $subtotal += (float)$item['precio'] * (float)$item['cantidad'];
         }
         $subtotal -= $descGlobal;
-        $igv   = round($subtotal * 0.18, 2);
-        $total = round($subtotal + $igv, 2);
+        $total    = round($subtotal, 2);
+        $base     = round($total / 1.18, 2);
+        $igv      = round($total - $base, 2);
 
         $codigo = generarCodigoVenta($db);
 
@@ -55,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
 
         $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
-           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$subtotal,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
+           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
         $ventaId = $db->lastInsertId();
 
         foreach ($items as $item) {
@@ -212,7 +213,7 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
         <!-- Totales -->
         <div class="bg-light rounded p-3 mb-3">
-          <div class="d-flex justify-content-between small mb-1"><span>Subtotal:</span><span id="txt-subtotal">S/ 0.00</span></div>
+          <div class="d-flex justify-content-between small mb-1"><span>Base imponible:</span><span id="txt-subtotal">S/ 0.00</span></div>
           <div class="d-flex justify-content-between small mb-1"><span>IGV (18%):</span><span id="txt-igv">S/ 0.00</span></div>
           <div class="d-flex justify-content-between small mb-1 text-danger"><span>Descuento:</span><span id="txt-desc">S/ 0.00</span></div>
           <hr class="my-2">
@@ -330,15 +331,15 @@ function renderCarrito() {
 
 function calcularTotales() {
   const desc = parseFloat(document.getElementById('descuento-global').value)||0;
-  let sub = carrito.reduce((s,i)=>s+(i.precio*i.cantidad),0) - desc;
-  const igv = sub*0.18, total = sub+igv;
-  document.getElementById('txt-subtotal').textContent='S/ '+sub.toFixed(2);
+  const total = carrito.reduce((s,i)=>s+(i.precio*i.cantidad),0) - desc;
+  const base  = total / 1.18;
+  const igv   = total - base;
+  document.getElementById('txt-subtotal').textContent='S/ '+base.toFixed(2);
   document.getElementById('txt-igv').textContent='S/ '+igv.toFixed(2);
   document.getElementById('txt-desc').textContent='S/ '+desc.toFixed(2);
   document.getElementById('txt-total').textContent='S/ '+total.toFixed(2);
   const pagado = parseFloat(document.getElementById('monto-pagado').value)||0;
-  const vuelto = pagado-total;
-  document.getElementById('txt-vuelto').textContent = pagado>0 ? 'Vuelto: S/ '+Math.max(0,vuelto).toFixed(2) : '';
+  document.getElementById('txt-vuelto').textContent = pagado>0 ? 'Vuelto: S/ '+Math.max(0,pagado-total).toFixed(2) : '';
 }
 
 document.getElementById('descuento-global').addEventListener('input', calcularTotales);

@@ -58,10 +58,7 @@
       <i data-feather="shopping-cart"></i><span>Punto de venta</span>
     </a>
     <a href="<?= BASE_URL ?>modules/ventas/index.php" class="tr-nav-item">
-      <i data-feather="list"></i><span>Lista de ventas</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/ventas/facturacion.php" class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'facturacion')!==false?'active':'' ?>">
-      <i data-feather="cloud"></i><span>Comprobantes SUNAT</span>
+      <i data-feather="list"></i><span>Ventas</span>
     </a>
     <?php endif; ?>
 
