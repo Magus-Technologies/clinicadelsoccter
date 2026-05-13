@@ -131,6 +131,16 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar') {
 
 $clientes = $db->query("SELECT id,codigo,nombre FROM clientes WHERE activo=1 ORDER BY nombre LIMIT 500")->fetchAll();
 
+// Obtener correlativos actuales para mostrar en UI
+$correlativos = [];
+$stCorr = $db->query("SELECT tipo, serie, numero FROM documentos_empresa WHERE activo=1");
+while ($row = $stCorr->fetch()) {
+    $correlativos[$row['tipo']] = [
+        'serie' => $row['serie'],
+        'numero' => (int)$row['numero'] + 1,
+    ];
+}
+
 $pageTitle  = 'Punto de venta — ' . APP_NAME;
 $breadcrumb = [['label'=>'Ventas','url'=>BASE_URL.'modules/ventas/index.php'],['label'=>'POS','url'=>null]];
 require_once __DIR__ . '/../../includes/header.php';
@@ -184,16 +194,17 @@ require_once __DIR__ . '/../../includes/header.php';
             <?php endforeach; ?>
           </select>
         </div>
-        <!-- Tipo comprobante -->
-        <div class="mb-3">
+<!-- Tipo comprobante -->
+        <div class="mb-2">
           <label class="tr-form-label">Comprobante</label>
           <select id="tipo-doc" class="form-select form-select-sm">
-            <option value="ticket">Ticket</option>
-            <option value="boleta">Boleta</option>
+            <option value="boleta" selected>Boleta</option>
             <option value="factura">Factura</option>
+            <option value="ticket">Ticket</option>
             <option value="sin_comprobante">Sin comprobante</option>
           </select>
         </div>
+        <div id="correlativo-info" class="mb-3 text-primary fw-semibold" style="font-size:15px"></div>
         <!-- Descuento -->
         <div class="mb-3">
           <label class="tr-form-label">Descuento global (S/)</label>
@@ -226,7 +237,7 @@ require_once __DIR__ . '/../../includes/header.php';
           <div class="mt-1 small text-success" id="txt-vuelto"></div>
         </div>
 
-        <button class="btn btn-primary w-100 btn-lg" onclick="procesarVenta()">
+        <button id="btn-confirmar-venta" class="btn btn-primary w-100 btn-lg" onclick="procesarVenta()">
           <i data-feather="check-circle" style="width:18px;height:18px"></i> Confirmar venta
         </button>
       </div>
@@ -336,7 +347,21 @@ document.getElementById('monto-pagado').addEventListener('input', calcularTotale
 function limpiarCarrito() { carrito=[]; renderCarrito(); }
 
 function procesarVenta() {
-  if (!carrito.length) { alert('Agrega productos al carrito.'); return; }
+  if (!carrito.length) {
+    const btn = document.getElementById('btn-confirmar-venta');
+    btn.classList.add('btn-danger');
+    btn.innerHTML = '<i data-feather="alert-circle" style="width:18px;height:18px"></i> Agrega productos primero';
+    if (typeof feather !== 'undefined') feather.replace();
+    setTimeout(() => {
+      btn.classList.remove('btn-danger');
+      btn.innerHTML = '<i data-feather="check-circle" style="width:18px;height:18px"></i> Confirmar venta';
+      if (typeof feather !== 'undefined') feather.replace();
+    }, 2000);
+    return;
+  }
+  const btn = document.getElementById('btn-confirmar-venta');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
   const metodo = document.querySelector('input[name=metodo_pago_radio]:checked').value;
   const payload = new FormData();
   payload.append('action','procesar_venta');
@@ -363,7 +388,15 @@ function procesarVenta() {
         }
         new bootstrap.Modal(document.getElementById('modal-ticket')).show();
         limpiarCarrito();
+      } else {
+        alert(data.error || 'Error al procesar la venta.');
       }
+    })
+    .catch(() => alert('Error de conexión.'))
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-feather="check-circle" style="width:18px;height:18px"></i> Confirmar venta';
+      if (typeof feather !== 'undefined') feather.replace();
     });
 }
 
@@ -371,7 +404,30 @@ function nuevaVenta() {
   bootstrap.Modal.getInstance(document.getElementById('modal-ticket'))?.hide();
   limpiarCarrito();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const el = document.getElementById('tipo-doc');
+  if (el) el.addEventListener('change', mostrarCorrelativo);
+  mostrarCorrelativo();
+});
 </script>
 JS;
+
+// Función mostrarCorrelativo fuera del heredoc para que PHP interpole el JSON
+$pageScripts .= '<script>
+const CORRELATIVOS = ' . json_encode($correlativos) . ';
+function mostrarCorrelativo() {
+  const el = document.getElementById("tipo-doc");
+  if (!el) return;
+  const tipo = el.value;
+  const info = document.getElementById("correlativo-info");
+  if (CORRELATIVOS[tipo]) {
+    const c = CORRELATIVOS[tipo];
+    info.textContent = "Correlativo: " + c.serie + "-" + String(c.numero).padStart(8, "0");
+  } else {
+    info.textContent = tipo === "ticket" ? "Ticket — sin correlativo SUNAT" : "Sin serie configurada";
+  }
+}
+</script>';
 require_once __DIR__ . '/../../includes/footer.php';
 ?>
