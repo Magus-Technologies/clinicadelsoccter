@@ -32,15 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // ─── Guardar series ────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'guardar_series') {
     foreach (['factura','boleta'] as $tipo) {
-        $serie   = trim($_POST["serie_$tipo"] ?? '');
+        $serie   = strtoupper(trim($_POST["serie_$tipo"] ?? ''));
+        $numero  = max(0, (int)($_POST["numero_$tipo"] ?? 0));
         $activo  = isset($_POST["activo_$tipo"]) ? 1 : 0;
         $existe  = $db->query("SELECT id FROM documentos_empresa WHERE empresa_id=1 AND tipo='$tipo'")->fetch();
         if ($existe) {
-            $db->prepare("UPDATE documentos_empresa SET serie=?, activo=? WHERE empresa_id=1 AND tipo=?")
-               ->execute([$serie, $activo, $tipo]);
+            $db->prepare("UPDATE documentos_empresa SET serie=?, numero=?, activo=? WHERE empresa_id=1 AND tipo=?")
+               ->execute([$serie, $numero, $activo, $tipo]);
         } else {
-            $db->prepare("INSERT INTO documentos_empresa (empresa_id,tipo,serie,numero,activo) VALUES (1,?,?,0,?)")
-               ->execute([$tipo, $serie, $activo]);
+            $db->prepare("INSERT INTO documentos_empresa (empresa_id,tipo,serie,numero,activo) VALUES (1,?,?,?,?)")
+               ->execute([$tipo, $serie, $numero, $activo]);
         }
     }
     setFlash('success','Series guardadas.');
@@ -172,25 +173,29 @@ require_once __DIR__ . '/../../includes/header.php';
       <div class="tr-card-body">
         <div class="mb-3">
           <label class="tr-form-label">Serie Factura</label>
-          <div class="d-flex gap-2">
-            <input type="text" name="serie_factura" class="form-control" value="<?= sanitize($series['factura']['serie'] ?? 'F001') ?>" maxlength="4" style="width:100px"/>
-            <div class="form-check">
+          <div class="d-flex gap-2 align-items-center">
+            <input type="text" name="serie_factura" class="form-control" value="<?= sanitize($series['factura']['serie'] ?? 'F001') ?>" maxlength="4" style="width:90px" placeholder="F001"/>
+            <span class="text-muted">-</span>
+            <input type="number" name="numero_factura" class="form-control" value="<?= (int)($series['factura']['numero'] ?? 0) ?>" min="0" style="width:110px" placeholder="0"/>
+            <div class="form-check mb-0">
               <input type="checkbox" class="form-check-input" name="activo_factura" id="chk-fact" value="1" <?= ($series['factura']['activo'] ?? 1) ? 'checked' : '' ?>/>
               <label class="form-check-label" for="chk-fact">Activa</label>
             </div>
           </div>
-          <small class="text-muted">Correlativo actual: <?= (int)($series['factura']['numero'] ?? 0) ?></small>
+          <small class="text-muted">La próxima factura será el número <strong><?= (int)($series['factura']['numero'] ?? 0) + 1 ?></strong></small>
         </div>
         <div class="mb-3">
           <label class="tr-form-label">Serie Boleta</label>
-          <div class="d-flex gap-2">
-            <input type="text" name="serie_boleta" class="form-control" value="<?= sanitize($series['boleta']['serie'] ?? 'B001') ?>" maxlength="4" style="width:100px"/>
-            <div class="form-check">
+          <div class="d-flex gap-2 align-items-center">
+            <input type="text" name="serie_boleta" class="form-control" value="<?= sanitize($series['boleta']['serie'] ?? 'B001') ?>" maxlength="4" style="width:90px" placeholder="B001"/>
+            <span class="text-muted">-</span>
+            <input type="number" name="numero_boleta" class="form-control" value="<?= (int)($series['boleta']['numero'] ?? 0) ?>" min="0" style="width:110px" placeholder="0"/>
+            <div class="form-check mb-0">
               <input type="checkbox" class="form-check-input" name="activo_boleta" id="chk-bol" value="1" <?= ($series['boleta']['activo'] ?? 1) ? 'checked' : '' ?>/>
               <label class="form-check-label" for="chk-bol">Activa</label>
             </div>
           </div>
-          <small class="text-muted">Correlativo actual: <?= (int)($series['boleta']['numero'] ?? 0) ?></small>
+          <small class="text-muted">La próxima boleta será el número <strong><?= (int)($series['boleta']['numero'] ?? 0) + 1 ?></strong></small>
         </div>
       </div>
     </div>
