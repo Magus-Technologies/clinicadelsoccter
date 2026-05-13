@@ -29,7 +29,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     redirect(BASE_URL.'modules/configuracion/index.php');
 }
 
-// ─── Guardar series ────────────────────────────────────────────
+// ─── Enviar certificado al servidor SUNAT ─────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'enviar_certificado') {
+    require_once __DIR__ . '/../../config/sunat.php';
+    $ruc  = cf('empresa_ruc');
+    $cert = cf('sunat_certificado');
+    if (empty($ruc) || empty($cert)) {
+        setFlash('error', 'Falta RUC o certificado en la configuración.');
+    } else {
+        $url = SUNAT_API_URL . '/guardar/certificado/' . $ruc;
+        $ch  = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode(['certificado' => $cert]),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json','Accept: application/json'],
+        ]);
+        $res  = curl_exec($ch);
+        $err  = curl_error($ch);
+        curl_close($ch);
+        if ($err) {
+            setFlash('error', 'Error de conexión: ' . $err);
+        } else {
+            $decoded = json_decode($res, true);
+            if (!empty($decoded['estado'])) {
+                setFlash('success', '✅ Certificado enviado al servidor SUNAT correctamente.');
+            } else {
+                setFlash('error', 'Servidor respondió: ' . ($decoded['mensaje'] ?? $res));
+            }
+        }
+    }
+    redirect(BASE_URL . 'modules/configuracion/index.php');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'guardar_series') {
     foreach (['factura','boleta'] as $tipo) {
         $serie   = strtoupper(trim($_POST["serie_$tipo"] ?? ''));
@@ -124,7 +156,13 @@ require_once __DIR__ . '/../../includes/header.php';
         <div class="mb-2"><label class="tr-form-label">Contraseña SOL</label><input type="password" name="sunat_clave_sol" class="form-control form-control-sm" value="<?= cf('sunat_clave_sol') ?>" placeholder="••••••"/></div>
         <?php $cert = cf('sunat_certificado'); ?>
         <?php if (!empty($cert) && strlen($cert) > 100): ?>
-          <div class="alert alert-success py-1 small"><i data-feather="check-circle" style="width:13px"></i> Certificado cargado</div>
+          <div class="alert alert-success py-1 small"><i data-feather="check-circle" style="width:13px"></i> Certificado cargado en BD</div>
+          <form method="POST" class="mb-2">
+            <input type="hidden" name="action" value="enviar_certificado"/>
+            <button type="submit" class="btn btn-warning btn-sm w-100">
+              <i data-feather="upload-cloud" style="width:13px;height:13px"></i> Enviar certificado al servidor SUNAT
+            </button>
+          </form>
         <?php else: ?>
           <div class="alert alert-warning py-1 small"><i data-feather="alert-triangle" style="width:13px"></i> Sin certificado — la facturación no funcionará</div>
         <?php endif; ?>

@@ -185,21 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Wrap all .tr-card-body > .tr-table with scroll div ───
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.tr-card-body > .tr-table, .tr-card > .tr-table').forEach(table => {
+  document.querySelectorAll('.tr-table').forEach(table => {
     if (!table.closest('.table-responsive-wrapper')) {
       const wrap = document.createElement('div');
       wrap.className = 'table-responsive-wrapper';
       table.parentNode.insertBefore(wrap, table);
-      wrap.appendChild(table);
-    }
-  });
-  // Also wrap p-0 card bodies that contain tables
-  document.querySelectorAll('.tr-card-body.p-0').forEach(body => {
-    const table = body.querySelector('.tr-table');
-    if (table && !table.closest('.table-responsive-wrapper')) {
-      const wrap = document.createElement('div');
-      wrap.className = 'table-responsive-wrapper';
-      body.insertBefore(wrap, table);
       wrap.appendChild(table);
     }
   });
