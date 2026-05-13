@@ -32,8 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // ─── Enviar certificado al servidor SUNAT ─────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'enviar_certificado') {
     require_once __DIR__ . '/../../config/sunat.php';
-    $ruc  = cf('empresa_ruc');
-    $cert = cf('sunat_certificado');
+    // Leer directo de BD (cf() aún no está disponible aquí)
+    $cfgRows = $db->query("SELECT clave,valor FROM configuracion WHERE clave IN ('empresa_ruc','sunat_certificado')")->fetchAll();
+    $cfgMap  = array_column($cfgRows, 'valor', 'clave');
+    $ruc  = $cfgMap['empresa_ruc'] ?? '';
+    $cert = $cfgMap['sunat_certificado'] ?? '';
     if (empty($ruc) || empty($cert)) {
         setFlash('error', 'Falta RUC o certificado en la configuración.');
     } else {
@@ -56,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'envia
             if (!empty($decoded['estado'])) {
                 setFlash('success', '✅ Certificado enviado al servidor SUNAT correctamente.');
             } else {
-                setFlash('error', 'Servidor respondió: ' . ($decoded['mensaje'] ?? $res));
+                setFlash('error', 'Servidor respondió: ' . ($decoded['mensaje'] ?? substr($res,0,300)));
             }
         }
     }
