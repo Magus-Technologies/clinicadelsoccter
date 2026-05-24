@@ -304,7 +304,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <option value="boleta" selected>Boleta</option>
             <option value="factura">Factura</option>
             <option value="ticket">Ticket</option>
-            <option value="sin_comprobante">Sin comprobante</option>
+            <option value="nota_venta">Nota de venta</option>
           </select>
         </div>
         <div id="correlativo-info" class="mb-3 text-primary fw-semibold" style="font-size:15px"></div>
@@ -660,7 +660,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 JS;
 
-// Función mostrarCorrelativo fuera del heredoc para que PHP interpole el JSON
 $pageScripts .= '<script>
 const CORRELATIVOS = ' . json_encode($correlativos) . ';
 function mostrarCorrelativo() {
@@ -671,8 +670,12 @@ function mostrarCorrelativo() {
   if (CORRELATIVOS[tipo]) {
     const c = CORRELATIVOS[tipo];
     info.textContent = "Correlativo: " + c.serie + "-" + String(c.numero).padStart(8, "0");
+  } else if (tipo === "ticket") {
+    info.textContent = "Ticket";
+  } else if (tipo === "nota_venta") {
+    info.textContent = "Nota de venta";
   } else {
-    info.textContent = tipo === "ticket" ? "Ticket — sin correlativo SUNAT" : "Sin serie configurada";
+    info.textContent = "Sin serie configurada";
   }
 }
 </script>';
