@@ -80,6 +80,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Subir nuevos videos
+    if (!empty($_FILES['videos']['name'][0])) {
+        foreach ($_FILES['videos']['name'] as $i => $vname) {
+            if ($_FILES['videos']['error'][$i] === 0) {
+                $vData = uploadVideo([
+                    'name'     => $vname,
+                    'tmp_name' => $_FILES['videos']['tmp_name'][$i],
+                    'error'    => $_FILES['videos']['error'][$i],
+                    'size'     => $_FILES['videos']['size'][$i],
+                ], 'ot/'.$id, 10);
+                if ($vData) {
+                    $db->prepare("INSERT INTO fotos_ot (ot_id,ruta,tipo_archivo,duracion_seg,tamano_bytes,tipo) VALUES (?,?,'video',?,?,'proceso')")
+                       ->execute([$id,$vData['ruta'],$vData['duracion_seg'],$vData['tamano_bytes']]);
+                }
+            }
+        }
+    }
+
     // Registrar repuestos (borrar y reinsertar)
     $db->prepare("DELETE FROM ot_repuestos WHERE ot_id=?")->execute([$id]);
     $descs  = $_POST['rep_desc']   ?? [];
@@ -239,6 +257,24 @@ require_once __DIR__ . '/../../includes/header.php';
           <input type="file" id="input-fotos" name="fotos[]" multiple accept="image/*" style="display:none"/>
         </div>
         <div class="foto-preview-grid mt-2" id="preview-fotos"></div>
+
+        <hr class="my-3"/>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div><i data-feather="video" style="width:16px;height:16px" class="me-1"></i>
+            <span class="fw-semibold small">Agregar videos</span>
+          </div>
+          <span class="badge bg-info text-dark" style="font-size:10px">🎬 Compresión automática · máx 10MB</span>
+        </div>
+        <div class="video-drop-zone" id="video-drop"
+             style="border:2px dashed #c7d2fe;border-radius:10px;padding:18px;
+                    text-align:center;cursor:pointer;background:#f5f3ff">
+          <i data-feather="film" style="width:26px;height:26px;color:#818cf8"></i>
+          <p class="mb-0 mt-2 small fw-semibold" style="color:#6366f1">Arrastra videos o haz clic</p>
+          <input type="file" id="input-videos" name="videos[]" multiple
+                 accept="video/mp4,video/quicktime,video/avi,video/webm,.mp4,.mov,.avi,.mkv,.webm,.3gp"
+                 style="display:none"/>
+        </div>
+        <div class="video-preview-list mt-2" id="preview-videos"></div>
       </div>
     </div>
 
@@ -335,6 +371,32 @@ require_once __DIR__ . '/../../includes/header.php';
 $pageScripts = <<<'JS'
 <script>
 initFotoDrop('foto-drop','preview-fotos','input-fotos');
+
+(function() {
+  var dropZone=document.getElementById('video-drop'),input=document.getElementById('input-videos'),
+      previewDiv=document.getElementById('preview-videos'),videoFiles=[];
+  if (!dropZone || !input || !previewDiv) return;
+  dropZone.addEventListener('click',function(){input.click();});
+  dropZone.addEventListener('dragover',function(e){e.preventDefault();dropZone.style.borderColor='#6366f1';});
+  dropZone.addEventListener('dragleave',function(){dropZone.style.borderColor='#c7d2fe';});
+  dropZone.addEventListener('drop',function(e){e.preventDefault();addVideos(e.dataTransfer.files);dropZone.style.borderColor='#c7d2fe';});
+  input.addEventListener('change',function(){addVideos(this.files);});
+  function addVideos(files){
+    Array.from(files).forEach(function(file){
+      if(file.size>200*1024*1024){alert('Video muy grande: '+file.name);return;}
+      videoFiles.push(file);
+      var idx=videoFiles.length-1,mb=(file.size/1024/1024).toFixed(1);
+      var div=document.createElement('div');div.id='vitem_'+idx;
+      div.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f5f3ff;border:1px solid #c7d2fe;border-radius:8px;margin-bottom:6px';
+      div.innerHTML='<span style="font-size:22px">🎬</span><div style="flex:1;min-width:0"><div class="fw-semibold small text-truncate">'+file.name+'</div><div style="font-size:11px;color:#6b7280">'+mb+' MB — se comprimirá al guardar</div></div>'
+        +'<button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="qv('+idx+')">✕</button>';
+      previewDiv.appendChild(div);
+      var dt=new DataTransfer();videoFiles.forEach(function(f){if(f)dt.items.add(f);});input.files=dt.files;
+    });
+  }
+  window.qv=function(idx){videoFiles[idx]=null;var el=document.getElementById('vitem_'+idx);if(el)el.remove();
+    var dt=new DataTransfer();videoFiles.forEach(function(f){if(f)dt.items.add(f);});input.files=dt.files;};
+})();
 
 // Cargar servicio → precargar repuestos en editar OT
 function cargarServicioEditar(id) {

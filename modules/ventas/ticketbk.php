@@ -30,39 +30,6 @@ $detalle = $db->prepare("
 $detalle->execute([$id]);
 $detalle = $detalle->fetchAll();
 
-// Extraer OTs cobradas desde notas — soporta formato nuevo (##OT##) y antiguo (OT: ... |)
-$items_ot = [];
-$notas_limpias = '';
-if (!empty($venta['notas'])) {
-    $notas_raw = $venta['notas'];
-
-    // Formato nuevo: ##OT##descripcion##PRECIO##monto##FIN##
-    if (strpos($notas_raw, '##OT##') !== false) {
-        preg_match_all('/##OT##(.+?)##PRECIO##([\d.]+)##FIN##/s', $notas_raw, $matches, PREG_SET_ORDER);
-        foreach ($matches as $m) {
-            $items_ot[] = ['desc' => trim($m[1]), 'precio' => (float)$m[2]];
-        }
-        $notas_limpias = trim(preg_replace('/##OT##.+?##FIN##\s*/s', '', $notas_raw));
-
-    // Formato antiguo: "OT: descripcion | OT: descripcion |"
-    } elseif (strpos($notas_raw, 'OT:') !== false) {
-        $partes = explode(' | ', $notas_raw);
-        foreach ($partes as $p) {
-            $p = trim($p);
-            if (preg_match('/^OT:\s*(.+)$/i', $p, $m)) {
-                $items_ot[] = ['desc' => trim($m[1]), 'precio' => null];
-            } elseif ($p !== '') {
-                $notas_limpias .= $p . ' ';
-            }
-        }
-        $notas_limpias = trim($notas_limpias);
-
-    // Sin OTs, solo notas normales
-    } else {
-        $notas_limpias = $notas_raw;
-    }
-}
-
 // Config empresa
 $cfg = [];
 foreach ($db->query("SELECT clave,valor FROM configuracion")->fetchAll() as $r) $cfg[$r['clave']] = $r['valor'];
@@ -239,8 +206,8 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
     </div>
     <div class="doc-title-right">
       <div class="doc-tipo"><?= $docLabel ?></div>
-      <?php if(!empty($venta['serie_doc']) && !empty($venta['num_doc'])): ?>
-      <div class="doc-num" style="font-size:14px;font-weight:800;color:#1a1a2e"><?= htmlspecialchars($venta['serie_doc']) ?>-<?= htmlspecialchars($venta['num_doc']) ?></div>
+      <?php if(!empty($venta['serie']) && !empty($venta['numero'])): ?>
+      <div class="doc-num" style="font-size:14px;font-weight:800;color:#1a1a2e"><?= htmlspecialchars($venta['serie']) ?>-<?= str_pad((string)$venta['numero'],8,'0',STR_PAD_LEFT) ?></div>
       <?php endif; ?>
       <div class="doc-num"><?= htmlspecialchars($venta['codigo']) ?></div>
       <div class="doc-fecha"><?= date('d/m/Y H:i', strtotime($venta['created_at'])) ?></div>
@@ -290,10 +257,9 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
     </thead>
     <tbody>
       <?php $hayDescuento = array_sum(array_column($detalle,'descuento')) > 0; ?>
-      <?php $num = 1; ?>
-      <?php foreach($detalle as $d): ?>
+      <?php foreach($detalle as $i => $d): ?>
       <tr>
-        <td class="text-center"><?= $num++ ?></td>
+        <td class="text-center"><?= $i+1 ?></td>
         <td>
           <div style="font-weight:600"><?= htmlspecialchars($d['prod_nombre']) ?></div>
           <div style="font-size:10px;color:#9ca3af"><?= htmlspecialchars($d['prod_codigo']) ?> — <?= htmlspecialchars($d['cat_nombre']) ?></div>
@@ -306,33 +272,6 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
         <td class="text-right" style="font-weight:700"><?= $moneda ?> <?= number_format($d['subtotal'],2) ?></td>
       </tr>
       <?php endforeach; ?>
-      <?php
-      // Calcular total de productos para obtener monto de OTs en formato antiguo
-      $total_productos = array_sum(array_column($detalle, 'subtotal'));
-      $total_ots_restante = $venta['total'] - $total_productos;
-      $ots_count = count($items_ot);
-      ?>
-      <?php foreach($items_ot as $idx => $ot_item):
-        // Si tiene precio guardado úsalo, sino distribuir el restante entre OTs
-        $precio_ot = $ot_item['precio'] !== null
-            ? $ot_item['precio']
-            : ($ots_count > 0 ? round($total_ots_restante / $ots_count, 2) : 0);
-      ?>
-      <tr style="background:#f0f4ff">
-        <td class="text-center"><?= $num++ ?></td>
-        <td>
-          <div style="font-weight:600;color:#1d4ed8">🔧 <?= htmlspecialchars($ot_item['desc']) ?></div>
-          <div style="font-size:10px;color:#6b7280">Servicio de reparación / mantenimiento</div>
-        </td>
-        <td class="text-center">1.00</td>
-        <td class="text-right"><?= $moneda ?> <?= number_format($precio_ot, 2) ?></td>
-        <?php if($hayDescuento): ?><td class="text-right">—</td><?php endif; ?>
-        <td class="text-right" style="font-weight:700"><?= $moneda ?> <?= number_format($precio_ot, 2) ?></td>
-      </tr>
-      <?php endforeach; ?>
-      <?php if(empty($detalle) && empty($items_ot)): ?>
-      <tr><td colspan="<?= $hayDescuento?6:5 ?>" class="text-center" style="color:#9ca3af;padding:12px">Sin detalle</td></tr>
-      <?php endif; ?>
     </tbody>
   </table>
 
@@ -379,10 +318,10 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
       <div class="val"><?= $moneda ?> <?= number_format($venta['vuelto'],2) ?></div>
     </div>
     <?php endif; ?>
-    <?php if($notas_limpias): ?>
+    <?php if($venta['notas']): ?>
     <div class="pago-box" style="flex:2">
       <div class="lbl">Notas</div>
-      <div class="val" style="font-size:11px;font-weight:500"><?= htmlspecialchars($notas_limpias) ?></div>
+      <div class="val" style="font-size:11px;font-weight:500"><?= htmlspecialchars($venta['notas']) ?></div>
     </div>
     <?php endif; ?>
   </div>
@@ -393,7 +332,7 @@ $docLabel = $tipoDocLabel[$venta['tipo_doc']] ?? 'COMPROBANTE';
     <p>¡Gracias por su compra! Si tiene alguna consulta comuníquese con nosotros.</p>
     <?php if($empresaTel): ?><p>📞 <?= htmlspecialchars($empresaTel) ?></p><?php endif; ?>
     <p style="margin-top:6px;font-size:10px;color:#9ca3af">
-      <?= $docLabel ?><?php if(!empty($venta['serie_doc']) && !empty($venta['num_doc'])): ?> <?= htmlspecialchars($venta['serie_doc']) ?>-<?= htmlspecialchars($venta['num_doc']) ?><?php endif; ?> — <?= htmlspecialchars($venta['codigo']) ?> — <?= date('d/m/Y H:i', strtotime($venta['created_at'])) ?>
+      <?= $docLabel ?><?php if(!empty($venta['serie']) && !empty($venta['numero'])): ?> <?= htmlspecialchars($venta['serie']) ?>-<?= str_pad((string)$venta['numero'],8,'0',STR_PAD_LEFT) ?><?php endif; ?> — <?= htmlspecialchars($venta['codigo']) ?> — <?= date('d/m/Y H:i', strtotime($venta['created_at'])) ?>
     </p>
   </div>
 

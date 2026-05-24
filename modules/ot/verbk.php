@@ -69,9 +69,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 // Fotos
-$fotos = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? ORDER BY created_at");
-$fotos->execute([$id]);
-$fotos = $fotos->fetchAll();
+// Cargar fotos y videos con fallback si columnas nuevas no existen
+try {
+    $fotos = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? AND (tipo_archivo='foto' OR tipo_archivo IS NULL) ORDER BY created_at");
+    $fotos->execute([$id]);
+    $fotos = $fotos->fetchAll();
+    $videos = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? AND tipo_archivo='video' ORDER BY created_at");
+    $videos->execute([$id]);
+    $videos = $videos->fetchAll();
+} catch (\Exception $e) {
+    // Columnas nuevas aún no existen en la BD
+    $fotos_stmt = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? ORDER BY created_at");
+    $fotos_stmt->execute([$id]);
+    $fotos  = $fotos_stmt->fetchAll();
+    $videos = [];
+}
 
 // Historial
 $historial = $db->prepare("
@@ -183,20 +195,66 @@ $eInfo  = ESTADOS_OT[$estado];
       </div>
     </div>
 
-    <!-- Fotos -->
-    <?php if ($fotos): ?>
+    <!-- Fotos y Videos -->
+    <?php if ($fotos || !empty($videos)): ?>
     <div class="tr-card mb-3">
-      <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">FOTOS DEL EQUIPO</h6></div>
+      <div class="tr-card-header">
+        <h6 class="mb-0 small fw-semibold">
+          FOTOS Y VIDEOS DEL EQUIPO
+          <?php if(!empty($fotos)): ?>
+          <span class="badge bg-secondary ms-1"><?= count($fotos) ?> foto(s)</span>
+          <?php endif; ?>
+          <?php if(!empty($videos)): ?>
+          <span class="badge bg-info text-dark ms-1">🎬 <?= count($videos) ?> video(s)</span>
+          <?php endif; ?>
+        </h6>
+      </div>
       <div class="tr-card-body">
-        <div class="foto-preview-grid">
+        <?php if(!empty($fotos)): ?>
+        <div class="foto-preview-grid mb-3">
           <?php foreach ($fotos as $foto): ?>
           <div class="foto-preview-item">
             <a href="<?= UPLOAD_URL . $foto['ruta'] ?>" target="_blank">
-              <img src="<?= UPLOAD_URL . $foto['ruta'] ?>" alt="<?= sanitize($foto['descripcion'] ?? 'foto') ?>">
+              <img src="<?= UPLOAD_URL . $foto['ruta'] ?>"
+                   alt="<?= sanitize($foto['descripcion'] ?? 'foto') ?>"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect fill='%23f3f4f6' width='80' height='80'/><text x='50%25' y='55%25' text-anchor='middle' fill='%239ca3af' font-size='11'>error</text></svg>'"/>
             </a>
           </div>
           <?php endforeach; ?>
         </div>
+        <?php endif; ?>
+
+        <?php if(!empty($videos)): ?>
+        <?php if(!empty($fotos)): ?><hr class="my-3"/><?php endif; ?>
+        <div class="row g-3">
+          <?php foreach($videos as $vid): ?>
+          <div class="col-12 col-md-6">
+            <div class="p-2 rounded border" style="background:#f5f3ff">
+              <video controls preload="metadata"
+                     style="width:100%;border-radius:6px;max-height:240px;background:#000;display:block">
+                <source src="<?= UPLOAD_URL . $vid['ruta'] ?>" type="video/mp4"/>
+                Tu navegador no soporta video HTML5.
+              </video>
+              <div class="d-flex justify-content-between align-items-center mt-1 px-1">
+                <span class="text-muted" style="font-size:11px">
+                  🎬
+                  <?php if(!empty($vid['duracion_seg'])): ?>
+                  <?= sprintf('%d:%02d', intdiv((int)$vid['duracion_seg'],60), (int)$vid['duracion_seg']%60) ?>
+                  <?php endif; ?>
+                  <?php if(!empty($vid['tamano_bytes'])): ?>
+                  · <?= round($vid['tamano_bytes']/1024/1024, 1) ?> MB
+                  <?php endif; ?>
+                </span>
+                <a href="<?= UPLOAD_URL . $vid['ruta'] ?>" target="_blank" download
+                   class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:11px">
+                  ⬇ Descargar
+                </a>
+              </div>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
       </div>
     </div>
     <?php endif; ?>

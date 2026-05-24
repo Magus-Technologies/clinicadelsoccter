@@ -114,7 +114,7 @@ $breadcrumb = [
 require_once __DIR__ . '/../../includes/header.php';
 
 $estado = $ot['estado'];
-$eInfo  = ESTADOS_OT[$estado];
+$eInfo = ESTADOS_OT[$estado] ?? ['label'=>ucfirst(str_replace('_',' ',$estado)),'color'=>'secondary','icon'=>'circle','es_final'=>false];
 ?>
 
 <!-- Header OT -->
@@ -137,7 +137,7 @@ $eInfo  = ESTADOS_OT[$estado];
       <i data-feather="file-text" style="width:14px;height:14px"></i> PDF / Imprimir
     </a>
     <?php if ($ot['whatsapp']): ?>
-    <a href="https://wa.me/<?= preg_replace('/\D/','',$ot['whatsapp']) ?>?text=Hola+<?= urlencode($ot['cliente_nombre']) ?>%2C+su+equipo+est%C3%A1+<?= urlencode(ESTADOS_OT[$estado]['label']) ?>+%28OT:+<?= $ot['codigo_ot'] ?>%29"
+    <a href="https://wa.me/<?= preg_replace('/\D/','',$ot['whatsapp']) ?>?text=Hola+<?= urlencode($ot['cliente_nombre']) ?>%2C+su+equipo+est%C3%A1+<?= urlencode(isset(ESTADOS_OT[$estado]) ? ESTADOS_OT[$estado]['label'] : ucfirst(str_replace('_',' ',$estado))) ?>+%28OT:+<?= $ot['codigo_ot'] ?>%29"
        target="_blank" class="btn btn-success btn-sm">
       <i data-feather="message-circle" style="width:14px;height:14px"></i> WhatsApp
     </a>
@@ -378,7 +378,7 @@ $eInfo  = ESTADOS_OT[$estado];
     </div>
 
     <!-- Cambiar estado -->
-    <?php if (!in_array($estado,['entregado','cancelado'])): ?>
+    <?php if (!(isset($eInfo['es_final']) && $eInfo['es_final'])): ?>
     <div class="tr-card mb-3">
       <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">CAMBIAR ESTADO</h6></div>
       <div class="tr-card-body">
@@ -409,7 +409,7 @@ $eInfo  = ESTADOS_OT[$estado];
         <div class="small mb-1"><strong>F. ingreso:</strong> <?= formatDateTime($ot['fecha_ingreso']) ?></div>
         <div class="small mb-1"><strong>F. estimada:</strong>
           <?php if ($ot['fecha_estimada']): ?>
-            <span class="<?= $ot['fecha_estimada'] < date('Y-m-d') && !in_array($estado,['listo','entregado']) ? 'text-danger fw-semibold' : '' ?>">
+            <span class="<?= $ot['fecha_estimada'] < date('Y-m-d') && !(isset($eInfo['es_final']) && $eInfo['es_final']) ? 'text-danger fw-semibold' : '' ?>">
               <?= formatDate($ot['fecha_estimada']) ?>
             </span>
           <?php else: ?> — <?php endif; ?>

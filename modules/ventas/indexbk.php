@@ -10,11 +10,11 @@ $tab  = $_GET['tab'] ?? 'historial';
 // ─── DESCARGAS XML / CDR ─────────────────────────────────────
 if (isset($_GET['accion']) && in_array($_GET['accion'], ['xml','cdr'], true) && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
-    $st = $db->prepare("SELECT tipo_doc,serie_doc,num_doc,sunat_xml,sunat_cdr FROM ventas WHERE id=?");
+    $st = $db->prepare("SELECT tipo_doc,serie,numero,sunat_xml,sunat_cdr FROM ventas WHERE id=?");
     $st->execute([$id]);
     $v = $st->fetch();
     if (!$v) { http_response_code(404); exit('No encontrado.'); }
-    $base = strtoupper($v['tipo_doc']).'-'.($v['serie_doc']??'B001').'-'.($v['num_doc']??'00000000');
+    $base = strtoupper($v['tipo_doc']).'-'.($v['serie']??'B001').'-'.str_pad((string)($v['numero']??0),8,'0',STR_PAD_LEFT);
     if ($_GET['accion'] === 'xml') {
         if (empty($v['sunat_xml'])) { http_response_code(404); exit('Sin XML.'); }
         header('Content-Type: application/xml; charset=utf-8');
@@ -69,7 +69,7 @@ if ($s_tipo) { $s_where .= " AND v.tipo_doc=?"; $s_params[] = $s_tipo; }
 if ($s_est === 'sin_xml') { $s_where .= " AND (v.sunat_xml IS NULL OR v.sunat_xml='')"; }
 elseif ($s_est) { $s_where .= " AND v.sunat_estado=?"; $s_params[] = $s_est; }
 if ($s_q) { $s_where .= " AND (c.nombre LIKE ? OR v.codigo LIKE ?)"; $b='%'.$s_q.'%'; $s_params[]=$b; $s_params[]=$b; }
-$st = $db->prepare("SELECT v.*,c.nombre AS cliente_nombre,c.num_doc AS cliente_ruc_dni FROM ventas v LEFT JOIN clientes c ON v.cliente_id=c.id $s_where ORDER BY v.created_at DESC LIMIT 200");
+$st = $db->prepare("SELECT v.*,c.nombre AS cliente_nombre,c.num_doc FROM ventas v LEFT JOIN clientes c ON v.cliente_id=c.id $s_where ORDER BY v.created_at DESC LIMIT 200");
 $st->execute($s_params);
 $comprobantes = $st->fetchAll();
 $kpi = $db->prepare("SELECT SUM(tipo_doc='factura') n_facturas,SUM(tipo_doc='boleta') n_boletas,SUM(sunat_estado='aceptado') n_acept,SUM(sunat_estado='rechazado') n_rech,SUM(sunat_estado='pendiente') n_pend,COALESCE(SUM(total),0) total FROM ventas WHERE tipo_doc IN ('boleta','factura') AND DATE(created_at) BETWEEN ? AND ?");
@@ -196,14 +196,10 @@ require_once __DIR__ . '/../../includes/header.php';
           <tr>
             <td>
               <span class="badge <?= $tc==='factura'?'bg-primary':'bg-info' ?>"><?= strtoupper($tc) ?></span>
-              <?php
-                $s_doc = $v['serie_doc'] ?? $v['serie'] ?? '';
-                $n_doc = $v['num_doc']   ?? ($v['numero'] ? str_pad((string)$v['numero'], 8, '0', STR_PAD_LEFT) : '');
-              ?>
-              <div class="small" style="font-size:11px"><?= !empty($s_doc) && !empty($n_doc) ? sanitize($s_doc).'-'.sanitize($n_doc) : sanitize($s_doc) ?></div>
+              <div class="small" style="font-size:11px"><?= sanitize($v['serie']??'') ?>-<?= str_pad((string)($v['numero']??0),8,'0',STR_PAD_LEFT) ?></div>
               <small class="text-muted"><?= sanitize($v['codigo']) ?></small>
             </td>
-            <td class="small"><?= sanitize($v['cliente_nombre'] ?? 'Consumidor Final') ?><?php if(!empty($v['cliente_ruc_dni'])): ?><br><span class="text-muted"><?= sanitize($v['cliente_ruc_dni']) ?></span><?php endif; ?></td>
+            <td class="small"><?= sanitize($v['cliente_nombre'] ?? 'Consumidor Final') ?><?php if(!empty($v['num_doc'])): ?><br><span class="text-muted"><?= sanitize($v['num_doc']) ?></span><?php endif; ?></td>
             <td class="small text-muted"><?= formatDateTime($v['created_at']) ?></td>
             <td class="text-end fw-bold"><?= formatMoney((float)$v['total']) ?></td>
             <td><span class="badge <?= $bc ?>"><?= $se ? strtoupper($se) : 'SIN XML' ?></span></td>

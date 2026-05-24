@@ -117,7 +117,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $tiposEquipo = $db->query("SELECT * FROM tipos_equipo WHERE activo=1 ORDER BY nombre")->fetchAll();
 $tecnicos    = $db->query("SELECT id, CONCAT(nombre,' ',apellido) AS nombre FROM usuarios WHERE rol='tecnico' AND activo=1")->fetchAll();
 $repuestos   = $db->prepare("SELECT * FROM ot_repuestos WHERE ot_id=? ORDER BY id"); $repuestos->execute([$id]); $repuestos=$repuestos->fetchAll();
-$fotos       = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? ORDER BY id"); $fotos->execute([$id]); $fotos=$fotos->fetchAll();
+// Separar fotos y videos
+try {
+    $fotos  = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? AND (tipo_archivo='foto' OR tipo_archivo IS NULL) ORDER BY id");
+    $fotos->execute([$id]);
+    $fotos  = $fotos->fetchAll();
+    $videos_existentes = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? AND tipo_archivo='video' ORDER BY id");
+    $videos_existentes->execute([$id]);
+    $videos_existentes = $videos_existentes->fetchAll();
+} catch (\Exception $e) {
+    $fotos = $db->prepare("SELECT * FROM fotos_ot WHERE ot_id=? ORDER BY id");
+    $fotos->execute([$id]);
+    $fotos = $fotos->fetchAll();
+    $videos_existentes = [];
+}
 
 $pageTitle  = 'Editar OT '.$ot['codigo_ot'].' — '.APP_NAME;
 $breadcrumb = [
@@ -245,10 +258,40 @@ require_once __DIR__ . '/../../includes/header.php';
           <?php foreach($fotos as $f): ?>
           <div class="foto-preview-item">
             <a href="<?= UPLOAD_URL.$f['ruta'] ?>" target="_blank">
-              <img src="<?= UPLOAD_URL.$f['ruta'] ?>" alt="foto"/>
+              <img src="<?= UPLOAD_URL.$f['ruta'] ?>" alt="foto"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\'><rect fill=\'%23f3f4f6\' width=\'80\' height=\'80\'/><text x=\'50%25\' y=\'55%25\' text-anchor=\'middle\' fill=\'%239ca3af\' font-size=\'10\'>foto</text></svg>'"/>
             </a>
           </div>
           <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if(!empty($videos_existentes)): ?>
+        <div class="mb-3">
+          <div class="fw-semibold small mb-2">
+            <i data-feather="video" style="width:14px;height:14px"></i>
+            Videos existentes (<?= count($videos_existentes) ?>)
+          </div>
+          <div class="row g-2">
+            <?php foreach($videos_existentes as $vid): ?>
+            <div class="col-md-6">
+              <div class="p-2 rounded border" style="background:#f5f3ff">
+                <video controls preload="metadata"
+                       style="width:100%;border-radius:6px;max-height:160px;background:#000;display:block">
+                  <source src="<?= UPLOAD_URL.$vid['ruta'] ?>" type="video/mp4"/>
+                </video>
+                <div class="d-flex justify-content-between mt-1">
+                  <span class="text-muted" style="font-size:10px">
+                    🎬 <?= !empty($vid['duracion_seg']) ? sprintf('%d:%02d',intdiv((int)$vid['duracion_seg'],60),(int)$vid['duracion_seg']%60) : '' ?>
+                    <?= !empty($vid['tamano_bytes']) ? ' · '.round($vid['tamano_bytes']/1024/1024,1).' MB' : '' ?>
+                  </span>
+                  <a href="<?= UPLOAD_URL.$vid['ruta'] ?>" target="_blank" download
+                     class="btn btn-outline-secondary btn-sm py-0" style="font-size:10px">⬇</a>
+                </div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+          </div>
         </div>
         <?php endif; ?>
         <div class="foto-drop-zone" id="foto-drop">

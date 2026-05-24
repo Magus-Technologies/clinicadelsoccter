@@ -1,4 +1,4 @@
-<?php ob_start();
+<?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
 requireLogin();
@@ -6,76 +6,34 @@ requireRole([ROL_ADMIN, ROL_TECNICO]);
 $db   = getDB();
 $user = currentUser();
 
-// API: crear categoría inline — debe ir ANTES del handler principal
-if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='nueva_categoria') {
-    header('Content-Type: application/json');
-    $nom = trim($_POST['nombre'] ?? '');
-    $tip = trim($_POST['tipo']   ?? 'repuesto');
-    if (!$nom) { echo json_encode(['ok'=>false,'msg'=>'Nombre requerido']); exit; }
-    try {
-        $db->prepare("INSERT INTO categorias (nombre,tipo) VALUES (?,?)")->execute([$nom,$tip]);
-        $newId = $db->lastInsertId();
-        echo json_encode(['ok'=>true,'id'=>$newId,'nombre'=>$nom,'tipo'=>$tip]);
-    } catch(\Exception $e) {
-        echo json_encode(['ok'=>false,'msg'=>'Error: '.$e->getMessage()]);
-    }
-    exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        $codigo = trim($_POST['codigo'] ?? '');
-        if (!$codigo) {
-            // Buscar el siguiente número que no exista
-            do {
-                $n = $db->query("SELECT COALESCE(MAX(CAST(SUBSTRING(codigo,5) AS UNSIGNED)),0)+1 FROM productos WHERE codigo LIKE 'PRD-%'")->fetchColumn();
-                $codigo = 'PRD-' . str_pad($n, 5, '0', STR_PAD_LEFT);
-                $existe = $db->prepare("SELECT COUNT(*) FROM productos WHERE codigo=?");
-                $existe->execute([$codigo]);
-            } while($existe->fetchColumn() > 0);
-        } else {
-            // Verificar que el código manual no exista
-            $existe = $db->prepare("SELECT COUNT(*) FROM productos WHERE codigo=?");
-            $existe->execute([$codigo]);
-            if ($existe->fetchColumn() > 0) {
-                throw new \Exception("El código '$codigo' ya existe. Usa otro código o deja el campo vacío para autogenerar.");
-            }
-        }
-        $stockInicial = (float)($_POST['stock_inicial'] ?? 0);
-
-        $db->prepare("INSERT INTO productos (codigo,nombre,descripcion,categoria_id,marca,modelo,serial,ubicacion,precio_costo,precio_venta,stock_actual,stock_minimo,stock_maximo,unidad) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
-           ->execute([
-               $codigo, trim($_POST['nombre']), trim($_POST['descripcion']??''),
-               (int)$_POST['categoria_id'], trim($_POST['marca']??''), trim($_POST['modelo']??''),
-               trim($_POST['serial']??''), trim($_POST['ubicacion']??''),
-               (float)$_POST['precio_costo'], (float)$_POST['precio_venta'],
-               $stockInicial, (float)$_POST['stock_minimo'],
-               (float)($_POST['stock_maximo']??100), trim($_POST['unidad']??'unidad'),
-           ]);
-        $prodId = $db->lastInsertId();
-
-        if ($stockInicial > 0) {
-            $db->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
-               ->execute([$prodId,'entrada',$stockInicial,0,$stockInicial,(float)$_POST['precio_costo'],'Stock inicial','INICIO',$user['id']]);
-        }
-
-        setFlash('success','Producto creado: '.$codigo);
-        ob_end_clean();
-        header('Location: ' . BASE_URL . 'modules/inventario/index.php');
-        exit;
-
-    } catch(\Exception $e) {
-        // Mostrar error exacto en pantalla en lugar de 500
-        ob_end_clean();
-        echo '<div style="font-family:monospace;padding:20px;background:#fef2f2;color:#991b1b;border:2px solid #fca5a5;margin:20px;border-radius:8px">';
-        echo '<h3>Error al guardar producto</h3>';
-        echo '<p><strong>Mensaje:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
-        echo '<p><strong>POST data:</strong><br>';
-        foreach($_POST as $k=>$v) echo htmlspecialchars($k).': '.htmlspecialchars($v).'<br>';
-        echo '</p>';
-        echo '<a href="javascript:history.back()" style="color:#1d4ed8">← Volver</a></div>';
-        exit;
+    // Generar código si no se proporciona
+    $codigo = trim($_POST['codigo'] ?? '');
+    if (!$codigo) {
+        $n = $db->query("SELECT COUNT(*)+1 FROM productos")->fetchColumn();
+        $codigo = 'PRD-' . str_pad($n, 5, '0', STR_PAD_LEFT);
     }
+    $stockInicial = (float)($_POST['stock_inicial'] ?? 0);
+
+    $db->prepare("INSERT INTO productos (codigo,nombre,descripcion,categoria_id,marca,modelo,serial,ubicacion,precio_costo,precio_venta,stock_actual,stock_minimo,stock_maximo,unidad) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+       ->execute([
+           $codigo, trim($_POST['nombre']), trim($_POST['descripcion']??''),
+           (int)$_POST['categoria_id'], trim($_POST['marca']??''), trim($_POST['modelo']??''),
+           trim($_POST['serial']??''), trim($_POST['ubicacion']??''),
+           (float)$_POST['precio_costo'], (float)$_POST['precio_venta'],
+           $stockInicial, (float)$_POST['stock_minimo'],
+           (float)($_POST['stock_maximo']??100), trim($_POST['unidad']??'unidad'),
+       ]);
+    $prodId = $db->lastInsertId();
+
+    // Kardex entrada inicial
+    if ($stockInicial > 0) {
+        $db->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
+           ->execute([$prodId,'entrada',$stockInicial,0,$stockInicial,(float)$_POST['precio_costo'],'Stock inicial','INICIO',$user['id']]);
+    }
+
+    setFlash('success','Producto creado con código '.$codigo);
+    redirect(BASE_URL.'modules/inventario/index.php');
 }
 
 $categorias = $db->query("SELECT * FROM categorias WHERE activo=1 ORDER BY tipo,nombre")->fetchAll();
@@ -88,7 +46,17 @@ try {
     $tiposParaModal = ['repuesto','hardware','ofimatica','accesorio','software','servicio','otro'];
 }
 
-// (API nueva_categoria movida al inicio del archivo)
+// API: crear categoría inline (llamada AJAX)
+if (isset($_POST['action']) && $_POST['action']==='nueva_categoria') {
+    header('Content-Type: application/json');
+    $nom = trim($_POST['nombre'] ?? '');
+    $tip = $_POST['tipo'] ?? 'repuesto';
+    if (!$nom) { echo json_encode(['ok'=>false,'msg'=>'Nombre requerido']); exit; }
+    $db->prepare("INSERT INTO categorias (nombre,tipo) VALUES (?,?)")->execute([$nom,$tip]);
+    $newId = $db->lastInsertId();
+    echo json_encode(['ok'=>true,'id'=>$newId,'nombre'=>$nom,'tipo'=>$tip]);
+    exit;
+}
 
 $pageTitle  = 'Nuevo producto — '.APP_NAME;
 $breadcrumb = [['label'=>'Inventario','url'=>BASE_URL.'modules/inventario/index.php'],['label'=>'Nuevo','url'=>null]];

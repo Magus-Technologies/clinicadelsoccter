@@ -46,21 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action']??'') === 'anular'
         $db->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
            ->execute([$d['producto_id'],'devolucion',$d['cantidad'],$antes,$despues,$d['precio_unit'],'Venta anulada',$venta['codigo'],$user['id']]);
     }
-    // Revertir OTs cobradas en esta venta — vuelven a estar pendientes de pago
-    if (!empty($venta['notas'])) {
-        preg_match_all('/##OT##.+?OT-\d{4}-(\d+).+?##FIN##/s', $venta['notas'], $m);
-        // Revertir por código de OT embebido en las notas
-        $db->prepare("
-            UPDATE ordenes_trabajo SET pagado=0, fecha_pago=NULL, metodo_pago=NULL
-            WHERE id IN (
-                SELECT id FROM (
-                    SELECT ot.id FROM ordenes_trabajo ot
-                    JOIN ventas v ON v.notas LIKE CONCAT('%', ot.codigo_ot, '%')
-                    WHERE v.id = ?
-                ) tmp
-            )
-        ")->execute([$id]);
-    }
     setFlash('success','Venta anulada y stock restaurado.');
     redirect(BASE_URL.'modules/ventas/detalle.php?id='.$id);
 }

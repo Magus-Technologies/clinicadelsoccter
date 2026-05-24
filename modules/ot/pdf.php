@@ -530,32 +530,45 @@ $notaLegal = "El equipo deberá ser recogido en un plazo máximo de 90 días lue
       </tr>
     </thead>
     <tbody>
-      <?php if(!empty($repuestos)): ?>
-        <?php foreach($repuestos as $i => $r): ?>
-        <tr>
-          <td style="text-align:center"><?= $i+1 ?></td>
-          <td><?= htmlspecialchars($r['descripcion']) ?></td>
-          <td style="text-align:right"><?= number_format($r['cantidad'],2) ?></td>
-          <td style="text-align:right"><?= $moneda ?> <?= number_format($r['precio_unit'],2) ?></td>
-          <td style="text-align:right;font-weight:700"><?= $moneda ?> <?= number_format($r['subtotal'],2) ?></td>
-        </tr>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <tr>
-          <td style="text-align:center">1</td>
-          <td>
-            <?php
-            $desc = '';
-            if ($ot['diagnostico_tecnico'])  $desc = $ot['diagnostico_tecnico'];
-            elseif ($ot['diagnostico_inicial']) $desc = $ot['diagnostico_inicial'];
-            else $desc = $ot['problema_reportado'];
-            echo htmlspecialchars(substr($desc, 0, 120));
-            ?>
-          </td>
-          <td style="text-align:right">1</td>
-          <td style="text-align:right"><?= $moneda ?> <?= number_format($ot['costo_mano_obra'],2) ?></td>
-          <td style="text-align:right;font-weight:700"><?= $moneda ?> <?= number_format($ot['costo_mano_obra'],2) ?></td>
-        </tr>
+      <?php
+      $num = 1;
+      // Primero: servicio principal (mano de obra) como item
+      if ($ot['costo_mano_obra'] > 0 || $ot['servicio_nombre']):
+        $desc_servicio = $ot['servicio_nombre'] ?: 'Servicio de reparación / diagnóstico';
+      ?>
+      <tr>
+        <td style="text-align:center"><?= $num++ ?></td>
+        <td>
+          <strong><?= htmlspecialchars($desc_servicio) ?></strong>
+          <?php if($ot['diagnostico_tecnico'] || $ot['diagnostico_inicial']): ?>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">
+            <?= htmlspecialchars(substr($ot['diagnostico_tecnico'] ?: $ot['diagnostico_inicial'], 0, 100)) ?>
+          </div>
+          <?php endif; ?>
+        </td>
+        <td style="text-align:right">1</td>
+        <td style="text-align:right"><?= $moneda ?> <?= number_format($ot['costo_mano_obra'],2) ?></td>
+        <td style="text-align:right;font-weight:700"><?= $moneda ?> <?= number_format($ot['costo_mano_obra'],2) ?></td>
+      </tr>
+      <?php endif; ?>
+      <!-- Repuestos como items adicionales -->
+      <?php foreach($repuestos as $r): ?>
+      <tr>
+        <td style="text-align:center"><?= $num++ ?></td>
+        <td><?= htmlspecialchars($r['descripcion']) ?></td>
+        <td style="text-align:right"><?= number_format($r['cantidad'],2) ?></td>
+        <td style="text-align:right"><?= $moneda ?> <?= number_format($r['precio_unit'],2) ?></td>
+        <td style="text-align:right;font-weight:700"><?= $moneda ?> <?= number_format($r['subtotal'],2) ?></td>
+      </tr>
+      <?php endforeach; ?>
+      <?php if($num === 1): // Sin servicio ni repuestos ?>
+      <tr>
+        <td style="text-align:center">1</td>
+        <td><?= htmlspecialchars(substr($ot['problema_reportado'], 0, 120)) ?></td>
+        <td style="text-align:right">1</td>
+        <td style="text-align:right">—</td>
+        <td style="text-align:right">—</td>
+      </tr>
       <?php endif; ?>
       <!-- Fila vacía de relleno -->
       <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
@@ -569,10 +582,6 @@ $notaLegal = "El equipo deberá ser recogido en un plazo máximo de 90 días lue
       <tr>
         <td class="label-col">Repuestos:</td>
         <td class="value-col"><?= $moneda ?> <?= number_format($ot['costo_repuestos'],2) ?></td>
-      </tr>
-      <tr>
-        <td class="label-col">Mano de obra:</td>
-        <td class="value-col"><?= $moneda ?> <?= number_format($ot['costo_mano_obra'],2) ?></td>
       </tr>
       <?php endif; ?>
       <?php if($ot['descuento'] > 0): ?>

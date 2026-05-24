@@ -59,15 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $items_productos = array_filter($items, fn($i) => empty($i['es_ot']));
         $items_ot        = array_filter($items, fn($i) => !empty($i['es_ot']));
 
-        // Notas: incluir resumen de OTs cobradas con precio
+        // Notas: incluir resumen de OTs cobradas
         $notas_ot = '';
         foreach ($items_ot as $iot) {
-            $notas_ot .= '##OT##' . ($iot['nombre'] ?? '') . '##PRECIO##' . number_format((float)$iot['precio'], 2) . '##FIN## ';
+            $notas_ot .= 'OT: ' . ($iot['nombre'] ?? '') . ' | ';
         }
-
-        // Notas manuales del usuario (campo notas del POST si existiera)
-        $notas_manual = trim($_POST['notas'] ?? '');
-        $notas_final  = trim($notas_ot . $notas_manual) ?: null;
 
         $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie_doc,num_doc,subtotal,igv,descuento,total,metodo_pago,monto_pagado,notas) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
            ->execute([
@@ -75,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                $serie, $numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : null,
                $base, $igv, $descGlobal, $total, $metPago,
                $_POST['monto_pagado'] ?? $total,
-               $notas_final
+               $notas_ot ?: null
            ]);
         $ventaId = $db->lastInsertId();
 
@@ -340,13 +336,6 @@ require_once __DIR__ . '/../../includes/header.php';
           <div class="mt-1 small text-success" id="txt-vuelto"></div>
         </div>
 
-        <!-- Notas -->
-        <div class="mb-3">
-          <label class="tr-form-label">Notas (opcional)</label>
-          <textarea id="pos-notas" class="form-control form-control-sm" rows="2"
-                    placeholder="Observaciones, referencias..."></textarea>
-        </div>
-
         <button id="btn-confirmar-venta" class="btn btn-primary w-100 btn-lg" onclick="procesarVenta()">
           <i data-feather="check-circle" style="width:18px;height:18px"></i> Confirmar venta
         </button>
@@ -481,7 +470,6 @@ function procesarVenta() {
   payload.append('metodo_pago', metodo);
   payload.append('descuento_global', document.getElementById('descuento-global').value);
   payload.append('monto_pagado', document.getElementById('monto-pagado').value||document.getElementById('txt-total').textContent.replace('S/ ',''));
-  payload.append('notas', document.getElementById('pos-notas').value);
 
   fetch('pos.php', {method:'POST', body:payload})
     .then(r=>r.json()).then(data=>{
@@ -516,7 +504,6 @@ function nuevaVenta() {
   limpiarCarrito();
   limpiarCliente();
   limpiarOT();
-  document.getElementById('pos-notas').value = '';
 }
 
 // ── Buscador de Cliente ──────────────────────────────────────────
@@ -620,7 +607,7 @@ function cargarOT(ot) {
   // 2. Cargar precio de la OT como item en el carrito
   limpiarCarrito();
   const desc = parseFloat(ot.precio_final) > 0 ? ot.precio_final : ot.costo_mano_obra;
-  const etiqueta = ot.codigo_ot + (ot.servicio_nombre ? ' — ' + ot.servicio_nombre : '') + ' (' + ot.equipo_desc + ')';
+  const etiqueta = 'OT ' + ot.codigo_ot + (ot.servicio_nombre ? ' — ' + ot.servicio_nombre : '') + ' (' + ot.equipo_desc + ')';
   carrito.push({
     id: 0,          // item de servicio, no producto de inventario
     nombre: etiqueta,

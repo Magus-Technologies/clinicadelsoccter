@@ -42,8 +42,11 @@ function getDB(): PDO {
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            die(json_encode(['error' => 'Error de conexiÃ³n a la base de datos: ' . $e->getMessage()]));
+            // Si estamos en una petición AJAX/API, devolver JSON
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || (isset($_GET['api']) || isset($_GET['accion']))) {
+                die(json_encode(['error' => 'Error de conexión: ' . $e->getMessage()]));
+            }
+            throw $e; // Para páginas normales, propagar la excepción
         }
-    }
-    return $pdo;
+    }    return $pdo;
 }
