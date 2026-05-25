@@ -35,3 +35,4 @@ certificados/
 # Temporary files
 *.tmp
 *.bak
+.r_scooter.sql

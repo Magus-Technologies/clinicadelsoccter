@@ -32,31 +32,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $igv      = round($total - $base, 2);
 
         $codigo = generarCodigoVenta($db);
+        $esSunat = in_array($tipoDoc, ['boleta','factura'], true);
 
         $serie = '';
         $numero = 0;
-        if (in_array($tipoDoc, ['boleta','factura'], true)) {
+        $sunatOk = false;
+        $sunatMsg = '';
+
+        if ($esSunat) {
+            require_once __DIR__ . '/../../includes/sunat/SunatService.php';
+
+            $pdo = getDB();
+            $pdo->beginTransaction();
             try {
-                $pdo = getDB();
-                $pdo->beginTransaction();
                 $st = $pdo->prepare("SELECT id, serie, numero FROM documentos_empresa WHERE empresa_id=1 AND tipo=? AND activo=1 ORDER BY id ASC LIMIT 1 FOR UPDATE");
                 $st->execute([$tipoDoc]);
                 $cor = $st->fetch();
-                if ($cor) {
-                    $numero = (int)$cor['numero'] + 1;
-                    $pdo->prepare("UPDATE documentos_empresa SET numero=? WHERE id=?")->execute([$numero, $cor['id']]);
-                    $serie = $cor['serie'];
+                if (!$cor) {
+                    throw new Exception("No existe correlativo para $tipoDoc. Configura la serie en Configuracion.");
                 }
+                $numero = (int)$cor['numero'] + 1;
+                $pdo->prepare("UPDATE documentos_empresa SET numero=? WHERE id=?")->execute([$numero, $cor['id']]);
+                $serie = $cor['serie'];
+
+                $pdo->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+                   ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
+                $ventaId = $pdo->lastInsertId();
+
+                foreach ($items as $item) {
+                    $pid  = (int)$item['id'];
+                    $cant = (float)$item['cantidad'];
+                    $precio = (float)$item['precio'];
+                    $subtItem = $cant * $precio;
+
+                    $pdo->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
+                       ->execute([$ventaId,$pid,$cant,$precio,$subtItem]);
+
+                    $prod = $pdo->prepare("SELECT stock_actual FROM productos WHERE id=?");
+                    $prod->execute([$pid]);
+                    $antes = (float)$prod->fetchColumn();
+                    $despues = $antes - $cant;
+                    $pdo->prepare("UPDATE productos SET stock_actual=? WHERE id=?")->execute([$despues,$pid]);
+                    $pdo->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
+                       ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
+                }
+
+                $caja = $pdo->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
+                $caja->execute();
+                $cajaId = $caja->fetchColumn();
+                if ($cajaId) {
+                    $pdo->prepare("INSERT INTO movimientos_caja (caja_id,tipo,concepto,monto,referencia,usuario_id) VALUES (?,?,?,?,?,?)")
+                       ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
+                }
+
                 $pdo->commit();
+
+                $sunat = new SunatService($pdo);
+                $res = $sunat->generarXml((int)$ventaId);
+                $sunatOk = $res['ok'];
+                $sunatMsg = $res['mensaje'] ?? '';
+
+                if (!$sunatOk) {
+                    $pdo2 = getDB();
+                    $pdo2->prepare("DELETE FROM movimientos_caja WHERE referencia=?")->execute([$codigo]);
+                    $pdo2->prepare("DELETE FROM venta_detalle WHERE venta_id=?")->execute([$ventaId]);
+                    $pdo2->prepare("DELETE FROM ventas WHERE id=?")->execute([$ventaId]);
+                    $pdo2->prepare("UPDATE documentos_empresa SET numero=numero-1 WHERE id=?")->execute([$cor['id']]);
+
+                    foreach ($items as $item) {
+                        $pid = (int)$item['id'];
+                        $cant = (float)$item['cantidad'];
+                        $pdo2->prepare("UPDATE productos SET stock_actual=stock_actual+? WHERE id=?")->execute([$cant,$pid]);
+                    }
+
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success'=>false,
+                        'error'=>'SUNAT rechazo la generacion del XML: '.$sunatMsg,
+                        'sunat_reject'=>true,
+                    ]);
+                    exit;
+                }
+
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
-                $serie = '';
-                $numero = 0;
+                header('Content-Type: application/json');
+                echo json_encode(['success'=>false,'error'=>'Error al procesar venta: '.$e->getMessage()]);
+                exit;
             }
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success'=>true,
+                'codigo'=>$codigo,
+                'total'=>$total,
+                'venta_id'=>$ventaId,
+                'sunat_xml'=>$sunatOk,
+                'sunat_msg'=>$sunatMsg,
+                'serie'=>$serie,
+                'numero'=>str_pad((string)$numero, 8, '0', STR_PAD_LEFT),
+            ]);
+            exit;
         }
 
         $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
-           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
+           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,'',0,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
         $ventaId = $db->lastInsertId();
 
         foreach ($items as $item) {
@@ -85,31 +165,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
-        $sunatOk = false;
-        $sunatMsg = '';
-        if (in_array($tipoDoc, ['boleta','factura'], true) && $serie && $numero) {
-            try {
-                require_once __DIR__ . '/../../includes/sunat/SunatService.php';
-                $sunat = new SunatService($db);
-                $res = $sunat->generarXml((int)$ventaId);
-                $sunatOk = $res['ok'];
-                $sunatMsg = $res['mensaje'] ?? '';
-            } catch (Throwable $e) {
-                $sunatMsg = 'SUNAT: ' . $e->getMessage();
-                $sunatOk = false;
-            }
-        }
-
         header('Content-Type: application/json');
         echo json_encode([
             'success'=>true,
             'codigo'=>$codigo,
             'total'=>$total,
             'venta_id'=>$ventaId,
-            'sunat_xml'=>$sunatOk,
-            'sunat_msg'=>$sunatMsg,
-            'serie'=>$serie,
-            'numero'=>$numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : '',
+            'sunat_xml'=>false,
+            'sunat_msg'=>'Nota de venta / Ticket - No requiere XML SUNAT',
+            'serie'=>'',
+            'numero'=>'',
         ]);
         exit;
 
@@ -375,22 +440,25 @@ function procesarVenta() {
 
   fetch('pos.php', {method:'POST', body:payload})
     .then(r=>r.json()).then(data=>{
-      if(data.success){
+      if (data.sunat_reject) {
+        alert('⚠️ RECHAZO DE SUNAT:\n\n' + data.error + '\n\nLa venta NO fue registrada. Corrija los datos e intente nuevamente.');
+        return;
+      }
+      if (data.success){
         document.getElementById('ticket-codigo').textContent=data.codigo;
         document.getElementById('ticket-total').textContent='Total: S/ '+parseFloat(data.total).toFixed(2);
         document.getElementById('btn-imprimir-ticket').href='ticket.php?id='+data.venta_id+'&print=1';
-        // Mostrar info SUNAT
         const sunatDiv = document.getElementById('sunat-info-ticket');
         if (data.sunat_xml) {
           const serieNum = data.serie ? data.serie+'-'+data.numero : '';
           sunatDiv.innerHTML = '<div class="mt-2 p-2 rounded" style="background:rgba(0,200,100,.1);font-size:11px"><i class="bi bi-check-circle" style="color:#00c864"></i> XML generado ' + serieNum + '<br><small class="text-muted">'+data.sunat_msg+'</small></div>';
         } else {
-          sunatDiv.innerHTML = '<div class="mt-2 small text-muted">Sin comprobante SUNAT</div>';
+          sunatDiv.innerHTML = '<div class="mt-2 small text-muted">'+data.sunat_msg+'</div>';
         }
         new bootstrap.Modal(document.getElementById('modal-ticket')).show();
         limpiarCarrito();
       } else {
-        alert(data.error || 'Error al procesar la venta.');
+        alert('❌ Error al procesar la venta:\n\n' + (data.error || 'Error desconocido.'));
       }
     })
     .catch(() => alert('Error de conexión.'))
