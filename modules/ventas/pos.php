@@ -7,7 +7,6 @@ requireRole([ROL_ADMIN, ROL_VENDEDOR]);
 $db   = getDB();
 $user = currentUser();
 
-// Procesar venta
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'procesar_venta') {
     try {
         $items     = json_decode($_POST['items'] ?? '[]', true);
@@ -135,18 +134,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             exit;
         }
 
-        $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
-           ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,'',0,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
+        $items_productos = array_filter($items, fn($i) => empty($i['es_ot']));
+        $items_ot        = array_filter($items, fn($i) => !empty($i['es_ot']));
+
+        $notas_ot = '';
+        foreach ($items_ot as $iot) {
+            $notas_ot .= '##OT##' . ($iot['nombre'] ?? '') . '##PRECIO##' . number_format((float)$iot['precio'], 2) . '##FIN## ';
+        }
+        $notas_manual = trim($_POST['notas'] ?? '');
+        $notas_final  = trim($notas_ot . $notas_manual) ?: null;
+
+        $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie_doc,num_doc,subtotal,igv,descuento,total,metodo_pago,monto_pagado,notas) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
+           ->execute([
+               $codigo, $clienteId, $user['id'], $tipoDoc,
+               $serie, $numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : null,
+               $base, $igv, $descGlobal, $total, $metPago,
+               $_POST['monto_pagado'] ?? $total,
+               $notas_final
+           ]);
         $ventaId = $db->lastInsertId();
 
-        foreach ($items as $item) {
+        foreach ($items_productos as $item) {
             $pid  = (int)$item['id'];
             $cant = (float)$item['cantidad'];
             $precio = (float)$item['precio'];
             $subtItem = $cant * $precio;
 
             $db->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-               ->execute([$ventaId,$pid,$cant,$precio,$subtItem]);
+               ->execute([$ventaId, $pid, $cant, $precio, $subtItem]);
 
             $prod = $db->prepare("SELECT stock_actual FROM productos WHERE id=?");
             $prod->execute([$pid]);
@@ -165,6 +180,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
+        foreach ($items_ot as $item) {
+            if (!empty($item['es_ot']) && !empty($item['ot_id'])) {
+                $db->prepare("UPDATE ordenes_trabajo SET pagado=1, fecha_pago=NOW(), metodo_pago=? WHERE id=? AND pagado=0")
+                   ->execute([$metPago, (int)$item['ot_id']]);
+            }
+        }
+
         header('Content-Type: application/json');
         echo json_encode([
             'success'=>true,
@@ -172,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'total'=>$total,
             'venta_id'=>$ventaId,
             'sunat_xml'=>false,
-            'sunat_msg'=>'Nota de venta / Ticket - No requiere XML SUNAT',
+            'sunat_msg'=>'Nota de venta / Ticket / OT - No requiere XML SUNAT',
             'serie'=>'',
             'numero'=>'',
         ]);
@@ -185,7 +207,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Buscar productos (API)
 if (isset($_GET['api']) && $_GET['api'] === 'buscar') {
     header('Content-Type: application/json');
     $q = '%' . trim($_GET['q'] ?? '') . '%';
@@ -195,9 +216,40 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar') {
     exit;
 }
 
-$clientes = $db->query("SELECT id,codigo,nombre FROM clientes WHERE activo=1 ORDER BY nombre LIMIT 500")->fetchAll();
+if (isset($_GET['api']) && $_GET['api'] === 'buscar_cliente') {
+    header('Content-Type: application/json');
+    $q = '%' . trim($_GET['q'] ?? '') . '%';
+    $r = $db->prepare("SELECT id, nombre, telefono, ruc_dni FROM clientes WHERE activo=1 AND (nombre LIKE ? OR telefono LIKE ? OR ruc_dni LIKE ?) LIMIT 15");
+    $r->execute([$q,$q,$q]);
+    echo json_encode($r->fetchAll());
+    exit;
+}
 
-// Obtener correlativos actuales para mostrar en UI
+if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
+    header('Content-Type: application/json');
+    $q = '%' . trim($_GET['q'] ?? '') . '%';
+    $r = $db->prepare("
+        SELECT ot.id, ot.codigo_ot, ot.precio_final, ot.descuento, ot.costo_mano_obra,
+               ot.estado, ot.pagado,
+               c.id as cliente_id, c.nombre as cliente_nombre, c.telefono as cliente_tel,
+               CONCAT(te.nombre,' ',COALESCE(e.marca,''),' ',COALESCE(e.modelo,'')) as equipo_desc,
+               s.nombre as servicio_nombre
+        FROM ordenes_trabajo ot
+        JOIN clientes c ON c.id = ot.cliente_id
+        JOIN equipos e ON e.id = ot.equipo_id
+        JOIN tipos_equipo te ON te.id = e.tipo_equipo_id
+        LEFT JOIN servicios s ON s.id = ot.servicio_id
+        WHERE ot.pagado = 0
+          AND ot.estado NOT IN ('cancelado')
+          AND (ot.codigo_ot LIKE ? OR c.nombre LIKE ? OR ot.codigo_publico LIKE ?)
+        ORDER BY ot.created_at DESC
+        LIMIT 15
+    ");
+    $r->execute([$q,$q,$q]);
+    echo json_encode($r->fetchAll());
+    exit;
+}
+
 $correlativos = [];
 $stCorr = $db->query("SELECT tipo, serie, numero FROM documentos_empresa WHERE activo=1");
 while ($row = $stCorr->fetch()) {
@@ -215,7 +267,6 @@ require_once __DIR__ . '/../../includes/header.php';
 <h5 class="fw-bold mb-3">Punto de venta</h5>
 
 <div class="row g-3">
-  <!-- Buscador de productos -->
   <div class="col-lg-7">
     <div class="tr-card mb-3">
       <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">BUSCAR PRODUCTO</h6></div>
@@ -228,7 +279,6 @@ require_once __DIR__ . '/../../includes/header.php';
       </div>
     </div>
 
-    <!-- Carrito -->
     <div class="tr-card">
       <div class="tr-card-header">
         <h6 class="mb-0 small fw-semibold">CARRITO</h6>
@@ -245,22 +295,59 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
   </div>
 
-  <!-- Resumen y pago -->
   <div class="col-lg-5">
     <div class="tr-card">
       <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">RESUMEN DE VENTA</h6></div>
       <div class="tr-card-body">
-        <!-- Cliente -->
         <div class="mb-3">
           <label class="tr-form-label">Cliente (opcional)</label>
-          <select id="sel-cliente-venta" class="form-select form-select-sm">
-            <option value="">— Sin cliente —</option>
-            <?php foreach ($clientes as $c): ?>
-            <option value="<?= $c['id'] ?>"><?= sanitize($c['nombre']) ?></option>
-            <?php endforeach; ?>
-          </select>
+          <div class="position-relative">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i data-feather="user" style="width:14px;height:14px"></i></span>
+              <input type="text" id="buscar-cliente-input" class="form-control form-control-sm"
+                     placeholder="Buscar por nombre, teléfono o doc..." autocomplete="off"/>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="limpiarCliente()" title="Quitar cliente" id="btn-limpiar-cliente" style="display:none">
+                <i data-feather="x" style="width:13px;height:13px"></i>
+              </button>
+            </div>
+            <div id="lista-clientes" class="list-group position-absolute w-100 shadow-sm" style="z-index:9999; display:none; max-height:200px; overflow-y:auto; top:100%"></div>
+          </div>
+          <div id="cliente-seleccionado" class="mt-1" style="display:none">
+            <span class="badge bg-primary" style="font-size:12px; padding:6px 10px">
+              <i data-feather="check" style="width:12px;height:12px"></i>
+              <span id="cliente-nombre-badge"></span>
+            </span>
+          </div>
+          <input type="hidden" id="sel-cliente-venta" value=""/>
         </div>
-<!-- Tipo comprobante -->
+
+        <div class="mb-3">
+          <label class="tr-form-label d-flex align-items-center gap-2">
+            <i data-feather="file-text" style="width:14px;height:14px"></i>
+            Cargar desde OT (cobranza)
+          </label>
+          <div class="position-relative">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i data-feather="search" style="width:14px;height:14px"></i></span>
+              <input type="text" id="buscar-ot-input" class="form-control form-control-sm"
+                     placeholder="Buscar OT por código o cliente..." autocomplete="off"/>
+            </div>
+            <div id="lista-ots" class="list-group position-absolute w-100 shadow-sm" style="z-index:9998; display:none; max-height:240px; overflow-y:auto; top:100%"></div>
+          </div>
+          <div id="ot-cargada" class="mt-2 p-2 rounded" style="display:none; background:rgba(79,70,229,0.07); border:1px solid rgba(79,70,229,0.2)">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold text-primary" style="font-size:13px" id="ot-codigo-badge"></div>
+                <div class="text-muted" style="font-size:11px" id="ot-equipo-badge"></div>
+                <div class="text-muted" style="font-size:11px" id="ot-servicio-badge"></div>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="limpiarOT()" title="Quitar OT">
+                <i data-feather="x" style="width:12px;height:12px"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="mb-2">
           <label class="tr-form-label">Comprobante</label>
           <select id="tipo-doc" class="form-select form-select-sm">
@@ -271,12 +358,12 @@ require_once __DIR__ . '/../../includes/header.php';
           </select>
         </div>
         <div id="correlativo-info" class="mb-3 text-primary fw-semibold" style="font-size:15px"></div>
-        <!-- Descuento -->
+
         <div class="mb-3">
           <label class="tr-form-label">Descuento global (S/)</label>
           <input type="number" id="descuento-global" class="form-control form-control-sm currency-input" value="0" step="0.01" min="0"/>
         </div>
-        <!-- Totales -->
+
         <div class="bg-light rounded p-3 mb-3">
           <div class="d-flex justify-content-between small mb-1"><span>Base imponible:</span><span id="txt-subtotal">S/ 0.00</span></div>
           <div class="d-flex justify-content-between small mb-1"><span>IGV (18%):</span><span id="txt-igv">S/ 0.00</span></div>
@@ -284,7 +371,7 @@ require_once __DIR__ . '/../../includes/header.php';
           <hr class="my-2">
           <div class="d-flex justify-content-between fw-bold fs-5"><span>TOTAL:</span><span id="txt-total">S/ 0.00</span></div>
         </div>
-        <!-- Método pago -->
+
         <div class="mb-3">
           <label class="tr-form-label">Método de pago</label>
           <div class="d-flex gap-2 flex-wrap">
@@ -296,11 +383,17 @@ require_once __DIR__ . '/../../includes/header.php';
             <?php endforeach; ?>
           </div>
         </div>
-        <!-- Monto pagado (efectivo) -->
+
         <div class="mb-3" id="bloque-efectivo">
           <label class="tr-form-label">Monto recibido (S/)</label>
           <input type="number" id="monto-pagado" class="form-control form-control-sm currency-input" step="0.01"/>
           <div class="mt-1 small text-success" id="txt-vuelto"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="tr-form-label">Notas (opcional)</label>
+          <textarea id="pos-notas" class="form-control form-control-sm" rows="2"
+                    placeholder="Observaciones, referencias..."></textarea>
         </div>
 
         <button id="btn-confirmar-venta" class="btn btn-primary w-100 btn-lg" onclick="procesarVenta()">
@@ -311,7 +404,6 @@ require_once __DIR__ . '/../../includes/header.php';
   </div>
 </div>
 
-<!-- Modal ticket -->
 <div class="modal fade" id="modal-ticket" tabindex="-1">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
@@ -339,7 +431,6 @@ $pageScripts = <<<'JS'
 const BASE_URL_JS = document.querySelector('meta[name=base-url]')?.content || '';
 let carrito = [];
 
-// Buscar productos
 let timeoutBusq;
 document.getElementById('buscar-producto').addEventListener('input', function() {
   clearTimeout(timeoutBusq);
@@ -437,6 +528,7 @@ function procesarVenta() {
   payload.append('metodo_pago', metodo);
   payload.append('descuento_global', document.getElementById('descuento-global').value);
   payload.append('monto_pagado', document.getElementById('monto-pagado').value||document.getElementById('txt-total').textContent.replace('S/ ',''));
+  payload.append('notas', document.getElementById('pos-notas').value);
 
   fetch('pos.php', {method:'POST', body:payload})
     .then(r=>r.json()).then(data=>{
@@ -472,6 +564,133 @@ function procesarVenta() {
 function nuevaVenta() {
   bootstrap.Modal.getInstance(document.getElementById('modal-ticket'))?.hide();
   limpiarCarrito();
+  limpiarCliente();
+  limpiarOT();
+  document.getElementById('pos-notas').value = '';
+}
+
+let timeoutCliente;
+document.getElementById('buscar-cliente-input').addEventListener('input', function() {
+  clearTimeout(timeoutCliente);
+  const q = this.value.trim();
+  const lista = document.getElementById('lista-clientes');
+  if (q.length < 2) { lista.style.display='none'; return; }
+  timeoutCliente = setTimeout(() => {
+    fetch('pos.php?api=buscar_cliente&q=' + encodeURIComponent(q))
+      .then(r=>r.json()).then(data => {
+        if (!data.length) {
+          lista.innerHTML='<div class="list-group-item text-muted small py-2">Sin resultados</div>';
+        } else {
+          lista.innerHTML = data.map(c => `
+            <button type="button" class="list-group-item list-group-item-action py-2"
+                    onclick="seleccionarCliente(${c.id}, ${JSON.stringify(c.nombre).replace(/"/g,'&quot;')})">
+              <div class="fw-semibold small">${c.nombre}</div>
+              <div class="text-muted" style="font-size:11px">${c.telefono||''} ${c.ruc_dni?'· '+c.ruc_dni:''}</div>
+            </button>`).join('');
+        }
+        lista.style.display = 'block';
+      });
+  }, 280);
+});
+
+function seleccionarCliente(id, nombre) {
+  document.getElementById('sel-cliente-venta').value = id;
+  document.getElementById('buscar-cliente-input').value = '';
+  document.getElementById('buscar-cliente-input').placeholder = nombre;
+  document.getElementById('cliente-nombre-badge').textContent = nombre;
+  document.getElementById('cliente-seleccionado').style.display = 'block';
+  document.getElementById('btn-limpiar-cliente').style.display = 'inline-flex';
+  document.getElementById('lista-clientes').style.display = 'none';
+  if (typeof feather !== 'undefined') feather.replace();
+}
+
+function limpiarCliente() {
+  document.getElementById('sel-cliente-venta').value = '';
+  document.getElementById('buscar-cliente-input').value = '';
+  document.getElementById('buscar-cliente-input').placeholder = 'Buscar por nombre, teléfono o doc...';
+  document.getElementById('cliente-seleccionado').style.display = 'none';
+  document.getElementById('btn-limpiar-cliente').style.display = 'none';
+  document.getElementById('lista-clientes').style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#buscar-cliente-input') && !e.target.closest('#lista-clientes')) {
+    document.getElementById('lista-clientes').style.display = 'none';
+  }
+  if (!e.target.closest('#buscar-ot-input') && !e.target.closest('#lista-ots')) {
+    document.getElementById('lista-ots').style.display = 'none';
+  }
+});
+
+let timeoutOT;
+document.getElementById('buscar-ot-input').addEventListener('input', function() {
+  clearTimeout(timeoutOT);
+  const q = this.value.trim();
+  const lista = document.getElementById('lista-ots');
+  if (q.length < 2) { lista.style.display='none'; return; }
+  timeoutOT = setTimeout(() => {
+    fetch('pos.php?api=buscar_ot&q=' + encodeURIComponent(q))
+      .then(r=>r.json()).then(data => {
+        if (!data.length) {
+          lista.innerHTML='<div class="list-group-item text-muted small py-2">Sin OTs pendientes de pago</div>';
+        } else {
+          lista.innerHTML = data.map(ot => {
+            const estadoColor = {
+              'ingresado':'secondary','en_revision':'info','en_reparacion':'warning',
+              'listo':'success','cliente_citado':'primary'
+            }[ot.estado] || 'secondary';
+            return `<button type="button" class="list-group-item list-group-item-action py-2"
+                    onclick="cargarOT(${JSON.stringify(ot).replace(/"/g,'&quot;')})">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <span class="fw-semibold text-primary small">${ot.codigo_ot}</span>
+                  <span class="badge bg-${estadoColor} ms-1" style="font-size:10px">${ot.estado.replace('_',' ')}</span>
+                  <div class="text-truncate" style="max-width:200px">${ot.cliente_nombre}</div>
+                  <div class="text-muted" style="font-size:11px">${ot.equipo_desc}${ot.servicio_nombre?' · '+ot.servicio_nombre:''}</div>
+                </div>
+                <div class="text-end fw-bold text-primary" style="font-size:13px;white-space:nowrap">
+                  S/ ${parseFloat(ot.precio_final).toFixed(2)}
+                </div>
+              </div>
+            </button>`;
+          }).join('');
+        }
+        lista.style.display = 'block';
+      });
+  }, 280);
+});
+
+function cargarOT(ot) {
+  seleccionarCliente(ot.cliente_id, ot.cliente_nombre);
+  limpiarCarrito();
+  const desc = parseFloat(ot.precio_final) > 0 ? ot.precio_final : ot.costo_mano_obra;
+  const etiqueta = ot.codigo_ot + (ot.servicio_nombre ? ' — ' + ot.servicio_nombre : '') + ' (' + ot.equipo_desc + ')';
+  carrito.push({
+    id: 0,
+    nombre: etiqueta,
+    precio: parseFloat(desc),
+    cantidad: 1,
+    stock: 9999,
+    es_ot: true,
+    ot_id: ot.id
+  });
+  renderCarrito();
+
+  document.getElementById('ot-codigo-badge').textContent = ot.codigo_ot + ' — ' + ot.cliente_nombre;
+  document.getElementById('ot-equipo-badge').textContent = ot.equipo_desc;
+  document.getElementById('ot-servicio-badge').textContent = ot.servicio_nombre || '';
+  document.getElementById('ot-cargada').style.display = 'block';
+
+  document.getElementById('buscar-ot-input').value = '';
+  document.getElementById('lista-ots').style.display = 'none';
+  if (typeof feather !== 'undefined') feather.replace();
+}
+
+function limpiarOT() {
+  carrito = carrito.filter(i => !i.es_ot);
+  renderCarrito();
+  document.getElementById('ot-cargada').style.display = 'none';
+  document.getElementById('buscar-ot-input').value = '';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
