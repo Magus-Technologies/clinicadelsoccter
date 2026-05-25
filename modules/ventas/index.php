@@ -197,10 +197,10 @@ require_once __DIR__ . '/../../includes/header.php';
             <td>
               <span class="badge <?= $tc==='factura'?'bg-primary':'bg-info' ?>"><?= strtoupper($tc) ?></span>
               <?php
-                $s_doc = $v['serie_doc'] ?? $v['serie'] ?? '';
-                $n_doc = $v['num_doc']   ?? ($v['numero'] ? str_pad((string)$v['numero'], 8, '0', STR_PAD_LEFT) : '');
+                $s_doc = $v['serie'] ?? '';
+                $n_doc = $v['numero'] ? str_pad((string)$v['numero'], 8, '0', STR_PAD_LEFT) : '';
               ?>
-              <div class="small" style="font-size:11px"><?= !empty($s_doc) && !empty($n_doc) ? sanitize($s_doc).'-'.sanitize($n_doc) : sanitize($s_doc) ?></div>
+              <div class="small" style="font-size:11px"><?= $s_doc ? sanitize($s_doc).'-'.sanitize($n_doc) : '<span class="text-muted">Sin comprobante</span>' ?></div>
               <small class="text-muted"><?= sanitize($v['codigo']) ?></small>
             </td>
             <td class="small"><?= sanitize($v['cliente_nombre'] ?? 'Consumidor Final') ?><?php if(!empty($v['cliente_ruc_dni'])): ?><br><span class="text-muted"><?= sanitize($v['cliente_ruc_dni']) ?></span><?php endif; ?></td>
