@@ -69,7 +69,7 @@ if ($s_tipo) { $s_where .= " AND v.tipo_doc=?"; $s_params[] = $s_tipo; }
 if ($s_est === 'sin_xml') { $s_where .= " AND (v.sunat_xml IS NULL OR v.sunat_xml='')"; }
 elseif ($s_est) { $s_where .= " AND v.sunat_estado=?"; $s_params[] = $s_est; }
 if ($s_q) { $s_where .= " AND (c.nombre LIKE ? OR v.codigo LIKE ?)"; $b='%'.$s_q.'%'; $s_params[]=$b; $s_params[]=$b; }
-$st = $db->prepare("SELECT v.*,c.nombre AS cliente_nombre,c.num_doc AS cliente_ruc_dni FROM ventas v LEFT JOIN clientes c ON v.cliente_id=c.id $s_where ORDER BY v.created_at DESC LIMIT 200");
+$st = $db->prepare("SELECT v.*,c.nombre AS cliente_nombre,COALESCE(c.num_doc,c.ruc_dni,'') AS cliente_ruc_dni FROM ventas v LEFT JOIN clientes c ON v.cliente_id=c.id $s_where ORDER BY v.created_at DESC LIMIT 200");
 $st->execute($s_params);
 $comprobantes = $st->fetchAll();
 $kpi = $db->prepare("SELECT SUM(tipo_doc='factura') n_facturas,SUM(tipo_doc='boleta') n_boletas,SUM(sunat_estado='aceptado') n_acept,SUM(sunat_estado='rechazado') n_rech,SUM(sunat_estado='pendiente') n_pend,COALESCE(SUM(total),0) total FROM ventas WHERE tipo_doc IN ('boleta','factura') AND DATE(created_at) BETWEEN ? AND ?");
