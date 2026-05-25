@@ -217,10 +217,10 @@ require_once __DIR__ . '/../../includes/header.php';
                 <?php if(!empty($v['sunat_cdr'])): ?>
                   <a href="?accion=cdr&id=<?= $v['id'] ?>" class="btn btn-success btn-sm py-0 px-1" title="CDR"><i data-feather="file-text" style="width:13px;height:13px"></i></a>
                 <?php endif; ?>
-                <?php if(!empty($v['sunat_xml']) && $se!=='aceptado'): ?>
-                  <form method="POST" style="display:inline"><input type="hidden" name="accion" value="enviar_sunat"/><input type="hidden" name="id" value="<?= $v['id'] ?>"/><button class="btn btn-primary btn-sm py-0 px-1" title="Enviar SUNAT"><i data-feather="send" style="width:13px;height:13px"></i></button></form>
+                <?php if($se === 'pendiente' && !empty($v['sunat_xml'])): ?>
+                  <form method="POST" style="display:inline"><input type="hidden" name="accion" value="enviar_sunat"/><input type="hidden" name="id" value="<?= $v['id'] ?>"/><button class="btn btn-primary btn-sm py-0 px-1" title="Enviar a SUNAT"><i data-feather="send" style="width:13px;height:13px"></i></button></form>
                 <?php endif; ?>
-                <?php if(empty($v['sunat_xml']) || $se!=='aceptado'): ?>
+                <?php if(empty($v['sunat_xml']) || $se === 'rechazado'): ?>
                   <form method="POST" style="display:inline"><input type="hidden" name="accion" value="regenerar"/><input type="hidden" name="id" value="<?= $v['id'] ?>"/><button class="btn btn-outline-warning btn-sm py-0 px-1" title="Regenerar XML"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button></form>
                 <?php endif; ?>
               </div>
