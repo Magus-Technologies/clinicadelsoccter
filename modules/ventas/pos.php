@@ -52,7 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                    ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
                 $ventaId = $pdo->lastInsertId();
 
-                foreach ($items as $item) {
+                $items_productos_sunat = array_filter($items, fn($i) => empty($i['es_ot']));
+                $items_ot_sunat       = array_filter($items, fn($i) => !empty($i['es_ot']));
+
+                foreach ($items_productos_sunat as $item) {
                     $pid  = (int)$item['id'];
                     $cant = (float)$item['cantidad'];
                     $precio = (float)$item['precio'];
