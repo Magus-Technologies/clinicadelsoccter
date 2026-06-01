@@ -7,6 +7,7 @@ requireRole([ROL_ADMIN, ROL_VENDEDOR]);
 $db   = getDB();
 $user = currentUser();
 
+// Procesar venta
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'procesar_venta') {
     try {
         $items     = json_decode($_POST['items'] ?? '[]', true);
@@ -31,28 +32,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $igv      = round($total - $base, 2);
 
         $codigo = generarCodigoVenta($db);
-        $esSunat = in_array($tipoDoc, ['boleta','factura'], true);
 
         $serie = '';
         $numero = 0;
-        $sunatOk = false;
-        $sunatMsg = '';
-
-        if ($esSunat) {
-            require_once __DIR__ . '/../../includes/sunat/SunatService.php';
-
-            $pdo = getDB();
-            $pdo->beginTransaction();
+        if (in_array($tipoDoc, ['boleta','factura'], true)) {
             try {
+                $pdo = getDB();
+                $pdo->beginTransaction();
                 $st = $pdo->prepare("SELECT id, serie, numero FROM documentos_empresa WHERE empresa_id=1 AND tipo=? AND activo=1 ORDER BY id ASC LIMIT 1 FOR UPDATE");
                 $st->execute([$tipoDoc]);
                 $cor = $st->fetch();
-                if (!$cor) {
-                    throw new Exception("No existe correlativo para $tipoDoc. Configura la serie en Configuracion.");
+                if ($cor) {
+                    $numero = (int)$cor['numero'] + 1;
+                    $pdo->prepare("UPDATE documentos_empresa SET numero=? WHERE id=?")->execute([$numero, $cor['id']]);
+                    $serie = $cor['serie'];
                 }
-                $numero = (int)$cor['numero'] + 1;
-                $pdo->prepare("UPDATE documentos_empresa SET numero=? WHERE id=?")->execute([$numero, $cor['id']]);
-                $serie = $cor['serie'];
 
                 $pdo->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
                    ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
@@ -102,34 +96,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                 $pdo->commit();
 
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success'=>true,
+                    'codigo'=>$codigo,
+                    'total'=>$total,
+                    'venta_id'=>$ventaId,
+                    'sunat_xml'=>$sunatOk,
+                    'sunat_msg'=>$sunatMsg,
+                    'serie'=>$serie,
+                    'numero'=>$numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : '',
+                ]);
+                exit;
+
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
+                $serie = '';
+                $numero = 0;
                 header('Content-Type: application/json');
-                echo json_encode(['success'=>false,'error'=>'Error al procesar venta: '.$e->getMessage()]);
+                echo json_encode([
+                    'success'=>false,
+                    'error'=>'Error al procesar venta SUNAT: '.$e->getMessage(),
+                ]);
                 exit;
             }
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success'=>true,
-                'codigo'=>$codigo,
-                'total'=>$total,
-                'venta_id'=>$ventaId,
-                'sunat_xml'=>$sunatOk,
-                'sunat_msg'=>$sunatMsg,
-                'serie'=>$serie,
-                'numero'=>str_pad((string)$numero, 8, '0', STR_PAD_LEFT),
-            ]);
-            exit;
         }
 
+        // Separar items reales de items OT
         $items_productos = array_filter($items, fn($i) => empty($i['es_ot']));
         $items_ot        = array_filter($items, fn($i) => !empty($i['es_ot']));
 
+        // Notas: incluir resumen de OTs cobradas con precio
         $notas_ot = '';
         foreach ($items_ot as $iot) {
             $notas_ot .= '##OT##' . ($iot['nombre'] ?? '') . '##PRECIO##' . number_format((float)$iot['precio'], 2) . '##FIN## ';
         }
+
+        // Notas manuales del usuario (campo notas del POST si existiera)
         $notas_manual = trim($_POST['notas'] ?? '');
         $notas_final  = trim($notas_ot . $notas_manual) ?: null;
 
@@ -144,10 +147,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $ventaId = $db->lastInsertId();
 
         foreach ($items_productos as $item) {
-            $pid  = (int)$item['id'];
-            $cant = (float)$item['cantidad'];
-            $precio = (float)$item['precio'];
+            $pid  = (int)($item['id'] ?? 0);
+            $cant = (float)($item['cantidad'] ?? 1);
+            $precio = (float)($item['precio'] ?? 0);
             $subtItem = $cant * $precio;
+
+            // Saltar items sin producto vÃ¡lido
+            if ($pid <= 0) continue;
 
             $db->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
                ->execute([$ventaId, $pid, $cant, $precio, $subtItem]);
@@ -169,10 +175,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
-        foreach ($items_ot as $item) {
+        // Marcar como pagadas las OTs incluidas en esta venta
+        foreach ($items as $item) {
             if (!empty($item['es_ot']) && !empty($item['ot_id'])) {
                 $db->prepare("UPDATE ordenes_trabajo SET pagado=1, fecha_pago=NOW(), metodo_pago=? WHERE id=? AND pagado=0")
                    ->execute([$metPago, (int)$item['ot_id']]);
+            }
+        }
+
+        $sunatOk = false;
+        $sunatMsg = '';
+        if (in_array($tipoDoc, ['boleta','factura'], true) && $serie && $numero) {
+            try {
+                require_once __DIR__ . '/../../includes/sunat/SunatService.php';
+                $sunat = new SunatService($db);
+                $res = $sunat->generarXml((int)$ventaId);
+                $sunatOk = $res['ok'];
+                $sunatMsg = $res['mensaje'] ?? '';
+            } catch (Throwable $e) {
+                $sunatMsg = 'SUNAT: ' . $e->getMessage();
+                $sunatOk = false;
             }
         }
 
@@ -182,10 +204,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'codigo'=>$codigo,
             'total'=>$total,
             'venta_id'=>$ventaId,
-            'sunat_xml'=>false,
-            'sunat_msg'=>'Nota de venta / Ticket / OT - No requiere XML SUNAT',
-            'serie'=>'',
-            'numero'=>'',
+            'sunat_xml'=>$sunatOk,
+            'sunat_msg'=>$sunatMsg,
+            'serie'=>$serie,
+            'numero'=>$numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : '',
         ]);
         exit;
 
@@ -196,6 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Buscar productos (API)
 if (isset($_GET['api']) && $_GET['api'] === 'buscar') {
     header('Content-Type: application/json');
     $q = '%' . trim($_GET['q'] ?? '') . '%';
@@ -205,6 +228,7 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar') {
     exit;
 }
 
+// Buscar clientes (API)
 if (isset($_GET['api']) && $_GET['api'] === 'buscar_cliente') {
     header('Content-Type: application/json');
     $q = '%' . trim($_GET['q'] ?? '') . '%';
@@ -214,6 +238,7 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar_cliente') {
     exit;
 }
 
+// Buscar OTs para cobranza (API)
 if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
     header('Content-Type: application/json');
     $q = '%' . trim($_GET['q'] ?? '') . '%';
@@ -239,6 +264,7 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
     exit;
 }
 
+// Obtener correlativos actuales para mostrar en UI
 $correlativos = [];
 $stCorr = $db->query("SELECT tipo, serie, numero FROM documentos_empresa WHERE activo=1");
 while ($row = $stCorr->fetch()) {
@@ -248,7 +274,7 @@ while ($row = $stCorr->fetch()) {
     ];
 }
 
-$pageTitle  = 'Punto de venta — ' . APP_NAME;
+$pageTitle  = 'Punto de venta â€” ' . APP_NAME;
 $breadcrumb = [['label'=>'Ventas','url'=>BASE_URL.'modules/ventas/index.php'],['label'=>'POS','url'=>null]];
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -256,45 +282,49 @@ require_once __DIR__ . '/../../includes/header.php';
 <h5 class="fw-bold mb-3">Punto de venta</h5>
 
 <div class="row g-3">
+  <!-- Buscador de productos -->
   <div class="col-lg-7">
     <div class="tr-card mb-3">
       <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">BUSCAR PRODUCTO</h6></div>
       <div class="tr-card-body">
         <div class="input-group mb-3">
           <span class="input-group-text"><i data-feather="search" style="width:16px;height:16px"></i></span>
-          <input type="text" id="buscar-producto" class="form-control" placeholder="Nombre o código del producto..." autocomplete="off"/>
+          <input type="text" id="buscar-producto" class="form-control" placeholder="Nombre o cÃ³digo del producto..." autocomplete="off"/>
         </div>
         <div id="resultados-busqueda" class="list-group"></div>
       </div>
     </div>
 
+    <!-- Carrito -->
     <div class="tr-card">
       <div class="tr-card-header">
         <h6 class="mb-0 small fw-semibold">CARRITO</h6>
-        <button class="btn btn-outline-danger btn-sm" onclick="limpiarCarrito()">🗑 Limpiar</button>
+        <button class="btn btn-outline-danger btn-sm" onclick="limpiarCarrito()">ðŸ—‘ Limpiar</button>
       </div>
       <div class="tr-card-body p-0">
         <table class="tr-table" id="tabla-carrito">
           <thead><tr><th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th></th></tr></thead>
           <tbody id="carrito-body">
-            <tr id="carrito-vacio"><td colspan="5" class="text-center text-muted py-4">Carrito vacío</td></tr>
+            <tr id="carrito-vacio"><td colspan="5" class="text-center text-muted py-4">Carrito vacÃ­o</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
+  <!-- Resumen y pago -->
   <div class="col-lg-5">
     <div class="tr-card">
       <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">RESUMEN DE VENTA</h6></div>
       <div class="tr-card-body">
+        <!-- Cliente buscador -->
         <div class="mb-3">
           <label class="tr-form-label">Cliente (opcional)</label>
           <div class="position-relative">
             <div class="input-group input-group-sm">
               <span class="input-group-text"><i data-feather="user" style="width:14px;height:14px"></i></span>
               <input type="text" id="buscar-cliente-input" class="form-control form-control-sm"
-                     placeholder="Buscar por nombre, teléfono o doc..." autocomplete="off"/>
+                     placeholder="Buscar por nombre, telÃ©fono o doc..." autocomplete="off"/>
               <button type="button" class="btn btn-outline-secondary btn-sm" onclick="limpiarCliente()" title="Quitar cliente" id="btn-limpiar-cliente" style="display:none">
                 <i data-feather="x" style="width:13px;height:13px"></i>
               </button>
@@ -310,6 +340,7 @@ require_once __DIR__ . '/../../includes/header.php';
           <input type="hidden" id="sel-cliente-venta" value=""/>
         </div>
 
+        <!-- Importar OT para cobranza -->
         <div class="mb-3">
           <label class="tr-form-label d-flex align-items-center gap-2">
             <i data-feather="file-text" style="width:14px;height:14px"></i>
@@ -319,7 +350,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <div class="input-group input-group-sm">
               <span class="input-group-text"><i data-feather="search" style="width:14px;height:14px"></i></span>
               <input type="text" id="buscar-ot-input" class="form-control form-control-sm"
-                     placeholder="Buscar OT por código o cliente..." autocomplete="off"/>
+                     placeholder="Buscar OT por cÃ³digo o cliente..." autocomplete="off"/>
             </div>
             <div id="lista-ots" class="list-group position-absolute w-100 shadow-sm" style="z-index:9998; display:none; max-height:240px; overflow-y:auto; top:100%"></div>
           </div>
@@ -336,23 +367,23 @@ require_once __DIR__ . '/../../includes/header.php';
             </div>
           </div>
         </div>
-
+<!-- Tipo comprobante -->
         <div class="mb-2">
           <label class="tr-form-label">Comprobante</label>
           <select id="tipo-doc" class="form-select form-select-sm">
             <option value="boleta" selected>Boleta</option>
             <option value="factura">Factura</option>
             <option value="ticket">Ticket</option>
-            <option value="nota_venta">Nota de venta</option>
+            <option value="sin_comprobante">Sin comprobante</option>
           </select>
         </div>
         <div id="correlativo-info" class="mb-3 text-primary fw-semibold" style="font-size:15px"></div>
-
+        <!-- Descuento -->
         <div class="mb-3">
           <label class="tr-form-label">Descuento global (S/)</label>
           <input type="number" id="descuento-global" class="form-control form-control-sm currency-input" value="0" step="0.01" min="0"/>
         </div>
-
+        <!-- Totales -->
         <div class="bg-light rounded p-3 mb-3">
           <div class="d-flex justify-content-between small mb-1"><span>Base imponible:</span><span id="txt-subtotal">S/ 0.00</span></div>
           <div class="d-flex justify-content-between small mb-1"><span>IGV (18%):</span><span id="txt-igv">S/ 0.00</span></div>
@@ -360,11 +391,11 @@ require_once __DIR__ . '/../../includes/header.php';
           <hr class="my-2">
           <div class="d-flex justify-content-between fw-bold fs-5"><span>TOTAL:</span><span id="txt-total">S/ 0.00</span></div>
         </div>
-
+        <!-- MÃ©todo pago -->
         <div class="mb-3">
-          <label class="tr-form-label">Método de pago</label>
+          <label class="tr-form-label">MÃ©todo de pago</label>
           <div class="d-flex gap-2 flex-wrap">
-            <?php foreach (['efectivo'=>'💵 Efectivo','yape'=>'💜 Yape','plin'=>'💚 Plin','tarjeta'=>'💳 Tarjeta'] as $val=>$lbl): ?>
+            <?php foreach (['efectivo'=>'ðŸ’µ Efectivo','yape'=>'ðŸ’œ Yape','plin'=>'ðŸ’š Plin','tarjeta'=>'ðŸ’³ Tarjeta'] as $val=>$lbl): ?>
             <div>
               <input type="radio" class="btn-check" name="metodo_pago_radio" id="mp_<?= $val ?>" value="<?= $val ?>" <?= $val==='efectivo'?'checked':'' ?>>
               <label class="btn btn-outline-secondary btn-sm" for="mp_<?= $val ?>"><?= $lbl ?></label>
@@ -372,13 +403,14 @@ require_once __DIR__ . '/../../includes/header.php';
             <?php endforeach; ?>
           </div>
         </div>
-
+        <!-- Monto pagado (efectivo) -->
         <div class="mb-3" id="bloque-efectivo">
           <label class="tr-form-label">Monto recibido (S/)</label>
           <input type="number" id="monto-pagado" class="form-control form-control-sm currency-input" step="0.01"/>
           <div class="mt-1 small text-success" id="txt-vuelto"></div>
         </div>
 
+        <!-- Notas -->
         <div class="mb-3">
           <label class="tr-form-label">Notas (opcional)</label>
           <textarea id="pos-notas" class="form-control form-control-sm" rows="2"
@@ -393,15 +425,16 @@ require_once __DIR__ . '/../../includes/header.php';
   </div>
 </div>
 
+<!-- Modal ticket -->
 <div class="modal fade" id="modal-ticket" tabindex="-1">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <h6 class="modal-title">✅ Venta registrada</h6>
+        <h6 class="modal-title">âœ… Venta registrada</h6>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center">
-        <div class="fs-1">🎉</div>
+        <div class="fs-1">ðŸŽ‰</div>
         <div id="ticket-codigo" class="fw-bold fs-5 mt-2"></div>
         <div id="ticket-total" class="text-muted"></div>
         <div id="sunat-info-ticket" class="mt-2"></div>
@@ -420,6 +453,7 @@ $pageScripts = <<<'JS'
 const BASE_URL_JS = document.querySelector('meta[name=base-url]')?.content || '';
 let carrito = [];
 
+// Buscar productos
 let timeoutBusq;
 document.getElementById('buscar-producto').addEventListener('input', function() {
   clearTimeout(timeoutBusq);
@@ -458,19 +492,28 @@ function agregarCarrito(p) {
 function renderCarrito() {
   const tbody = document.getElementById('carrito-body');
   if (!carrito.length) {
-    tbody.innerHTML='<tr id="carrito-vacio"><td colspan="5" class="text-center text-muted py-4">Carrito vacío</td></tr>';
+    tbody.innerHTML='<tr id="carrito-vacio"><td colspan="5" class="text-center text-muted py-4">Carrito vacÃ­o</td></tr>';
     calcularTotales(); return;
   }
   tbody.innerHTML = carrito.map((item,i) => `
     <tr>
       <td class="small">${item.nombre}</td>
       <td><input type="number" class="form-control form-control-sm" style="width:80px" value="${item.precio.toFixed(2)}" step="0.01"
-                 onchange="carrito[${i}].precio=parseFloat(this.value)||0;renderCarrito()"/></td>
-      <td><input type="number" class="form-control form-control-sm" style="width:65px" value="${item.cantidad}" min="1" max="${item.stock}"
-                 onchange="carrito[${i}].cantidad=parseInt(this.value)||1;renderCarrito()"/></td>
+                 data-idx="${i}" data-field="precio"
+                 onchange="actualizarCarrito(${i},'precio',parseFloat(this.value)||0)"/></td>
+      <td><input type="number" class="form-control form-control-sm" style="width:65px" value="${item.cantidad}" min="1" max="${item.stock||9999}"
+                 data-idx="${i}" data-field="cantidad"
+                 onchange="actualizarCarrito(${i},'cantidad',parseInt(this.value)||1)"/></td>
       <td class="fw-semibold">S/ ${(item.precio*item.cantidad).toFixed(2)}</td>
-      <td><button class="btn btn-sm btn-outline-danger py-0" onclick="carrito.splice(${i},1);renderCarrito()">✕</button></td>
+      <td><button class="btn btn-sm btn-outline-danger py-0" onclick="carrito.splice(${i},1);renderCarrito()">âœ•</button></td>
     </tr>`).join('');
+  calcularTotales();
+}
+
+function actualizarCarrito(idx, campo, valor) {
+  if (idx < 0 || idx >= carrito.length) return;
+  carrito[idx][campo] = valor;
+  // Recalcular sin re-renderizar para no perder el foco
   calcularTotales();
 }
 
@@ -521,28 +564,25 @@ function procesarVenta() {
 
   fetch('pos.php', {method:'POST', body:payload})
     .then(r=>r.json()).then(data=>{
-      if (data.sunat_reject) {
-        alert('⚠️ RECHAZO DE SUNAT:\n\n' + data.error + '\n\nLa venta NO fue registrada. Corrija los datos e intente nuevamente.');
-        return;
-      }
-      if (data.success){
+      if(data.success){
         document.getElementById('ticket-codigo').textContent=data.codigo;
         document.getElementById('ticket-total').textContent='Total: S/ '+parseFloat(data.total).toFixed(2);
         document.getElementById('btn-imprimir-ticket').href='ticket.php?id='+data.venta_id+'&print=1';
+        // Mostrar info SUNAT
         const sunatDiv = document.getElementById('sunat-info-ticket');
         if (data.sunat_xml) {
           const serieNum = data.serie ? data.serie+'-'+data.numero : '';
           sunatDiv.innerHTML = '<div class="mt-2 p-2 rounded" style="background:rgba(0,200,100,.1);font-size:11px"><i class="bi bi-check-circle" style="color:#00c864"></i> XML generado ' + serieNum + '<br><small class="text-muted">'+data.sunat_msg+'</small></div>';
         } else {
-          sunatDiv.innerHTML = '<div class="mt-2 small text-muted">'+data.sunat_msg+'</div>';
+          sunatDiv.innerHTML = '<div class="mt-2 small text-muted">Sin comprobante SUNAT</div>';
         }
         new bootstrap.Modal(document.getElementById('modal-ticket')).show();
         limpiarCarrito();
       } else {
-        alert('❌ Error al procesar la venta:\n\n' + (data.error || 'Error desconocido.'));
+        alert(data.error || 'Error al procesar la venta.');
       }
     })
-    .catch(() => alert('Error de conexión.'))
+    .catch(() => alert('Error de conexiÃ³n.'))
     .finally(() => {
       btn.disabled = false;
       btn.innerHTML = '<i data-feather="check-circle" style="width:18px;height:18px"></i> Confirmar venta';
@@ -558,6 +598,7 @@ function nuevaVenta() {
   document.getElementById('pos-notas').value = '';
 }
 
+// â”€â”€ Buscador de Cliente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let timeoutCliente;
 document.getElementById('buscar-cliente-input').addEventListener('input', function() {
   clearTimeout(timeoutCliente);
@@ -574,7 +615,7 @@ document.getElementById('buscar-cliente-input').addEventListener('input', functi
             <button type="button" class="list-group-item list-group-item-action py-2"
                     onclick="seleccionarCliente(${c.id}, ${JSON.stringify(c.nombre).replace(/"/g,'&quot;')})">
               <div class="fw-semibold small">${c.nombre}</div>
-              <div class="text-muted" style="font-size:11px">${c.telefono||''} ${c.ruc_dni?'· '+c.ruc_dni:''}</div>
+              <div class="text-muted" style="font-size:11px">${c.telefono||''} ${c.ruc_dni?'Â· '+c.ruc_dni:''}</div>
             </button>`).join('');
         }
         lista.style.display = 'block';
@@ -596,12 +637,13 @@ function seleccionarCliente(id, nombre) {
 function limpiarCliente() {
   document.getElementById('sel-cliente-venta').value = '';
   document.getElementById('buscar-cliente-input').value = '';
-  document.getElementById('buscar-cliente-input').placeholder = 'Buscar por nombre, teléfono o doc...';
+  document.getElementById('buscar-cliente-input').placeholder = 'Buscar por nombre, telÃ©fono o doc...';
   document.getElementById('cliente-seleccionado').style.display = 'none';
   document.getElementById('btn-limpiar-cliente').style.display = 'none';
   document.getElementById('lista-clientes').style.display = 'none';
 }
 
+// Cerrar dropdown cliente al hacer clic afuera
 document.addEventListener('click', function(e) {
   if (!e.target.closest('#buscar-cliente-input') && !e.target.closest('#lista-clientes')) {
     document.getElementById('lista-clientes').style.display = 'none';
@@ -611,6 +653,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// â”€â”€ Buscador de OT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let timeoutOT;
 document.getElementById('buscar-ot-input').addEventListener('input', function() {
   clearTimeout(timeoutOT);
@@ -635,7 +678,7 @@ document.getElementById('buscar-ot-input').addEventListener('input', function() 
                   <span class="fw-semibold text-primary small">${ot.codigo_ot}</span>
                   <span class="badge bg-${estadoColor} ms-1" style="font-size:10px">${ot.estado.replace('_',' ')}</span>
                   <div class="text-truncate" style="max-width:200px">${ot.cliente_nombre}</div>
-                  <div class="text-muted" style="font-size:11px">${ot.equipo_desc}${ot.servicio_nombre?' · '+ot.servicio_nombre:''}</div>
+                  <div class="text-muted" style="font-size:11px">${ot.equipo_desc}${ot.servicio_nombre?' Â· '+ot.servicio_nombre:''}</div>
                 </div>
                 <div class="text-end fw-bold text-primary" style="font-size:13px;white-space:nowrap">
                   S/ ${parseFloat(ot.precio_final).toFixed(2)}
@@ -650,12 +693,15 @@ document.getElementById('buscar-ot-input').addEventListener('input', function() 
 });
 
 function cargarOT(ot) {
+  // 1. Seleccionar cliente automÃ¡ticamente
   seleccionarCliente(ot.cliente_id, ot.cliente_nombre);
+
+  // 2. Cargar precio de la OT como item en el carrito
   limpiarCarrito();
   const desc = parseFloat(ot.precio_final) > 0 ? ot.precio_final : ot.costo_mano_obra;
-  const etiqueta = ot.codigo_ot + (ot.servicio_nombre ? ' — ' + ot.servicio_nombre : '') + ' (' + ot.equipo_desc + ')';
+  const etiqueta = ot.codigo_ot + (ot.servicio_nombre ? ' â€” ' + ot.servicio_nombre : '') + ' (' + ot.equipo_desc + ')';
   carrito.push({
-    id: 0,
+    id: 0,          // item de servicio, no producto de inventario
     nombre: etiqueta,
     precio: parseFloat(desc),
     cantidad: 1,
@@ -665,17 +711,20 @@ function cargarOT(ot) {
   });
   renderCarrito();
 
-  document.getElementById('ot-codigo-badge').textContent = ot.codigo_ot + ' — ' + ot.cliente_nombre;
+  // 3. Mostrar resumen OT cargada
+  document.getElementById('ot-codigo-badge').textContent = ot.codigo_ot + ' â€” ' + ot.cliente_nombre;
   document.getElementById('ot-equipo-badge').textContent = ot.equipo_desc;
   document.getElementById('ot-servicio-badge').textContent = ot.servicio_nombre || '';
   document.getElementById('ot-cargada').style.display = 'block';
 
+  // 4. Limpiar campo bÃºsqueda
   document.getElementById('buscar-ot-input').value = '';
   document.getElementById('lista-ots').style.display = 'none';
   if (typeof feather !== 'undefined') feather.replace();
 }
 
 function limpiarOT() {
+  // Quitar del carrito los items de OT
   carrito = carrito.filter(i => !i.es_ot);
   renderCarrito();
   document.getElementById('ot-cargada').style.display = 'none';
@@ -690,6 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 JS;
 
+// FunciÃ³n mostrarCorrelativo fuera del heredoc para que PHP interpole el JSON
 $pageScripts .= '<script>
 const CORRELATIVOS = ' . json_encode($correlativos) . ';
 function mostrarCorrelativo() {
@@ -700,12 +750,8 @@ function mostrarCorrelativo() {
   if (CORRELATIVOS[tipo]) {
     const c = CORRELATIVOS[tipo];
     info.textContent = "Correlativo: " + c.serie + "-" + String(c.numero).padStart(8, "0");
-  } else if (tipo === "ticket") {
-    info.textContent = "Ticket";
-  } else if (tipo === "nota_venta") {
-    info.textContent = "Nota de venta";
   } else {
-    info.textContent = "Sin serie configurada";
+    info.textContent = tipo === "ticket" ? "Ticket â€” sin correlativo SUNAT" : "Sin serie configurada";
   }
 }
 </script>';
