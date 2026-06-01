@@ -40,12 +40,22 @@ class SunatService
         $cliente = $this->fetchCliente((int)($venta['cliente_id'] ?? 0));
         $items   = $this->fetchItems($ventaId);
 
+        app_log('generarXml items fetched: '.count($items), 'DEBUG', [
+            'venta_id' => $ventaId,
+            'items' => $items,
+        ]);
+
         try {
             $payload = SunatBuilder::buildComprobante($venta, $cliente, $items);
         } catch (Throwable $e) {
             $this->marcarRechazada($ventaId, $e->getMessage());
             return ['ok' => false, 'mensaje' => $e->getMessage()];
         }
+
+        app_log('generarXml payload: '.json_encode($payload, JSON_UNESCAPED_UNICODE), 'DEBUG', [
+            'venta_id' => $ventaId,
+            'detalles_count' => count($payload['detalles'] ?? []),
+        ]);
 
         $gen = $this->client->generarComprobante($payload);
         if (empty($gen['estado'])) {
