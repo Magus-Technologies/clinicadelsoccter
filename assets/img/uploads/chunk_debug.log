@@ -6174,3 +6174,2416 @@
 [18:13:08] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1234797277e3.03616202.mp4 size=2735715
 [18:13:08] Guardado en BD: id=142 ruta=ot/temp/vid_6a1234797277e3.03616202.mp4
 [18:13:08] Respuesta: {"status":"complete","compressed":true,"original_size":3626776,"final_size":2735715,"saved_db":true,"fotos_ot_id":"142","ruta":"ot\/temp\/vid_6a1234797277e3.03616202.mp4","duracion":22,"final_size_mb":2.61}
+[17:56:37] chunk=0/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:37] mkdir tmpDir=/tmp/ot_chunks_f17797497931066ienry/ ok=1
+[17:56:37] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00000 moved=1 size=1048576
+[17:56:37] chunks recibidos=1 total=15
+[17:56:39] chunk=1/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:39] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00001 moved=1 size=1048576
+[17:56:39] chunks recibidos=2 total=15
+[17:56:40] chunk=2/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:40] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00002 moved=1 size=1048576
+[17:56:40] chunks recibidos=3 total=15
+[17:56:42] chunk=3/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:42] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00003 moved=1 size=1048576
+[17:56:42] chunks recibidos=4 total=15
+[17:56:44] chunk=4/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:44] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00004 moved=1 size=1048576
+[17:56:44] chunks recibidos=5 total=15
+[17:56:46] chunk=5/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:46] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00005 moved=1 size=1048576
+[17:56:46] chunks recibidos=6 total=15
+[17:56:48] chunk=6/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:48] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00006 moved=1 size=1048576
+[17:56:48] chunks recibidos=7 total=15
+[17:56:55] chunk=7/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:55] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00007 moved=1 size=1048576
+[17:56:55] chunks recibidos=8 total=15
+[17:56:59] chunk=8/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:56:59] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00008 moved=1 size=1048576
+[17:56:59] chunks recibidos=9 total=15
+[17:57:01] chunk=9/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:57:01] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00009 moved=1 size=1048576
+[17:57:01] chunks recibidos=10 total=15
+[17:57:05] chunk=10/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:57:05] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00010 moved=1 size=1048576
+[17:57:05] chunks recibidos=11 total=15
+[17:57:07] chunk=11/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:57:07] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00011 moved=1 size=1048576
+[17:57:07] chunks recibidos=12 total=15
+[17:57:09] chunk=12/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:57:09] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00012 moved=1 size=1048576
+[17:57:09] chunks recibidos=13 total=15
+[17:57:11] chunk=13/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:57:11] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00013 moved=1 size=1048576
+[17:57:11] chunks recibidos=14 total=15
+[17:57:13] chunk=14/15 fileId=f17797497931066ienry fileName=63850.mp4
+[17:57:13] chunk saved=/tmp/ot_chunks_f17797497931066ienry/chunk_00014 moved=1 size=545010
+[17:57:13] chunks recibidos=15 total=15
+[17:57:13] Ensamblando archivo...
+[17:57:13] Ensamblado: /tmp/ot_chunks_f17797497931066ienry/assembled.mp4 size=15225074
+[17:57:13] ffmpeg=/usr/bin/ffmpeg
+[17:57:13] Ejecutando ffmpeg...
+[17:57:41] ffmpeg ret=0 outExists=1 outSize=6358095
+[17:57:41] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a14d3c9b9ee76.04756693.mp4 size=6358095
+[17:57:42] Guardado en BD: id=143 ruta=ot/temp/vid_6a14d3c9b9ee76.04756693.mp4
+[17:57:42] Respuesta: {"status":"complete","compressed":true,"original_size":15225074,"final_size":6358095,"saved_db":true,"fotos_ot_id":"143","ruta":"ot\/temp\/vid_6a14d3c9b9ee76.04756693.mp4","duracion":37,"final_size_mb":6.06}
+[18:06:45] chunk=0/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:45] mkdir tmpDir=/tmp/ot_chunks_f17797504018935tqs82/ ok=1
+[18:06:45] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00000 moved=1 size=1048576
+[18:06:45] chunks recibidos=1 total=16
+[18:06:47] chunk=1/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:47] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00001 moved=1 size=1048576
+[18:06:47] chunks recibidos=2 total=16
+[18:06:49] chunk=2/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:49] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00002 moved=1 size=1048576
+[18:06:49] chunks recibidos=3 total=16
+[18:06:50] chunk=3/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:50] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00003 moved=1 size=1048576
+[18:06:50] chunks recibidos=4 total=16
+[18:06:51] chunk=4/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:51] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00004 moved=1 size=1048576
+[18:06:51] chunks recibidos=5 total=16
+[18:06:52] chunk=5/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:52] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00005 moved=1 size=1048576
+[18:06:52] chunks recibidos=6 total=16
+[18:06:53] chunk=6/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:53] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00006 moved=1 size=1048576
+[18:06:53] chunks recibidos=7 total=16
+[18:06:55] chunk=7/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:55] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00007 moved=1 size=1048576
+[18:06:55] chunks recibidos=8 total=16
+[18:06:56] chunk=8/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:56] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00008 moved=1 size=1048576
+[18:06:56] chunks recibidos=9 total=16
+[18:06:57] chunk=9/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:57] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00009 moved=1 size=1048576
+[18:06:57] chunks recibidos=10 total=16
+[18:06:59] chunk=10/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:06:59] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00010 moved=1 size=1048576
+[18:06:59] chunks recibidos=11 total=16
+[18:07:00] chunk=11/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:07:00] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00011 moved=1 size=1048576
+[18:07:00] chunks recibidos=12 total=16
+[18:07:01] chunk=12/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:07:01] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00012 moved=1 size=1048576
+[18:07:01] chunks recibidos=13 total=16
+[18:07:03] chunk=13/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:07:03] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00013 moved=1 size=1048576
+[18:07:03] chunks recibidos=14 total=16
+[18:07:04] chunk=14/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:07:04] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00014 moved=1 size=1048576
+[18:07:04] chunks recibidos=15 total=16
+[18:07:04] chunk=15/16 fileId=f17797504018935tqs82 fileName=63860.mp4
+[18:07:04] chunk saved=/tmp/ot_chunks_f17797504018935tqs82/chunk_00015 moved=1 size=366511
+[18:07:04] chunks recibidos=16 total=16
+[18:07:04] Ensamblando archivo...
+[18:07:05] Ensamblado: /tmp/ot_chunks_f17797504018935tqs82/assembled.mp4 size=16095151
+[18:07:05] ffmpeg=/usr/bin/ffmpeg
+[18:07:05] Ejecutando ffmpeg...
+[18:07:33] ffmpeg ret=0 outExists=1 outSize=7236969
+[18:07:33] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a14d618ef56d6.16943067.mp4 size=7236969
+[18:07:34] Guardado en BD: id=144 ruta=ot/temp/vid_6a14d618ef56d6.16943067.mp4
+[18:07:34] Respuesta: {"status":"complete","compressed":true,"original_size":16095151,"final_size":7236969,"saved_db":true,"fotos_ot_id":"144","ruta":"ot\/temp\/vid_6a14d618ef56d6.16943067.mp4","duracion":71,"final_size_mb":6.9}
+[19:07:07] chunk=0/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:07] mkdir tmpDir=/tmp/ot_chunks_f1779754019907k4s6gd/ ok=1
+[19:07:07] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00000 moved=1 size=1048576
+[19:07:07] chunks recibidos=1 total=15
+[19:07:11] chunk=1/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:11] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00001 moved=1 size=1048576
+[19:07:11] chunks recibidos=2 total=15
+[19:07:14] chunk=2/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:14] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00002 moved=1 size=1048576
+[19:07:14] chunks recibidos=3 total=15
+[19:07:16] chunk=3/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:16] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00003 moved=1 size=1048576
+[19:07:16] chunks recibidos=4 total=15
+[19:07:18] chunk=4/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:18] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00004 moved=1 size=1048576
+[19:07:18] chunks recibidos=5 total=15
+[19:07:20] chunk=5/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:20] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00005 moved=1 size=1048576
+[19:07:20] chunks recibidos=6 total=15
+[19:07:22] chunk=6/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:22] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00006 moved=1 size=1048576
+[19:07:22] chunks recibidos=7 total=15
+[19:07:25] chunk=7/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:25] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00007 moved=1 size=1048576
+[19:07:25] chunks recibidos=8 total=15
+[19:07:28] chunk=8/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:28] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00008 moved=1 size=1048576
+[19:07:28] chunks recibidos=9 total=15
+[19:07:31] chunk=9/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:31] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00009 moved=1 size=1048576
+[19:07:31] chunks recibidos=10 total=15
+[19:07:33] chunk=10/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:33] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00010 moved=1 size=1048576
+[19:07:33] chunks recibidos=11 total=15
+[19:07:36] chunk=11/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:36] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00011 moved=1 size=1048576
+[19:07:36] chunks recibidos=12 total=15
+[19:07:38] chunk=12/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:38] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00012 moved=1 size=1048576
+[19:07:38] chunks recibidos=13 total=15
+[19:07:40] chunk=13/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:40] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00013 moved=1 size=1048576
+[19:07:40] chunks recibidos=14 total=15
+[19:07:41] chunk=14/15 fileId=f1779754019907k4s6gd fileName=63902.mp4
+[19:07:41] chunk saved=/tmp/ot_chunks_f1779754019907k4s6gd/chunk_00014 moved=1 size=528597
+[19:07:41] chunks recibidos=15 total=15
+[19:07:41] Ensamblando archivo...
+[19:07:41] Ensamblado: /tmp/ot_chunks_f1779754019907k4s6gd/assembled.mp4 size=15208661
+[19:07:41] ffmpeg=/usr/bin/ffmpeg
+[19:07:41] Ejecutando ffmpeg...
+[19:08:03] ffmpeg ret=0 outExists=1 outSize=5242340
+[19:08:03] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a14e44d8b9d38.35629679.mp4 size=5242340
+[19:08:03] Guardado en BD: id=145 ruta=ot/temp/vid_6a14e44d8b9d38.35629679.mp4
+[19:08:03] Respuesta: {"status":"complete","compressed":true,"original_size":15208661,"final_size":5242340,"saved_db":true,"fotos_ot_id":"145","ruta":"ot\/temp\/vid_6a14e44d8b9d38.35629679.mp4","duracion":37,"final_size_mb":5}
+[09:40:43] chunk=0/5 fileId=f17798064384183ks8zx fileName=64278.mp4
+[09:40:43] mkdir tmpDir=/tmp/ot_chunks_f17798064384183ks8zx/ ok=1
+[09:40:43] chunk saved=/tmp/ot_chunks_f17798064384183ks8zx/chunk_00000 moved=1 size=1048576
+[09:40:43] chunks recibidos=1 total=5
+[09:40:46] chunk=1/5 fileId=f17798064384183ks8zx fileName=64278.mp4
+[09:40:46] chunk saved=/tmp/ot_chunks_f17798064384183ks8zx/chunk_00001 moved=1 size=1048576
+[09:40:46] chunks recibidos=2 total=5
+[09:40:48] chunk=2/5 fileId=f17798064384183ks8zx fileName=64278.mp4
+[09:40:48] chunk saved=/tmp/ot_chunks_f17798064384183ks8zx/chunk_00002 moved=1 size=1048576
+[09:40:48] chunks recibidos=3 total=5
+[09:40:51] chunk=3/5 fileId=f17798064384183ks8zx fileName=64278.mp4
+[09:40:51] chunk saved=/tmp/ot_chunks_f17798064384183ks8zx/chunk_00003 moved=1 size=1048576
+[09:40:51] chunks recibidos=4 total=5
+[09:40:52] chunk=4/5 fileId=f17798064384183ks8zx fileName=64278.mp4
+[09:40:52] chunk saved=/tmp/ot_chunks_f17798064384183ks8zx/chunk_00004 moved=1 size=509681
+[09:40:52] chunks recibidos=5 total=5
+[09:40:52] Ensamblando archivo...
+[09:40:52] Ensamblado: /tmp/ot_chunks_f17798064384183ks8zx/assembled.mp4 size=4703985
+[09:40:52] ffmpeg=/usr/bin/ffmpeg
+[09:40:52] Ejecutando ffmpeg...
+[09:41:03] ffmpeg ret=0 outExists=1 outSize=2481935
+[09:41:03] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a15b0f453a1a8.61788142.mp4 size=2481935
+[09:41:03] Guardado en BD: id=146 ruta=ot/temp/vid_6a15b0f453a1a8.61788142.mp4
+[09:41:03] Respuesta: {"status":"complete","compressed":true,"original_size":4703985,"final_size":2481935,"saved_db":true,"fotos_ot_id":"146","ruta":"ot\/temp\/vid_6a15b0f453a1a8.61788142.mp4","duracion":21,"final_size_mb":2.37}
+[11:16:23] chunk=0/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:23] mkdir tmpDir=/tmp/ot_chunks_f17798121779866zjs1m/ ok=1
+[11:16:23] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00000 moved=1 size=1048576
+[11:16:23] chunks recibidos=1 total=14
+[11:16:26] chunk=1/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:26] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00001 moved=1 size=1048576
+[11:16:26] chunks recibidos=2 total=14
+[11:16:28] chunk=2/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:28] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00002 moved=1 size=1048576
+[11:16:28] chunks recibidos=3 total=14
+[11:16:30] chunk=3/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:30] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00003 moved=1 size=1048576
+[11:16:30] chunks recibidos=4 total=14
+[11:16:33] chunk=4/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:33] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00004 moved=1 size=1048576
+[11:16:33] chunks recibidos=5 total=14
+[11:16:35] chunk=5/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:35] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00005 moved=1 size=1048576
+[11:16:35] chunks recibidos=6 total=14
+[11:16:37] chunk=6/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:37] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00006 moved=1 size=1048576
+[11:16:37] chunks recibidos=7 total=14
+[11:16:39] chunk=7/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:39] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00007 moved=1 size=1048576
+[11:16:39] chunks recibidos=8 total=14
+[11:16:41] chunk=8/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:41] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00008 moved=1 size=1048576
+[11:16:41] chunks recibidos=9 total=14
+[11:16:43] chunk=9/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:43] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00009 moved=1 size=1048576
+[11:16:43] chunks recibidos=10 total=14
+[11:16:45] chunk=10/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:45] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00010 moved=1 size=1048576
+[11:16:45] chunks recibidos=11 total=14
+[11:16:47] chunk=11/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:47] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00011 moved=1 size=1048576
+[11:16:47] chunks recibidos=12 total=14
+[11:16:49] chunk=12/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:49] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00012 moved=1 size=1048576
+[11:16:49] chunks recibidos=13 total=14
+[11:16:49] chunk=13/14 fileId=f17798121779866zjs1m fileName=64367.mp4
+[11:16:49] chunk saved=/tmp/ot_chunks_f17798121779866zjs1m/chunk_00013 moved=1 size=123481
+[11:16:49] chunks recibidos=14 total=14
+[11:16:49] Ensamblando archivo...
+[11:16:49] Ensamblado: /tmp/ot_chunks_f17798121779866zjs1m/assembled.mp4 size=13754969
+[11:16:49] ffmpeg=/usr/bin/ffmpeg
+[11:16:49] Ejecutando ffmpeg...
+[11:17:15] ffmpeg ret=0 outExists=1 outSize=4889453
+[11:17:15] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a15c771cc4204.33100103.mp4 size=4889453
+[11:17:15] Guardado en BD: id=147 ruta=ot/temp/vid_6a15c771cc4204.33100103.mp4
+[11:17:15] Respuesta: {"status":"complete","compressed":true,"original_size":13754969,"final_size":4889453,"saved_db":true,"fotos_ot_id":"147","ruta":"ot\/temp\/vid_6a15c771cc4204.33100103.mp4","duracion":34,"final_size_mb":4.66}
+[12:02:08] chunk=0/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:08] mkdir tmpDir=/tmp/ot_chunks_f17798149237459vlf88/ ok=1
+[12:02:08] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00000 moved=1 size=1048576
+[12:02:08] chunks recibidos=1 total=13
+[12:02:11] chunk=1/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:11] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00001 moved=1 size=1048576
+[12:02:11] chunks recibidos=2 total=13
+[12:02:13] chunk=2/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:13] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00002 moved=1 size=1048576
+[12:02:13] chunks recibidos=3 total=13
+[12:02:15] chunk=3/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:15] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00003 moved=1 size=1048576
+[12:02:15] chunks recibidos=4 total=13
+[12:02:17] chunk=4/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:17] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00004 moved=1 size=1048576
+[12:02:17] chunks recibidos=5 total=13
+[12:02:19] chunk=5/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:19] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00005 moved=1 size=1048576
+[12:02:19] chunks recibidos=6 total=13
+[12:02:21] chunk=6/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:21] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00006 moved=1 size=1048576
+[12:02:21] chunks recibidos=7 total=13
+[12:02:22] chunk=7/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:22] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00007 moved=1 size=1048576
+[12:02:22] chunks recibidos=8 total=13
+[12:02:24] chunk=8/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:24] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00008 moved=1 size=1048576
+[12:02:24] chunks recibidos=9 total=13
+[12:02:25] chunk=9/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:25] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00009 moved=1 size=1048576
+[12:02:25] chunks recibidos=10 total=13
+[12:02:27] chunk=10/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:27] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00010 moved=1 size=1048576
+[12:02:27] chunks recibidos=11 total=13
+[12:02:28] chunk=11/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:28] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00011 moved=1 size=1048576
+[12:02:28] chunks recibidos=12 total=13
+[12:02:29] chunk=12/13 fileId=f17798149237459vlf88 fileName=64392.mp4
+[12:02:29] chunk saved=/tmp/ot_chunks_f17798149237459vlf88/chunk_00012 moved=1 size=16276
+[12:02:29] chunks recibidos=13 total=13
+[12:02:29] Ensamblando archivo...
+[12:02:29] Ensamblado: /tmp/ot_chunks_f17798149237459vlf88/assembled.mp4 size=12599188
+[12:02:29] ffmpeg=/usr/bin/ffmpeg
+[12:02:29] Ejecutando ffmpeg...
+[12:02:46] ffmpeg ret=0 outExists=1 outSize=4699411
+[12:02:46] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a15d22541bd69.80347570.mp4 size=4699411
+[12:02:46] Guardado en BD: id=150 ruta=ot/temp/vid_6a15d22541bd69.80347570.mp4
+[12:02:46] Respuesta: {"status":"complete","compressed":true,"original_size":12599188,"final_size":4699411,"saved_db":true,"fotos_ot_id":"150","ruta":"ot\/temp\/vid_6a15d22541bd69.80347570.mp4","duracion":61,"final_size_mb":4.48}
+[16:36:34] chunk=0/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:34] mkdir tmpDir=/tmp/ot_chunks_f1779831392913y2gqrf/ ok=1
+[16:36:34] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00000 moved=1 size=1048576
+[16:36:34] chunks recibidos=1 total=20
+[16:36:36] chunk=1/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:36] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00001 moved=1 size=1048576
+[16:36:36] chunks recibidos=2 total=20
+[16:36:36] chunk=2/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:36] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00002 moved=1 size=1048576
+[16:36:36] chunks recibidos=3 total=20
+[16:36:37] chunk=3/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:37] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00003 moved=1 size=1048576
+[16:36:37] chunks recibidos=4 total=20
+[16:36:38] chunk=4/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:38] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00004 moved=1 size=1048576
+[16:36:38] chunks recibidos=5 total=20
+[16:36:39] chunk=5/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:39] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00005 moved=1 size=1048576
+[16:36:39] chunks recibidos=6 total=20
+[16:36:40] chunk=6/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:40] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00006 moved=1 size=1048576
+[16:36:40] chunks recibidos=7 total=20
+[16:36:41] chunk=7/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:41] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00007 moved=1 size=1048576
+[16:36:41] chunks recibidos=8 total=20
+[16:36:42] chunk=8/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:42] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00008 moved=1 size=1048576
+[16:36:42] chunks recibidos=9 total=20
+[16:36:43] chunk=9/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:43] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00009 moved=1 size=1048576
+[16:36:43] chunks recibidos=10 total=20
+[16:36:44] chunk=10/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:44] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00010 moved=1 size=1048576
+[16:36:44] chunks recibidos=11 total=20
+[16:36:45] chunk=11/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:45] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00011 moved=1 size=1048576
+[16:36:45] chunks recibidos=12 total=20
+[16:36:45] chunk=12/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:45] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00012 moved=1 size=1048576
+[16:36:45] chunks recibidos=13 total=20
+[16:36:46] chunk=13/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:46] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00013 moved=1 size=1048576
+[16:36:46] chunks recibidos=14 total=20
+[16:36:47] chunk=14/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:47] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00014 moved=1 size=1048576
+[16:36:47] chunks recibidos=15 total=20
+[16:36:48] chunk=15/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:48] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00015 moved=1 size=1048576
+[16:36:48] chunks recibidos=16 total=20
+[16:36:49] chunk=16/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:49] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00016 moved=1 size=1048576
+[16:36:49] chunks recibidos=17 total=20
+[16:36:50] chunk=17/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:50] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00017 moved=1 size=1048576
+[16:36:50] chunks recibidos=18 total=20
+[16:36:51] chunk=18/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:51] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00018 moved=1 size=1048576
+[16:36:51] chunks recibidos=19 total=20
+[16:36:52] chunk=19/20 fileId=f1779831392913y2gqrf fileName=WhatsApp Video 2026-05-26 at 4.04.31 PM.mp4
+[16:36:52] chunk saved=/tmp/ot_chunks_f1779831392913y2gqrf/chunk_00019 moved=1 size=837197
+[16:36:52] chunks recibidos=20 total=20
+[16:36:52] Ensamblando archivo...
+[16:36:52] Ensamblado: /tmp/ot_chunks_f1779831392913y2gqrf/assembled.mp4 size=20760141
+[16:36:52] ffmpeg=/usr/bin/ffmpeg
+[16:36:52] Ejecutando ffmpeg...
+[16:37:37] ffmpeg ret=0 outExists=1 outSize=11991173
+[16:37:37] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1612742b1682.05824666.mp4 size=11991173
+[16:37:37] Guardado en BD: id=151 ruta=ot/temp/vid_6a1612742b1682.05824666.mp4
+[16:37:37] Respuesta: {"status":"complete","compressed":true,"original_size":20760141,"final_size":11991173,"saved_db":true,"fotos_ot_id":"151","ruta":"ot\/temp\/vid_6a1612742b1682.05824666.mp4","duracion":101,"final_size_mb":11.44}
+[17:35:19] chunk=0/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:19] mkdir tmpDir=/tmp/ot_chunks_f1779834917987cdrmhf/ ok=1
+[17:35:19] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00000 moved=1 size=1048576
+[17:35:19] chunks recibidos=1 total=12
+[17:35:20] chunk=1/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:20] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00001 moved=1 size=1048576
+[17:35:20] chunks recibidos=2 total=12
+[17:35:21] chunk=2/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:21] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00002 moved=1 size=1048576
+[17:35:21] chunks recibidos=3 total=12
+[17:35:22] chunk=3/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:22] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00003 moved=1 size=1048576
+[17:35:22] chunks recibidos=4 total=12
+[17:35:22] chunk=4/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:22] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00004 moved=1 size=1048576
+[17:35:22] chunks recibidos=5 total=12
+[17:35:23] chunk=5/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:23] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00005 moved=1 size=1048576
+[17:35:23] chunks recibidos=6 total=12
+[17:35:24] chunk=6/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:24] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00006 moved=1 size=1048576
+[17:35:24] chunks recibidos=7 total=12
+[17:35:25] chunk=7/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:25] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00007 moved=1 size=1048576
+[17:35:25] chunks recibidos=8 total=12
+[17:35:25] chunk=8/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:25] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00008 moved=1 size=1048576
+[17:35:25] chunks recibidos=9 total=12
+[17:35:26] chunk=9/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:26] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00009 moved=1 size=1048576
+[17:35:26] chunks recibidos=10 total=12
+[17:35:27] chunk=10/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:27] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00010 moved=1 size=1048576
+[17:35:27] chunks recibidos=11 total=12
+[17:35:27] chunk=11/12 fileId=f1779834917987cdrmhf fileName=WhatsApp Video 2026-05-26 at 5.30.45 PM.mp4
+[17:35:27] chunk saved=/tmp/ot_chunks_f1779834917987cdrmhf/chunk_00011 moved=1 size=103466
+[17:35:27] chunks recibidos=12 total=12
+[17:35:27] Ensamblando archivo...
+[17:35:27] Ensamblado: /tmp/ot_chunks_f1779834917987cdrmhf/assembled.mp4 size=11637802
+[17:35:27] ffmpeg=/usr/bin/ffmpeg
+[17:35:27] Ejecutando ffmpeg...
+[17:36:32] ffmpeg ret=0 outExists=1 outSize=14595845
+[17:36:32] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a16202faa52b4.74517933.mp4 size=14595845
+[17:36:33] Guardado en BD: id=152 ruta=ot/temp/vid_6a16202faa52b4.74517933.mp4
+[17:36:33] Respuesta: {"status":"complete","compressed":true,"original_size":11637802,"final_size":14595845,"saved_db":true,"fotos_ot_id":"152","ruta":"ot\/temp\/vid_6a16202faa52b4.74517933.mp4","duracion":112,"final_size_mb":13.92}
+[11:11:35] chunk=0/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:35] mkdir tmpDir=/tmp/ot_chunks_f1779898292627s5461n/ ok=1
+[11:11:35] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00000 moved=1 size=1048576
+[11:11:35] chunks recibidos=1 total=8
+[11:11:36] chunk=1/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:36] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00001 moved=1 size=1048576
+[11:11:36] chunks recibidos=2 total=8
+[11:11:37] chunk=2/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:37] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00002 moved=1 size=1048576
+[11:11:37] chunks recibidos=3 total=8
+[11:11:38] chunk=3/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:38] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00003 moved=1 size=1048576
+[11:11:38] chunks recibidos=4 total=8
+[11:11:39] chunk=4/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:39] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00004 moved=1 size=1048576
+[11:11:39] chunks recibidos=5 total=8
+[11:11:39] chunk=5/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:39] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00005 moved=1 size=1048576
+[11:11:39] chunks recibidos=6 total=8
+[11:11:40] chunk=6/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:40] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00006 moved=1 size=1048576
+[11:11:40] chunks recibidos=7 total=8
+[11:11:41] chunk=7/8 fileId=f1779898292627s5461n fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:11:41] chunk saved=/tmp/ot_chunks_f1779898292627s5461n/chunk_00007 moved=1 size=429967
+[11:11:41] chunks recibidos=8 total=8
+[11:11:41] Ensamblando archivo...
+[11:11:41] Ensamblado: /tmp/ot_chunks_f1779898292627s5461n/assembled.mp4 size=7769999
+[11:11:41] ffmpeg=/usr/bin/ffmpeg
+[11:11:41] Ejecutando ffmpeg...
+[11:12:04] ffmpeg ret=0 outExists=1 outSize=6187046
+[11:12:04] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1717bd2c8392.24727780.mp4 size=6187046
+[11:12:04] Guardado en BD: id=153 ruta=ot/temp/vid_6a1717bd2c8392.24727780.mp4
+[11:12:04] Respuesta: {"status":"complete","compressed":true,"original_size":7769999,"final_size":6187046,"saved_db":true,"fotos_ot_id":"153","ruta":"ot\/temp\/vid_6a1717bd2c8392.24727780.mp4","duracion":48,"final_size_mb":5.9}
+[11:14:15] chunk=0/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:15] mkdir tmpDir=/tmp/ot_chunks_f1779898453094lv6e1s/ ok=1
+[11:14:15] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00000 moved=1 size=1048576
+[11:14:15] chunks recibidos=1 total=8
+[11:14:16] chunk=1/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:16] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00001 moved=1 size=1048576
+[11:14:16] chunks recibidos=2 total=8
+[11:14:17] chunk=2/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:17] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00002 moved=1 size=1048576
+[11:14:17] chunks recibidos=3 total=8
+[11:14:18] chunk=3/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:18] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00003 moved=1 size=1048576
+[11:14:18] chunks recibidos=4 total=8
+[11:14:19] chunk=4/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:19] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00004 moved=1 size=1048576
+[11:14:19] chunks recibidos=5 total=8
+[11:14:19] chunk=5/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:19] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00005 moved=1 size=1048576
+[11:14:19] chunks recibidos=6 total=8
+[11:14:20] chunk=6/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:20] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00006 moved=1 size=1048576
+[11:14:20] chunks recibidos=7 total=8
+[11:14:21] chunk=7/8 fileId=f1779898453094lv6e1s fileName=WhatsApp Video 2026-05-26 at 2.43.32 PM.mp4
+[11:14:21] chunk saved=/tmp/ot_chunks_f1779898453094lv6e1s/chunk_00007 moved=1 size=429967
+[11:14:21] chunks recibidos=8 total=8
+[11:14:21] Ensamblando archivo...
+[11:14:21] Ensamblado: /tmp/ot_chunks_f1779898453094lv6e1s/assembled.mp4 size=7769999
+[11:14:21] ffmpeg=/usr/bin/ffmpeg
+[11:14:21] Ejecutando ffmpeg...
+[11:14:46] ffmpeg ret=0 outExists=1 outSize=6187046
+[11:14:46] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a17185d1b3fb8.41304545.mp4 size=6187046
+[11:14:46] Guardado en BD: id=154 ruta=ot/temp/vid_6a17185d1b3fb8.41304545.mp4
+[11:14:46] Respuesta: {"status":"complete","compressed":true,"original_size":7769999,"final_size":6187046,"saved_db":true,"fotos_ot_id":"154","ruta":"ot\/temp\/vid_6a17185d1b3fb8.41304545.mp4","duracion":48,"final_size_mb":5.9}
+[11:19:02] chunk=0/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:02] mkdir tmpDir=/tmp/ot_chunks_f1779898739113lri4jl/ ok=1
+[11:19:02] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00000 moved=1 size=1048576
+[11:19:02] chunks recibidos=1 total=30
+[11:19:03] chunk=1/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:03] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00001 moved=1 size=1048576
+[11:19:03] chunks recibidos=2 total=30
+[11:19:05] chunk=2/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:05] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00002 moved=1 size=1048576
+[11:19:05] chunks recibidos=3 total=30
+[11:19:06] chunk=3/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:06] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00003 moved=1 size=1048576
+[11:19:06] chunks recibidos=4 total=30
+[11:19:07] chunk=4/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:07] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00004 moved=1 size=1048576
+[11:19:07] chunks recibidos=5 total=30
+[11:19:08] chunk=5/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:08] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00005 moved=1 size=1048576
+[11:19:08] chunks recibidos=6 total=30
+[11:19:09] chunk=6/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:09] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00006 moved=1 size=1048576
+[11:19:09] chunks recibidos=7 total=30
+[11:19:10] chunk=7/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:10] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00007 moved=1 size=1048576
+[11:19:10] chunks recibidos=8 total=30
+[11:19:12] chunk=8/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:12] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00008 moved=1 size=1048576
+[11:19:12] chunks recibidos=9 total=30
+[11:19:13] chunk=9/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:13] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00009 moved=1 size=1048576
+[11:19:13] chunks recibidos=10 total=30
+[11:19:14] chunk=10/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:14] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00010 moved=1 size=1048576
+[11:19:14] chunks recibidos=11 total=30
+[11:19:15] chunk=11/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:15] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00011 moved=1 size=1048576
+[11:19:15] chunks recibidos=12 total=30
+[11:19:16] chunk=12/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:16] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00012 moved=1 size=1048576
+[11:19:16] chunks recibidos=13 total=30
+[11:19:18] chunk=13/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:18] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00013 moved=1 size=1048576
+[11:19:18] chunks recibidos=14 total=30
+[11:19:19] chunk=14/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:19] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00014 moved=1 size=1048576
+[11:19:19] chunks recibidos=15 total=30
+[11:19:20] chunk=15/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:20] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00015 moved=1 size=1048576
+[11:19:20] chunks recibidos=16 total=30
+[11:19:21] chunk=16/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:21] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00016 moved=1 size=1048576
+[11:19:21] chunks recibidos=17 total=30
+[11:19:22] chunk=17/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:22] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00017 moved=1 size=1048576
+[11:19:22] chunks recibidos=18 total=30
+[11:19:23] chunk=18/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:23] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00018 moved=1 size=1048576
+[11:19:23] chunks recibidos=19 total=30
+[11:19:24] chunk=19/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:24] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00019 moved=1 size=1048576
+[11:19:25] chunks recibidos=20 total=30
+[11:19:26] chunk=20/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:26] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00020 moved=1 size=1048576
+[11:19:26] chunks recibidos=21 total=30
+[11:19:27] chunk=21/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:27] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00021 moved=1 size=1048576
+[11:19:27] chunks recibidos=22 total=30
+[11:19:28] chunk=22/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:28] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00022 moved=1 size=1048576
+[11:19:28] chunks recibidos=23 total=30
+[11:19:29] chunk=23/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:29] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00023 moved=1 size=1048576
+[11:19:29] chunks recibidos=24 total=30
+[11:19:30] chunk=24/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:30] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00024 moved=1 size=1048576
+[11:19:30] chunks recibidos=25 total=30
+[11:19:32] chunk=25/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:32] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00025 moved=1 size=1048576
+[11:19:32] chunks recibidos=26 total=30
+[11:19:33] chunk=26/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:33] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00026 moved=1 size=1048576
+[11:19:33] chunks recibidos=27 total=30
+[11:19:34] chunk=27/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:34] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00027 moved=1 size=1048576
+[11:19:34] chunks recibidos=28 total=30
+[11:19:35] chunk=28/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:35] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00028 moved=1 size=1048576
+[11:19:35] chunks recibidos=29 total=30
+[11:19:36] chunk=29/30 fileId=f1779898739113lri4jl fileName=65207.mp4
+[11:19:36] chunk saved=/tmp/ot_chunks_f1779898739113lri4jl/chunk_00029 moved=1 size=473423
+[11:19:36] chunks recibidos=30 total=30
+[11:19:36] Ensamblando archivo...
+[11:19:36] Ensamblado: /tmp/ot_chunks_f1779898739113lri4jl/assembled.mp4 size=30882127
+[11:19:36] ffmpeg=/usr/bin/ffmpeg
+[11:19:36] Ejecutando ffmpeg...
+[11:20:34] ffmpeg ret=0 outExists=1 outSize=12297605
+[11:20:34] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a171998d74825.55171489.mp4 size=12297605
+[11:20:34] Guardado en BD: id=155 ruta=ot/temp/vid_6a171998d74825.55171489.mp4
+[11:20:34] Respuesta: {"status":"complete","compressed":true,"original_size":30882127,"final_size":12297605,"saved_db":true,"fotos_ot_id":"155","ruta":"ot\/temp\/vid_6a171998d74825.55171489.mp4","duracion":79,"final_size_mb":11.73}
+[11:26:17] chunk=0/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:17] mkdir tmpDir=/tmp/ot_chunks_f1779899173409s9x9g6/ ok=1
+[11:26:17] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00000 moved=1 size=1048576
+[11:26:17] chunks recibidos=1 total=32
+[11:26:18] chunk=1/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:18] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00001 moved=1 size=1048576
+[11:26:18] chunks recibidos=2 total=32
+[11:26:20] chunk=2/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:20] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00002 moved=1 size=1048576
+[11:26:20] chunks recibidos=3 total=32
+[11:26:21] chunk=3/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:21] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00003 moved=1 size=1048576
+[11:26:21] chunks recibidos=4 total=32
+[11:26:22] chunk=4/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:22] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00004 moved=1 size=1048576
+[11:26:22] chunks recibidos=5 total=32
+[11:26:23] chunk=5/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:23] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00005 moved=1 size=1048576
+[11:26:23] chunks recibidos=6 total=32
+[11:26:24] chunk=6/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:24] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00006 moved=1 size=1048576
+[11:26:24] chunks recibidos=7 total=32
+[11:26:25] chunk=7/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:25] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00007 moved=1 size=1048576
+[11:26:25] chunks recibidos=8 total=32
+[11:26:26] chunk=8/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:26] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00008 moved=1 size=1048576
+[11:26:26] chunks recibidos=9 total=32
+[11:26:28] chunk=9/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:28] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00009 moved=1 size=1048576
+[11:26:28] chunks recibidos=10 total=32
+[11:26:29] chunk=10/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:29] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00010 moved=1 size=1048576
+[11:26:29] chunks recibidos=11 total=32
+[11:26:30] chunk=11/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:30] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00011 moved=1 size=1048576
+[11:26:30] chunks recibidos=12 total=32
+[11:26:31] chunk=12/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:31] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00012 moved=1 size=1048576
+[11:26:31] chunks recibidos=13 total=32
+[11:26:33] chunk=13/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:33] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00013 moved=1 size=1048576
+[11:26:33] chunks recibidos=14 total=32
+[11:26:34] chunk=14/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:34] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00014 moved=1 size=1048576
+[11:26:34] chunks recibidos=15 total=32
+[11:26:35] chunk=15/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:35] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00015 moved=1 size=1048576
+[11:26:35] chunks recibidos=16 total=32
+[11:26:37] chunk=16/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:37] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00016 moved=1 size=1048576
+[11:26:37] chunks recibidos=17 total=32
+[11:26:38] chunk=17/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:38] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00017 moved=1 size=1048576
+[11:26:38] chunks recibidos=18 total=32
+[11:26:39] chunk=18/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:39] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00018 moved=1 size=1048576
+[11:26:39] chunks recibidos=19 total=32
+[11:26:40] chunk=19/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:40] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00019 moved=1 size=1048576
+[11:26:40] chunks recibidos=20 total=32
+[11:26:41] chunk=20/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:41] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00020 moved=1 size=1048576
+[11:26:41] chunks recibidos=21 total=32
+[11:26:42] chunk=21/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:42] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00021 moved=1 size=1048576
+[11:26:42] chunks recibidos=22 total=32
+[11:26:44] chunk=22/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:44] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00022 moved=1 size=1048576
+[11:26:44] chunks recibidos=23 total=32
+[11:26:45] chunk=23/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:45] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00023 moved=1 size=1048576
+[11:26:45] chunks recibidos=24 total=32
+[11:26:46] chunk=24/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:46] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00024 moved=1 size=1048576
+[11:26:46] chunks recibidos=25 total=32
+[11:26:47] chunk=25/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:47] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00025 moved=1 size=1048576
+[11:26:47] chunks recibidos=26 total=32
+[11:26:48] chunk=26/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:48] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00026 moved=1 size=1048576
+[11:26:48] chunks recibidos=27 total=32
+[11:26:49] chunk=27/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:49] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00027 moved=1 size=1048576
+[11:26:49] chunks recibidos=28 total=32
+[11:26:51] chunk=28/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:51] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00028 moved=1 size=1048576
+[11:26:51] chunks recibidos=29 total=32
+[11:26:52] chunk=29/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:52] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00029 moved=1 size=1048576
+[11:26:52] chunks recibidos=30 total=32
+[11:26:53] chunk=30/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:53] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00030 moved=1 size=1048576
+[11:26:53] chunks recibidos=31 total=32
+[11:26:54] chunk=31/32 fileId=f1779899173409s9x9g6 fileName=65212.mp4
+[11:26:54] chunk saved=/tmp/ot_chunks_f1779899173409s9x9g6/chunk_00031 moved=1 size=837374
+[11:26:54] chunks recibidos=32 total=32
+[11:26:54] Ensamblando archivo...
+[11:26:54] Ensamblado: /tmp/ot_chunks_f1779899173409s9x9g6/assembled.mp4 size=33343230
+[11:26:54] ffmpeg=/usr/bin/ffmpeg
+[11:26:54] Ejecutando ffmpeg...
+[11:27:55] ffmpeg ret=0 outExists=1 outSize=13756373
+[11:27:55] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a171b4e5e4068.34445070.mp4 size=13756373
+[11:27:55] Guardado en BD: id=156 ruta=ot/temp/vid_6a171b4e5e4068.34445070.mp4
+[11:27:55] Respuesta: {"status":"complete","compressed":true,"original_size":33343230,"final_size":13756373,"saved_db":true,"fotos_ot_id":"156","ruta":"ot\/temp\/vid_6a171b4e5e4068.34445070.mp4","duracion":95,"final_size_mb":13.12}
+[11:31:17] chunk=0/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:17] mkdir tmpDir=/tmp/ot_chunks_f1779899473788hakm4u/ ok=1
+[11:31:17] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00000 moved=1 size=1048576
+[11:31:17] chunks recibidos=1 total=29
+[11:31:18] chunk=1/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:18] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00001 moved=1 size=1048576
+[11:31:18] chunks recibidos=2 total=29
+[11:31:20] chunk=2/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:20] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00002 moved=1 size=1048576
+[11:31:20] chunks recibidos=3 total=29
+[11:31:21] chunk=3/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:21] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00003 moved=1 size=1048576
+[11:31:21] chunks recibidos=4 total=29
+[11:31:22] chunk=4/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:22] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00004 moved=1 size=1048576
+[11:31:22] chunks recibidos=5 total=29
+[11:31:23] chunk=5/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:23] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00005 moved=1 size=1048576
+[11:31:23] chunks recibidos=6 total=29
+[11:31:24] chunk=6/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:24] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00006 moved=1 size=1048576
+[11:31:24] chunks recibidos=7 total=29
+[11:31:25] chunk=7/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:25] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00007 moved=1 size=1048576
+[11:31:25] chunks recibidos=8 total=29
+[11:31:26] chunk=8/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:26] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00008 moved=1 size=1048576
+[11:31:26] chunks recibidos=9 total=29
+[11:31:27] chunk=9/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:27] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00009 moved=1 size=1048576
+[11:31:27] chunks recibidos=10 total=29
+[11:31:28] chunk=10/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:28] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00010 moved=1 size=1048576
+[11:31:28] chunks recibidos=11 total=29
+[11:31:29] chunk=11/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:29] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00011 moved=1 size=1048576
+[11:31:29] chunks recibidos=12 total=29
+[11:31:31] chunk=12/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:31] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00012 moved=1 size=1048576
+[11:31:31] chunks recibidos=13 total=29
+[11:31:32] chunk=13/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:32] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00013 moved=1 size=1048576
+[11:31:32] chunks recibidos=14 total=29
+[11:31:32] chunk=14/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:32] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00014 moved=1 size=1048576
+[11:31:32] chunks recibidos=15 total=29
+[11:31:34] chunk=15/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:34] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00015 moved=1 size=1048576
+[11:31:34] chunks recibidos=16 total=29
+[11:31:35] chunk=16/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:35] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00016 moved=1 size=1048576
+[11:31:35] chunks recibidos=17 total=29
+[11:31:36] chunk=17/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:36] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00017 moved=1 size=1048576
+[11:31:36] chunks recibidos=18 total=29
+[11:31:37] chunk=18/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:37] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00018 moved=1 size=1048576
+[11:31:37] chunks recibidos=19 total=29
+[11:31:38] chunk=19/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:38] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00019 moved=1 size=1048576
+[11:31:38] chunks recibidos=20 total=29
+[11:31:39] chunk=20/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:39] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00020 moved=1 size=1048576
+[11:31:39] chunks recibidos=21 total=29
+[11:31:40] chunk=21/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:40] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00021 moved=1 size=1048576
+[11:31:40] chunks recibidos=22 total=29
+[11:31:41] chunk=22/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:41] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00022 moved=1 size=1048576
+[11:31:41] chunks recibidos=23 total=29
+[11:31:42] chunk=23/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:42] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00023 moved=1 size=1048576
+[11:31:42] chunks recibidos=24 total=29
+[11:31:43] chunk=24/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:43] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00024 moved=1 size=1048576
+[11:31:43] chunks recibidos=25 total=29
+[11:31:44] chunk=25/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:44] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00025 moved=1 size=1048576
+[11:31:44] chunks recibidos=26 total=29
+[11:31:45] chunk=26/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:45] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00026 moved=1 size=1048576
+[11:31:45] chunks recibidos=27 total=29
+[11:31:46] chunk=27/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:46] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00027 moved=1 size=1048576
+[11:31:46] chunks recibidos=28 total=29
+[11:31:46] chunk=28/29 fileId=f1779899473788hakm4u fileName=65213.mp4
+[11:31:46] chunk saved=/tmp/ot_chunks_f1779899473788hakm4u/chunk_00028 moved=1 size=110892
+[11:31:46] chunks recibidos=29 total=29
+[11:31:46] Ensamblando archivo...
+[11:31:46] Ensamblado: /tmp/ot_chunks_f1779899473788hakm4u/assembled.mp4 size=29471020
+[11:31:46] ffmpeg=/usr/bin/ffmpeg
+[11:31:46] Ejecutando ffmpeg...
+[11:32:41] ffmpeg ret=0 outExists=1 outSize=11618581
+[11:32:41] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a171c72e1d589.19282533.mp4 size=11618581
+[11:32:41] Guardado en BD: id=157 ruta=ot/temp/vid_6a171c72e1d589.19282533.mp4
+[11:32:41] Respuesta: {"status":"complete","compressed":true,"original_size":29471020,"final_size":11618581,"saved_db":true,"fotos_ot_id":"157","ruta":"ot\/temp\/vid_6a171c72e1d589.19282533.mp4","duracion":84,"final_size_mb":11.08}
+[11:37:26] chunk=0/4 fileId=f1779899842769ch7u7e fileName=65222.mp4
+[11:37:26] mkdir tmpDir=/tmp/ot_chunks_f1779899842769ch7u7e/ ok=1
+[11:37:26] chunk saved=/tmp/ot_chunks_f1779899842769ch7u7e/chunk_00000 moved=1 size=1048576
+[11:37:26] chunks recibidos=1 total=4
+[11:37:27] chunk=1/4 fileId=f1779899842769ch7u7e fileName=65222.mp4
+[11:37:27] chunk saved=/tmp/ot_chunks_f1779899842769ch7u7e/chunk_00001 moved=1 size=1048576
+[11:37:27] chunks recibidos=2 total=4
+[11:37:28] chunk=2/4 fileId=f1779899842769ch7u7e fileName=65222.mp4
+[11:37:28] chunk saved=/tmp/ot_chunks_f1779899842769ch7u7e/chunk_00002 moved=1 size=1048576
+[11:37:28] chunks recibidos=3 total=4
+[11:37:28] chunk=3/4 fileId=f1779899842769ch7u7e fileName=65222.mp4
+[11:37:28] chunk saved=/tmp/ot_chunks_f1779899842769ch7u7e/chunk_00003 moved=1 size=164576
+[11:37:28] chunks recibidos=4 total=4
+[11:37:28] Ensamblando archivo...
+[11:37:28] Ensamblado: /tmp/ot_chunks_f1779899842769ch7u7e/assembled.mp4 size=3310304
+[11:37:28] ffmpeg=/usr/bin/ffmpeg
+[11:37:28] Ejecutando ffmpeg...
+[11:37:38] ffmpeg ret=0 outExists=1 outSize=2984453
+[11:37:38] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a171dc8c5f647.65443895.mp4 size=2984453
+[11:37:39] Guardado en BD: id=158 ruta=ot/temp/vid_6a171dc8c5f647.65443895.mp4
+[11:37:39] Respuesta: {"status":"complete","compressed":true,"original_size":3310304,"final_size":2984453,"saved_db":true,"fotos_ot_id":"158","ruta":"ot\/temp\/vid_6a171dc8c5f647.65443895.mp4","duracion":24,"final_size_mb":2.85}
+[11:39:08] chunk=0/3 fileId=f1779899944368uebnze fileName=65230.mp4
+[11:39:08] mkdir tmpDir=/tmp/ot_chunks_f1779899944368uebnze/ ok=1
+[11:39:08] chunk saved=/tmp/ot_chunks_f1779899944368uebnze/chunk_00000 moved=1 size=1048576
+[11:39:08] chunks recibidos=1 total=3
+[11:39:10] chunk=1/3 fileId=f1779899944368uebnze fileName=65230.mp4
+[11:39:10] chunk saved=/tmp/ot_chunks_f1779899944368uebnze/chunk_00001 moved=1 size=1048576
+[11:39:10] chunks recibidos=2 total=3
+[11:39:11] chunk=2/3 fileId=f1779899944368uebnze fileName=65230.mp4
+[11:39:11] chunk saved=/tmp/ot_chunks_f1779899944368uebnze/chunk_00002 moved=1 size=779953
+[11:39:11] chunks recibidos=3 total=3
+[11:39:11] Ensamblando archivo...
+[11:39:11] Ensamblado: /tmp/ot_chunks_f1779899944368uebnze/assembled.mp4 size=2877105
+[11:39:11] ffmpeg=/usr/bin/ffmpeg
+[11:39:11] Ejecutando ffmpeg...
+[11:39:20] ffmpeg ret=0 outExists=1 outSize=2431689
+[11:39:20] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a171e2fdeb969.92473882.mp4 size=2431689
+[11:39:20] Guardado en BD: id=159 ruta=ot/temp/vid_6a171e2fdeb969.92473882.mp4
+[11:39:20] Respuesta: {"status":"complete","compressed":true,"original_size":2877105,"final_size":2431689,"saved_db":true,"fotos_ot_id":"159","ruta":"ot\/temp\/vid_6a171e2fdeb969.92473882.mp4","duracion":24,"final_size_mb":2.32}
+[14:47:20] chunk=0/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:20] mkdir tmpDir=/tmp/ot_chunks_f1779911236683wl1ax8/ ok=1
+[14:47:20] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00000 moved=1 size=1048576
+[14:47:20] chunks recibidos=1 total=33
+[14:47:21] chunk=1/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:21] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00001 moved=1 size=1048576
+[14:47:21] chunks recibidos=2 total=33
+[14:47:23] chunk=2/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:23] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00002 moved=1 size=1048576
+[14:47:23] chunks recibidos=3 total=33
+[14:47:24] chunk=3/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:24] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00003 moved=1 size=1048576
+[14:47:24] chunks recibidos=4 total=33
+[14:47:25] chunk=4/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:25] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00004 moved=1 size=1048576
+[14:47:25] chunks recibidos=5 total=33
+[14:47:26] chunk=5/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:26] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00005 moved=1 size=1048576
+[14:47:26] chunks recibidos=6 total=33
+[14:47:27] chunk=6/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:27] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00006 moved=1 size=1048576
+[14:47:27] chunks recibidos=7 total=33
+[14:47:28] chunk=7/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:28] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00007 moved=1 size=1048576
+[14:47:28] chunks recibidos=8 total=33
+[14:47:29] chunk=8/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:29] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00008 moved=1 size=1048576
+[14:47:29] chunks recibidos=9 total=33
+[14:47:31] chunk=9/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:31] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00009 moved=1 size=1048576
+[14:47:31] chunks recibidos=10 total=33
+[14:47:32] chunk=10/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:32] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00010 moved=1 size=1048576
+[14:47:32] chunks recibidos=11 total=33
+[14:47:33] chunk=11/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:33] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00011 moved=1 size=1048576
+[14:47:33] chunks recibidos=12 total=33
+[14:47:35] chunk=12/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:35] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00012 moved=1 size=1048576
+[14:47:35] chunks recibidos=13 total=33
+[14:47:36] chunk=13/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:36] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00013 moved=1 size=1048576
+[14:47:36] chunks recibidos=14 total=33
+[14:47:37] chunk=14/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:37] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00014 moved=1 size=1048576
+[14:47:37] chunks recibidos=15 total=33
+[14:47:38] chunk=15/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:38] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00015 moved=1 size=1048576
+[14:47:38] chunks recibidos=16 total=33
+[14:47:39] chunk=16/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:39] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00016 moved=1 size=1048576
+[14:47:39] chunks recibidos=17 total=33
+[14:47:41] chunk=17/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:41] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00017 moved=1 size=1048576
+[14:47:41] chunks recibidos=18 total=33
+[14:47:42] chunk=18/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:42] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00018 moved=1 size=1048576
+[14:47:42] chunks recibidos=19 total=33
+[14:47:43] chunk=19/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:43] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00019 moved=1 size=1048576
+[14:47:43] chunks recibidos=20 total=33
+[14:47:44] chunk=20/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:44] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00020 moved=1 size=1048576
+[14:47:44] chunks recibidos=21 total=33
+[14:47:45] chunk=21/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:45] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00021 moved=1 size=1048576
+[14:47:45] chunks recibidos=22 total=33
+[14:47:47] chunk=22/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:47] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00022 moved=1 size=1048576
+[14:47:47] chunks recibidos=23 total=33
+[14:47:48] chunk=23/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:48] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00023 moved=1 size=1048576
+[14:47:48] chunks recibidos=24 total=33
+[14:47:49] chunk=24/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:49] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00024 moved=1 size=1048576
+[14:47:49] chunks recibidos=25 total=33
+[14:47:50] chunk=25/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:50] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00025 moved=1 size=1048576
+[14:47:50] chunks recibidos=26 total=33
+[14:47:51] chunk=26/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:51] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00026 moved=1 size=1048576
+[14:47:51] chunks recibidos=27 total=33
+[14:47:53] chunk=27/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:53] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00027 moved=1 size=1048576
+[14:47:53] chunks recibidos=28 total=33
+[14:47:54] chunk=28/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:54] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00028 moved=1 size=1048576
+[14:47:54] chunks recibidos=29 total=33
+[14:47:55] chunk=29/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:55] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00029 moved=1 size=1048576
+[14:47:55] chunks recibidos=30 total=33
+[14:47:56] chunk=30/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:56] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00030 moved=1 size=1048576
+[14:47:56] chunks recibidos=31 total=33
+[14:47:58] chunk=31/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:58] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00031 moved=1 size=1048576
+[14:47:58] chunks recibidos=32 total=33
+[14:47:58] chunk=32/33 fileId=f1779911236683wl1ax8 fileName=65446.mp4
+[14:47:58] chunk saved=/tmp/ot_chunks_f1779911236683wl1ax8/chunk_00032 moved=1 size=37567
+[14:47:58] chunks recibidos=33 total=33
+[14:47:58] Ensamblando archivo...
+[14:47:58] Ensamblado: /tmp/ot_chunks_f1779911236683wl1ax8/assembled.mp4 size=33591999
+[14:47:58] ffmpeg=/usr/bin/ffmpeg
+[14:47:58] Ejecutando ffmpeg...
+[14:48:56] ffmpeg ret=0 outExists=1 outSize=13943306
+[14:48:56] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a174a6eab7cc0.08122512.mp4 size=13943306
+[14:48:56] Guardado en BD: id=160 ruta=ot/temp/vid_6a174a6eab7cc0.08122512.mp4
+[14:48:56] Respuesta: {"status":"complete","compressed":true,"original_size":33591999,"final_size":13943306,"saved_db":true,"fotos_ot_id":"160","ruta":"ot\/temp\/vid_6a174a6eab7cc0.08122512.mp4","duracion":79,"final_size_mb":13.3}
+[18:15:09] chunk=0/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:09] mkdir tmpDir=/tmp/ot_chunks_f1779923705811joh36r/ ok=1
+[18:15:09] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00000 moved=1 size=1048576
+[18:15:09] chunks recibidos=1 total=13
+[18:15:10] chunk=1/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:10] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00001 moved=1 size=1048576
+[18:15:10] chunks recibidos=2 total=13
+[18:15:11] chunk=2/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:11] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00002 moved=1 size=1048576
+[18:15:11] chunks recibidos=3 total=13
+[18:15:12] chunk=3/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:12] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00003 moved=1 size=1048576
+[18:15:12] chunks recibidos=4 total=13
+[18:15:12] chunk=4/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:12] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00004 moved=1 size=1048576
+[18:15:12] chunks recibidos=5 total=13
+[18:15:13] chunk=5/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:13] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00005 moved=1 size=1048576
+[18:15:13] chunks recibidos=6 total=13
+[18:15:14] chunk=6/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:14] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00006 moved=1 size=1048576
+[18:15:14] chunks recibidos=7 total=13
+[18:15:15] chunk=7/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:15] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00007 moved=1 size=1048576
+[18:15:15] chunks recibidos=8 total=13
+[18:15:16] chunk=8/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:16] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00008 moved=1 size=1048576
+[18:15:16] chunks recibidos=9 total=13
+[18:15:16] chunk=9/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:16] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00009 moved=1 size=1048576
+[18:15:16] chunks recibidos=10 total=13
+[18:15:17] chunk=10/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:17] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00010 moved=1 size=1048576
+[18:15:17] chunks recibidos=11 total=13
+[18:15:18] chunk=11/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:18] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00011 moved=1 size=1048576
+[18:15:18] chunks recibidos=12 total=13
+[18:15:19] chunk=12/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:15:19] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00012 moved=1 size=719873
+[18:15:19] chunks recibidos=13 total=13
+[18:15:19] Ensamblando archivo...
+[18:15:19] Ensamblado: /tmp/ot_chunks_f1779923705811joh36r/assembled.mp4 size=13302785
+[18:15:19] ffmpeg=/usr/bin/ffmpeg
+[18:15:19] Ejecutando ffmpeg...
+[18:15:38] ffmpeg ret=0 outExists=1 outSize=5651441
+[18:15:38] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a177b0757e3c4.00105251.mp4 size=5651441
+[18:15:38] Guardado en BD: id=161 ruta=ot/temp/vid_6a177b0757e3c4.00105251.mp4
+[18:15:38] Respuesta: {"status":"complete","compressed":true,"original_size":13302785,"final_size":5651441,"saved_db":true,"fotos_ot_id":"161","ruta":"ot\/temp\/vid_6a177b0757e3c4.00105251.mp4","duracion":65,"final_size_mb":5.39}
+[18:16:19] chunk=12/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:19] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00012 moved=1 size=719873
+[18:16:19] chunks recibidos=1 total=13
+[18:16:19] chunk=13/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:19] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00013 moved=1 size=0
+[18:16:19] chunks recibidos=2 total=13
+[18:16:20] chunk=14/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:20] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00014 moved=1 size=0
+[18:16:20] chunks recibidos=3 total=13
+[18:16:20] chunk=15/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:20] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00015 moved=1 size=0
+[18:16:20] chunks recibidos=4 total=13
+[18:16:20] chunk=16/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:20] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00016 moved=1 size=0
+[18:16:20] chunks recibidos=5 total=13
+[18:16:21] chunk=17/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:21] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00017 moved=1 size=0
+[18:16:21] chunks recibidos=6 total=13
+[18:16:21] chunk=18/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:21] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00018 moved=1 size=0
+[18:16:21] chunks recibidos=7 total=13
+[18:16:22] chunk=19/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:22] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00019 moved=1 size=0
+[18:16:22] chunks recibidos=8 total=13
+[18:16:22] chunk=20/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:22] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00020 moved=1 size=0
+[18:16:22] chunks recibidos=9 total=13
+[18:16:23] chunk=21/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:23] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00021 moved=1 size=0
+[18:16:23] chunks recibidos=10 total=13
+[18:16:23] chunk=22/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:23] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00022 moved=1 size=0
+[18:16:23] chunks recibidos=11 total=13
+[18:16:23] chunk=23/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:23] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00023 moved=1 size=0
+[18:16:23] chunks recibidos=12 total=13
+[18:16:24] chunk=24/13 fileId=f1779923705811joh36r fileName=65701.mp4
+[18:16:24] chunk saved=/tmp/ot_chunks_f1779923705811joh36r/chunk_00024 moved=1 size=0
+[18:16:24] chunks recibidos=13 total=13
+[18:16:24] Ensamblando archivo...
+[18:16:24] Ensamblado: /tmp/ot_chunks_f1779923705811joh36r/assembled.mp4 size=719873
+[18:16:24] ffmpeg=/usr/bin/ffmpeg
+[18:16:24] Ejecutando ffmpeg...
+[18:16:24] ffmpeg ret=1 outExists=0 outSize=0
+[18:16:24] ffmpeg FALLÓ — usando original. Log:  27.100
+  libavdevice    59.  7.100 / 59.  7.100
+  libavfilter     8. 44.100 /  8. 44.100
+  libswscale      6.  7.100 /  6.  7.100
+  libswresample   4.  7.100 /  4.  7.100
+  libpostproc    56.  6.100 / 56.  6.100
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55ca60eef480] Format mov,mp4,m4a,3gp,3g2,mj2 detected only with low score of 1, misdetection possible!
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55ca60eef480] moov atom not found
+/tmp/ot_chunks_f1779923705811joh36r/assembled.mp4: Invalid data found when processing input
+
+[18:16:24] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a177b48684971.00955408.mp4 size=719873
+[18:16:24] Guardado en BD: id=162 ruta=ot/temp/vid_6a177b48684971.00955408.mp4
+[18:16:24] Respuesta: {"status":"complete","compressed":false,"ffmpeg_log":" 27.100\n  libavdevice    59.  7.100 \/ 59.  7.100\n  libavfilter     8. 44.100 \/  8. 44.100\n  libswscale      6.  7.100 \/  6.  7.100\n  libswresample   4.  7.100 \/  4.  7.100\n  libpostproc    56.  6.100 \/ 56.  6.100\n[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55ca60eef480] Format mov,mp4,m4a,3gp,3g2,mj2 detected only with low score of 1, misdetection possible!\n[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55ca60eef480] moov atom not found\n\/tmp\/ot_chunks_f1779923705811joh36r\/assembled.mp4: Invalid data found when processing input\n","saved_db":true,"fotos_ot_id":"162","ruta":"ot\/temp\/vid_6a177b48684971.00955408.mp4","duracion":null,"final_size":719873,"final_size_mb":0.69}
+[13:40:37] chunk=0/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:37] mkdir tmpDir=/tmp/ot_chunks_f17799936338762gyps2/ ok=1
+[13:40:37] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00000 moved=1 size=1048576
+[13:40:37] chunks recibidos=1 total=18
+[13:40:38] chunk=1/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:38] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00001 moved=1 size=1048576
+[13:40:38] chunks recibidos=2 total=18
+[13:40:39] chunk=2/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:39] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00002 moved=1 size=1048576
+[13:40:39] chunks recibidos=3 total=18
+[13:40:40] chunk=3/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:40] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00003 moved=1 size=1048576
+[13:40:40] chunks recibidos=4 total=18
+[13:40:41] chunk=4/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:41] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00004 moved=1 size=1048576
+[13:40:41] chunks recibidos=5 total=18
+[13:40:42] chunk=5/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:42] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00005 moved=1 size=1048576
+[13:40:42] chunks recibidos=6 total=18
+[13:40:43] chunk=6/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:43] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00006 moved=1 size=1048576
+[13:40:43] chunks recibidos=7 total=18
+[13:40:44] chunk=7/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:44] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00007 moved=1 size=1048576
+[13:40:44] chunks recibidos=8 total=18
+[13:40:45] chunk=8/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:45] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00008 moved=1 size=1048576
+[13:40:45] chunks recibidos=9 total=18
+[13:40:46] chunk=9/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:46] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00009 moved=1 size=1048576
+[13:40:46] chunks recibidos=10 total=18
+[13:40:48] chunk=10/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:48] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00010 moved=1 size=1048576
+[13:40:48] chunks recibidos=11 total=18
+[13:40:49] chunk=11/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:49] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00011 moved=1 size=1048576
+[13:40:49] chunks recibidos=12 total=18
+[13:40:50] chunk=12/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:50] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00012 moved=1 size=1048576
+[13:40:50] chunks recibidos=13 total=18
+[13:40:51] chunk=13/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:51] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00013 moved=1 size=1048576
+[13:40:51] chunks recibidos=14 total=18
+[13:40:52] chunk=14/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:52] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00014 moved=1 size=1048576
+[13:40:52] chunks recibidos=15 total=18
+[13:40:52] chunk=15/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:52] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00015 moved=1 size=1048576
+[13:40:52] chunks recibidos=16 total=18
+[13:40:53] chunk=16/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:53] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00016 moved=1 size=1048576
+[13:40:53] chunks recibidos=17 total=18
+[13:40:54] chunk=17/18 fileId=f17799936338762gyps2 fileName=1000161963.mp4
+[13:40:54] chunk saved=/tmp/ot_chunks_f17799936338762gyps2/chunk_00017 moved=1 size=926118
+[13:40:54] chunks recibidos=18 total=18
+[13:40:54] Ensamblando archivo...
+[13:40:54] Ensamblado: /tmp/ot_chunks_f17799936338762gyps2/assembled.mp4 size=18751910
+[13:40:54] ffmpeg=/usr/bin/ffmpeg
+[13:40:54] Ejecutando ffmpeg...
+[13:41:51] ffmpeg ret=0 outExists=1 outSize=9377298
+[13:41:51] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a188c369867b5.27797539.mp4 size=9377298
+[13:41:52] Guardado en BD: id=163 ruta=ot/temp/vid_6a188c369867b5.27797539.mp4
+[13:41:52] Respuesta: {"status":"complete","compressed":true,"original_size":18751910,"final_size":9377298,"saved_db":true,"fotos_ot_id":"163","ruta":"ot\/temp\/vid_6a188c369867b5.27797539.mp4","duracion":88,"final_size_mb":8.94}
+[14:26:44] chunk=0/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:44] mkdir tmpDir=/tmp/ot_chunks_f177999640044704zrie/ ok=1
+[14:26:44] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00000 moved=1 size=1048576
+[14:26:44] chunks recibidos=1 total=30
+[14:26:45] chunk=1/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:45] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00001 moved=1 size=1048576
+[14:26:45] chunks recibidos=2 total=30
+[14:26:47] chunk=2/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:47] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00002 moved=1 size=1048576
+[14:26:47] chunks recibidos=3 total=30
+[14:26:49] chunk=3/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:49] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00003 moved=1 size=1048576
+[14:26:49] chunks recibidos=4 total=30
+[14:26:50] chunk=4/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:50] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00004 moved=1 size=1048576
+[14:26:50] chunks recibidos=5 total=30
+[14:26:52] chunk=5/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:52] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00005 moved=1 size=1048576
+[14:26:52] chunks recibidos=6 total=30
+[14:26:53] chunk=6/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:53] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00006 moved=1 size=1048576
+[14:26:53] chunks recibidos=7 total=30
+[14:26:54] chunk=7/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:54] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00007 moved=1 size=1048576
+[14:26:54] chunks recibidos=8 total=30
+[14:26:56] chunk=8/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:56] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00008 moved=1 size=1048576
+[14:26:56] chunks recibidos=9 total=30
+[14:26:57] chunk=9/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:57] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00009 moved=1 size=1048576
+[14:26:57] chunks recibidos=10 total=30
+[14:26:58] chunk=10/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:58] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00010 moved=1 size=1048576
+[14:26:58] chunks recibidos=11 total=30
+[14:26:59] chunk=11/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:26:59] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00011 moved=1 size=1048576
+[14:26:59] chunks recibidos=12 total=30
+[14:27:01] chunk=12/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:01] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00012 moved=1 size=1048576
+[14:27:01] chunks recibidos=13 total=30
+[14:27:02] chunk=13/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:02] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00013 moved=1 size=1048576
+[14:27:02] chunks recibidos=14 total=30
+[14:27:04] chunk=14/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:04] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00014 moved=1 size=1048576
+[14:27:04] chunks recibidos=15 total=30
+[14:27:05] chunk=15/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:05] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00015 moved=1 size=1048576
+[14:27:05] chunks recibidos=16 total=30
+[14:27:06] chunk=16/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:06] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00016 moved=1 size=1048576
+[14:27:06] chunks recibidos=17 total=30
+[14:27:07] chunk=17/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:07] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00017 moved=1 size=1048576
+[14:27:07] chunks recibidos=18 total=30
+[14:27:09] chunk=18/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:09] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00018 moved=1 size=1048576
+[14:27:09] chunks recibidos=19 total=30
+[14:27:10] chunk=19/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:10] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00019 moved=1 size=1048576
+[14:27:10] chunks recibidos=20 total=30
+[14:27:11] chunk=20/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:11] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00020 moved=1 size=1048576
+[14:27:11] chunks recibidos=21 total=30
+[14:27:12] chunk=21/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:12] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00021 moved=1 size=1048576
+[14:27:12] chunks recibidos=22 total=30
+[14:27:13] chunk=22/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:13] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00022 moved=1 size=1048576
+[14:27:13] chunks recibidos=23 total=30
+[14:27:14] chunk=23/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:14] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00023 moved=1 size=1048576
+[14:27:14] chunks recibidos=24 total=30
+[14:27:16] chunk=24/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:16] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00024 moved=1 size=1048576
+[14:27:16] chunks recibidos=25 total=30
+[14:27:17] chunk=25/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:17] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00025 moved=1 size=1048576
+[14:27:17] chunks recibidos=26 total=30
+[14:27:18] chunk=26/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:18] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00026 moved=1 size=1048576
+[14:27:18] chunks recibidos=27 total=30
+[14:27:19] chunk=27/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:19] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00027 moved=1 size=1048576
+[14:27:19] chunks recibidos=28 total=30
+[14:27:20] chunk=28/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:20] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00028 moved=1 size=1048576
+[14:27:20] chunks recibidos=29 total=30
+[14:27:21] chunk=29/30 fileId=f177999640044704zrie fileName=1000162090.mp4
+[14:27:21] chunk saved=/tmp/ot_chunks_f177999640044704zrie/chunk_00029 moved=1 size=460498
+[14:27:21] chunks recibidos=30 total=30
+[14:27:21] Ensamblando archivo...
+[14:27:21] Ensamblado: /tmp/ot_chunks_f177999640044704zrie/assembled.mp4 size=30869202
+[14:27:21] ffmpeg=/usr/bin/ffmpeg
+[14:27:21] Ejecutando ffmpeg...
+[14:28:16] ffmpeg ret=0 outExists=1 outSize=13109139
+[14:28:16] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1897196ed0e3.12392493.mp4 size=13109139
+[14:28:16] Guardado en BD: id=164 ruta=ot/temp/vid_6a1897196ed0e3.12392493.mp4
+[14:28:16] Respuesta: {"status":"complete","compressed":true,"original_size":30869202,"final_size":13109139,"saved_db":true,"fotos_ot_id":"164","ruta":"ot\/temp\/vid_6a1897196ed0e3.12392493.mp4","duracion":87,"final_size_mb":12.5}
+[14:32:11] chunk=0/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:11] mkdir tmpDir=/tmp/ot_chunks_f1779996727160ginq0a/ ok=1
+[14:32:11] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00000 moved=1 size=1048576
+[14:32:11] chunks recibidos=1 total=31
+[14:32:12] chunk=1/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:12] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00001 moved=1 size=1048576
+[14:32:12] chunks recibidos=2 total=31
+[14:32:13] chunk=2/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:13] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00002 moved=1 size=1048576
+[14:32:13] chunks recibidos=3 total=31
+[14:32:14] chunk=3/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:14] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00003 moved=1 size=1048576
+[14:32:14] chunks recibidos=4 total=31
+[14:32:15] chunk=4/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:15] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00004 moved=1 size=1048576
+[14:32:15] chunks recibidos=5 total=31
+[14:32:16] chunk=5/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:16] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00005 moved=1 size=1048576
+[14:32:16] chunks recibidos=6 total=31
+[14:32:17] chunk=6/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:17] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00006 moved=1 size=1048576
+[14:32:17] chunks recibidos=7 total=31
+[14:32:18] chunk=7/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:18] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00007 moved=1 size=1048576
+[14:32:18] chunks recibidos=8 total=31
+[14:32:19] chunk=8/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:19] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00008 moved=1 size=1048576
+[14:32:19] chunks recibidos=9 total=31
+[14:32:20] chunk=9/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:20] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00009 moved=1 size=1048576
+[14:32:20] chunks recibidos=10 total=31
+[14:32:22] chunk=10/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:22] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00010 moved=1 size=1048576
+[14:32:22] chunks recibidos=11 total=31
+[14:32:23] chunk=11/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:23] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00011 moved=1 size=1048576
+[14:32:23] chunks recibidos=12 total=31
+[14:32:24] chunk=12/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:24] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00012 moved=1 size=1048576
+[14:32:24] chunks recibidos=13 total=31
+[14:32:27] chunk=13/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:27] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00013 moved=1 size=1048576
+[14:32:27] chunks recibidos=14 total=31
+[14:32:28] chunk=14/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:28] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00014 moved=1 size=1048576
+[14:32:28] chunks recibidos=15 total=31
+[14:32:29] chunk=15/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:29] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00015 moved=1 size=1048576
+[14:32:29] chunks recibidos=16 total=31
+[14:32:30] chunk=16/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:30] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00016 moved=1 size=1048576
+[14:32:30] chunks recibidos=17 total=31
+[14:32:31] chunk=17/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:31] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00017 moved=1 size=1048576
+[14:32:31] chunks recibidos=18 total=31
+[14:32:32] chunk=18/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:32] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00018 moved=1 size=1048576
+[14:32:32] chunks recibidos=19 total=31
+[14:32:33] chunk=19/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:33] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00019 moved=1 size=1048576
+[14:32:33] chunks recibidos=20 total=31
+[14:32:34] chunk=20/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:34] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00020 moved=1 size=1048576
+[14:32:34] chunks recibidos=21 total=31
+[14:32:35] chunk=21/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:35] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00021 moved=1 size=1048576
+[14:32:35] chunks recibidos=22 total=31
+[14:32:36] chunk=22/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:36] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00022 moved=1 size=1048576
+[14:32:36] chunks recibidos=23 total=31
+[14:32:37] chunk=23/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:37] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00023 moved=1 size=1048576
+[14:32:37] chunks recibidos=24 total=31
+[14:32:38] chunk=24/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:38] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00024 moved=1 size=1048576
+[14:32:38] chunks recibidos=25 total=31
+[14:32:39] chunk=25/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:39] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00025 moved=1 size=1048576
+[14:32:39] chunks recibidos=26 total=31
+[14:32:40] chunk=26/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:40] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00026 moved=1 size=1048576
+[14:32:40] chunks recibidos=27 total=31
+[14:32:41] chunk=27/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:41] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00027 moved=1 size=1048576
+[14:32:41] chunks recibidos=28 total=31
+[14:32:42] chunk=28/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:42] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00028 moved=1 size=1048576
+[14:32:42] chunks recibidos=29 total=31
+[14:32:43] chunk=29/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:43] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00029 moved=1 size=1048576
+[14:32:43] chunks recibidos=30 total=31
+[14:32:43] chunk=30/31 fileId=f1779996727160ginq0a fileName=1000162098.mp4
+[14:32:43] chunk saved=/tmp/ot_chunks_f1779996727160ginq0a/chunk_00030 moved=1 size=829272
+[14:32:43] chunks recibidos=31 total=31
+[14:32:43] Ensamblando archivo...
+[14:32:43] Ensamblado: /tmp/ot_chunks_f1779996727160ginq0a/assembled.mp4 size=32286552
+[14:32:43] ffmpeg=/usr/bin/ffmpeg
+[14:32:43] Ejecutando ffmpeg...
+[14:33:27] ffmpeg ret=0 outExists=1 outSize=11148896
+[14:33:27] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a18985bd1dbd9.66062384.mp4 size=11148896
+[14:33:27] Guardado en BD: id=165 ruta=ot/temp/vid_6a18985bd1dbd9.66062384.mp4
+[14:33:27] Respuesta: {"status":"complete","compressed":true,"original_size":32286552,"final_size":11148896,"saved_db":true,"fotos_ot_id":"165","ruta":"ot\/temp\/vid_6a18985bd1dbd9.66062384.mp4","duracion":92,"final_size_mb":10.63}
+[14:43:37] chunk=0/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:37] mkdir tmpDir=/tmp/ot_chunks_f1779997413115nfpef6/ ok=1
+[14:43:37] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00000 moved=1 size=1048576
+[14:43:37] chunks recibidos=1 total=27
+[14:43:38] chunk=1/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:38] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00001 moved=1 size=1048576
+[14:43:38] chunks recibidos=2 total=27
+[14:43:39] chunk=2/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:39] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00002 moved=1 size=1048576
+[14:43:39] chunks recibidos=3 total=27
+[14:43:40] chunk=3/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:40] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00003 moved=1 size=1048576
+[14:43:40] chunks recibidos=4 total=27
+[14:43:41] chunk=4/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:41] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00004 moved=1 size=1048576
+[14:43:41] chunks recibidos=5 total=27
+[14:43:42] chunk=5/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:42] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00005 moved=1 size=1048576
+[14:43:42] chunks recibidos=6 total=27
+[14:43:44] chunk=6/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:44] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00006 moved=1 size=1048576
+[14:43:44] chunks recibidos=7 total=27
+[14:43:45] chunk=7/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:45] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00007 moved=1 size=1048576
+[14:43:45] chunks recibidos=8 total=27
+[14:43:46] chunk=8/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:46] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00008 moved=1 size=1048576
+[14:43:46] chunks recibidos=9 total=27
+[14:43:48] chunk=9/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:48] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00009 moved=1 size=1048576
+[14:43:48] chunks recibidos=10 total=27
+[14:43:49] chunk=10/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:49] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00010 moved=1 size=1048576
+[14:43:49] chunks recibidos=11 total=27
+[14:43:50] chunk=11/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:50] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00011 moved=1 size=1048576
+[14:43:50] chunks recibidos=12 total=27
+[14:43:51] chunk=12/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:51] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00012 moved=1 size=1048576
+[14:43:51] chunks recibidos=13 total=27
+[14:43:52] chunk=13/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:52] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00013 moved=1 size=1048576
+[14:43:52] chunks recibidos=14 total=27
+[14:43:54] chunk=14/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:54] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00014 moved=1 size=1048576
+[14:43:54] chunks recibidos=15 total=27
+[14:43:55] chunk=15/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:55] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00015 moved=1 size=1048576
+[14:43:55] chunks recibidos=16 total=27
+[14:43:56] chunk=16/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:56] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00016 moved=1 size=1048576
+[14:43:56] chunks recibidos=17 total=27
+[14:43:58] chunk=17/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:58] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00017 moved=1 size=1048576
+[14:43:58] chunks recibidos=18 total=27
+[14:43:59] chunk=18/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:43:59] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00018 moved=1 size=1048576
+[14:43:59] chunks recibidos=19 total=27
+[14:44:00] chunk=19/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:00] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00019 moved=1 size=1048576
+[14:44:00] chunks recibidos=20 total=27
+[14:44:01] chunk=20/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:01] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00020 moved=1 size=1048576
+[14:44:01] chunks recibidos=21 total=27
+[14:44:02] chunk=21/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:02] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00021 moved=1 size=1048576
+[14:44:02] chunks recibidos=22 total=27
+[14:44:03] chunk=22/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:03] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00022 moved=1 size=1048576
+[14:44:03] chunks recibidos=23 total=27
+[14:44:04] chunk=23/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:04] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00023 moved=1 size=1048576
+[14:44:04] chunks recibidos=24 total=27
+[14:44:06] chunk=24/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:06] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00024 moved=1 size=1048576
+[14:44:06] chunks recibidos=25 total=27
+[14:44:07] chunk=25/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:07] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00025 moved=1 size=1048576
+[14:44:07] chunks recibidos=26 total=27
+[14:44:07] chunk=26/27 fileId=f1779997413115nfpef6 fileName=1000162110.mp4
+[14:44:07] chunk saved=/tmp/ot_chunks_f1779997413115nfpef6/chunk_00026 moved=1 size=102490
+[14:44:07] chunks recibidos=27 total=27
+[14:44:07] Ensamblando archivo...
+[14:44:07] Ensamblado: /tmp/ot_chunks_f1779997413115nfpef6/assembled.mp4 size=27365466
+[14:44:07] ffmpeg=/usr/bin/ffmpeg
+[14:44:07] Ejecutando ffmpeg...
+[14:44:45] ffmpeg ret=0 outExists=1 outSize=10440663
+[14:44:45] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a189b079feff9.73215945.mp4 size=10440663
+[14:44:46] Guardado en BD: id=166 ruta=ot/temp/vid_6a189b079feff9.73215945.mp4
+[14:44:46] Respuesta: {"status":"complete","compressed":true,"original_size":27365466,"final_size":10440663,"saved_db":true,"fotos_ot_id":"166","ruta":"ot\/temp\/vid_6a189b079feff9.73215945.mp4","duracion":77,"final_size_mb":9.96}
+[10:43:52] chunk=0/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:43:52] mkdir tmpDir=/tmp/ot_chunks_f1780069429385m2iali/ ok=1
+[10:43:52] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00000 moved=1 size=1048576
+[10:43:52] chunks recibidos=1 total=22
+[10:43:53] chunk=1/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:43:53] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00001 moved=1 size=1048576
+[10:43:53] chunks recibidos=2 total=22
+[10:43:55] chunk=2/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:43:55] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00002 moved=1 size=1048576
+[10:43:55] chunks recibidos=3 total=22
+[10:43:56] chunk=3/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:43:56] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00003 moved=1 size=1048576
+[10:43:56] chunks recibidos=4 total=22
+[10:43:57] chunk=4/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:43:57] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00004 moved=1 size=1048576
+[10:43:57] chunks recibidos=5 total=22
+[10:43:58] chunk=5/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:43:58] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00005 moved=1 size=1048576
+[10:43:58] chunks recibidos=6 total=22
+[10:44:00] chunk=6/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:00] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00006 moved=1 size=1048576
+[10:44:00] chunks recibidos=7 total=22
+[10:44:01] chunk=7/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:01] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00007 moved=1 size=1048576
+[10:44:01] chunks recibidos=8 total=22
+[10:44:02] chunk=8/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:02] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00008 moved=1 size=1048576
+[10:44:02] chunks recibidos=9 total=22
+[10:44:03] chunk=9/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:03] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00009 moved=1 size=1048576
+[10:44:03] chunks recibidos=10 total=22
+[10:44:04] chunk=10/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:04] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00010 moved=1 size=1048576
+[10:44:04] chunks recibidos=11 total=22
+[10:44:05] chunk=11/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:05] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00011 moved=1 size=1048576
+[10:44:05] chunks recibidos=12 total=22
+[10:44:06] chunk=12/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:06] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00012 moved=1 size=1048576
+[10:44:06] chunks recibidos=13 total=22
+[10:44:07] chunk=13/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:07] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00013 moved=1 size=1048576
+[10:44:07] chunks recibidos=14 total=22
+[10:44:08] chunk=14/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:08] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00014 moved=1 size=1048576
+[10:44:08] chunks recibidos=15 total=22
+[10:44:09] chunk=15/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:09] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00015 moved=1 size=1048576
+[10:44:09] chunks recibidos=16 total=22
+[10:44:10] chunk=16/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:10] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00016 moved=1 size=1048576
+[10:44:10] chunks recibidos=17 total=22
+[10:44:11] chunk=17/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:11] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00017 moved=1 size=1048576
+[10:44:11] chunks recibidos=18 total=22
+[10:44:12] chunk=18/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:12] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00018 moved=1 size=1048576
+[10:44:12] chunks recibidos=19 total=22
+[10:44:13] chunk=19/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:13] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00019 moved=1 size=1048576
+[10:44:13] chunks recibidos=20 total=22
+[10:44:15] chunk=20/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:15] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00020 moved=1 size=1048576
+[10:44:15] chunks recibidos=21 total=22
+[10:44:15] chunk=21/22 fileId=f1780069429385m2iali fileName=1000162578.mp4
+[10:44:15] chunk saved=/tmp/ot_chunks_f1780069429385m2iali/chunk_00021 moved=1 size=667261
+[10:44:15] chunks recibidos=22 total=22
+[10:44:15] Ensamblando archivo...
+[10:44:15] Ensamblado: /tmp/ot_chunks_f1780069429385m2iali/assembled.mp4 size=22687357
+[10:44:15] ffmpeg=/usr/bin/ffmpeg
+[10:44:15] Ejecutando ffmpeg...
+[10:44:56] ffmpeg ret=0 outExists=1 outSize=11765062
+[10:44:56] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a19b44fc6ba17.04733281.mp4 size=11765062
+[10:44:56] Guardado en BD: id=167 ruta=ot/temp/vid_6a19b44fc6ba17.04733281.mp4
+[10:44:56] Respuesta: {"status":"complete","compressed":true,"original_size":22687357,"final_size":11765062,"saved_db":true,"fotos_ot_id":"167","ruta":"ot\/temp\/vid_6a19b44fc6ba17.04733281.mp4","duracion":107,"final_size_mb":11.22}
+[18:22:12] chunk=0/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:12] mkdir tmpDir=/tmp/ot_chunks_f1780096928327zzk508/ ok=1
+[18:22:12] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00000 moved=1 size=1048576
+[18:22:12] chunks recibidos=1 total=24
+[18:22:14] chunk=1/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:14] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00001 moved=1 size=1048576
+[18:22:14] chunks recibidos=2 total=24
+[18:22:15] chunk=2/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:15] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00002 moved=1 size=1048576
+[18:22:15] chunks recibidos=3 total=24
+[18:22:17] chunk=3/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:17] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00003 moved=1 size=1048576
+[18:22:17] chunks recibidos=4 total=24
+[18:22:19] chunk=4/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:19] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00004 moved=1 size=1048576
+[18:22:19] chunks recibidos=5 total=24
+[18:22:20] chunk=5/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:20] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00005 moved=1 size=1048576
+[18:22:20] chunks recibidos=6 total=24
+[18:22:22] chunk=6/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:22] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00006 moved=1 size=1048576
+[18:22:22] chunks recibidos=7 total=24
+[18:22:24] chunk=7/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:24] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00007 moved=1 size=1048576
+[18:22:24] chunks recibidos=8 total=24
+[18:22:26] chunk=8/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:26] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00008 moved=1 size=1048576
+[18:22:26] chunks recibidos=9 total=24
+[18:22:28] chunk=9/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:28] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00009 moved=1 size=1048576
+[18:22:28] chunks recibidos=10 total=24
+[18:22:29] chunk=10/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:29] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00010 moved=1 size=1048576
+[18:22:29] chunks recibidos=11 total=24
+[18:22:31] chunk=11/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:31] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00011 moved=1 size=1048576
+[18:22:31] chunks recibidos=12 total=24
+[18:22:32] chunk=12/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:32] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00012 moved=1 size=1048576
+[18:22:32] chunks recibidos=13 total=24
+[18:22:34] chunk=13/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:34] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00013 moved=1 size=1048576
+[18:22:34] chunks recibidos=14 total=24
+[18:22:36] chunk=14/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:36] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00014 moved=1 size=1048576
+[18:22:36] chunks recibidos=15 total=24
+[18:22:37] chunk=15/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:37] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00015 moved=1 size=1048576
+[18:22:37] chunks recibidos=16 total=24
+[18:22:39] chunk=16/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:39] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00016 moved=1 size=1048576
+[18:22:39] chunks recibidos=17 total=24
+[18:22:40] chunk=17/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:40] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00017 moved=1 size=1048576
+[18:22:40] chunks recibidos=18 total=24
+[18:22:42] chunk=18/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:42] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00018 moved=1 size=1048576
+[18:22:42] chunks recibidos=19 total=24
+[18:22:44] chunk=19/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:44] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00019 moved=1 size=1048576
+[18:22:44] chunks recibidos=20 total=24
+[18:22:53] chunk=20/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:53] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00020 moved=1 size=1048576
+[18:22:53] chunks recibidos=21 total=24
+[18:22:54] chunk=21/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:54] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00021 moved=1 size=1048576
+[18:22:54] chunks recibidos=22 total=24
+[18:22:56] chunk=22/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:56] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00022 moved=1 size=1048576
+[18:22:56] chunks recibidos=23 total=24
+[18:22:57] chunk=23/24 fileId=f1780096928327zzk508 fileName=1000162814.mp4
+[18:22:57] chunk saved=/tmp/ot_chunks_f1780096928327zzk508/chunk_00023 moved=1 size=366347
+[18:22:57] chunks recibidos=24 total=24
+[18:22:57] Ensamblando archivo...
+[18:22:57] Ensamblado: /tmp/ot_chunks_f1780096928327zzk508/assembled.mp4 size=24483595
+[18:22:57] ffmpeg=/usr/bin/ffmpeg
+[18:22:57] Ejecutando ffmpeg...
+[18:23:30] ffmpeg ret=0 outExists=1 outSize=7241017
+[18:23:30] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1a1fd1248524.00831035.mp4 size=7241017
+[18:23:30] Guardado en BD: id=168 ruta=ot/temp/vid_6a1a1fd1248524.00831035.mp4
+[18:23:30] Respuesta: {"status":"complete","compressed":true,"original_size":24483595,"final_size":7241017,"saved_db":true,"fotos_ot_id":"168","ruta":"ot\/temp\/vid_6a1a1fd1248524.00831035.mp4","duracion":31,"final_size_mb":6.91}
+[19:25:15] chunk=0/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:15] mkdir tmpDir=/tmp/ot_chunks_f1780100709350xy3qul/ ok=1
+[19:25:15] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00000 moved=1 size=1048576
+[19:25:15] chunks recibidos=1 total=24
+[19:25:18] chunk=1/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:18] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00001 moved=1 size=1048576
+[19:25:18] chunks recibidos=2 total=24
+[19:25:21] chunk=2/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:21] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00002 moved=1 size=1048576
+[19:25:21] chunks recibidos=3 total=24
+[19:25:24] chunk=3/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:24] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00003 moved=1 size=1048576
+[19:25:24] chunks recibidos=4 total=24
+[19:25:26] chunk=4/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:26] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00004 moved=1 size=1048576
+[19:25:26] chunks recibidos=5 total=24
+[19:25:29] chunk=5/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:29] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00005 moved=1 size=1048576
+[19:25:29] chunks recibidos=6 total=24
+[19:25:31] chunk=6/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:31] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00006 moved=1 size=1048576
+[19:25:31] chunks recibidos=7 total=24
+[19:25:33] chunk=7/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:33] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00007 moved=1 size=1048576
+[19:25:33] chunks recibidos=8 total=24
+[19:25:35] chunk=8/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:35] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00008 moved=1 size=1048576
+[19:25:35] chunks recibidos=9 total=24
+[19:25:37] chunk=9/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:37] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00009 moved=1 size=1048576
+[19:25:37] chunks recibidos=10 total=24
+[19:25:39] chunk=10/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:39] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00010 moved=1 size=1048576
+[19:25:39] chunks recibidos=11 total=24
+[19:25:41] chunk=11/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:41] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00011 moved=1 size=1048576
+[19:25:41] chunks recibidos=12 total=24
+[19:25:43] chunk=12/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:43] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00012 moved=1 size=1048576
+[19:25:43] chunks recibidos=13 total=24
+[19:25:45] chunk=13/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:45] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00013 moved=1 size=1048576
+[19:25:45] chunks recibidos=14 total=24
+[19:25:47] chunk=14/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:47] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00014 moved=1 size=1048576
+[19:25:47] chunks recibidos=15 total=24
+[19:25:54] chunk=15/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:54] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00015 moved=1 size=1048576
+[19:25:54] chunks recibidos=16 total=24
+[19:25:56] chunk=16/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:56] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00016 moved=1 size=1048576
+[19:25:56] chunks recibidos=17 total=24
+[19:25:58] chunk=17/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:25:58] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00017 moved=1 size=1048576
+[19:25:58] chunks recibidos=18 total=24
+[19:26:00] chunk=18/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:26:00] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00018 moved=1 size=1048576
+[19:26:00] chunks recibidos=19 total=24
+[19:26:01] chunk=19/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:26:01] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00019 moved=1 size=1048576
+[19:26:01] chunks recibidos=20 total=24
+[19:26:03] chunk=20/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:26:03] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00020 moved=1 size=1048576
+[19:26:03] chunks recibidos=21 total=24
+[19:26:05] chunk=21/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:26:05] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00021 moved=1 size=1048576
+[19:26:05] chunks recibidos=22 total=24
+[19:26:06] chunk=22/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:26:06] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00022 moved=1 size=1048576
+[19:26:06] chunks recibidos=23 total=24
+[19:26:10] chunk=23/24 fileId=f1780100709350xy3qul fileName=1000162903.mp4
+[19:26:10] chunk saved=/tmp/ot_chunks_f1780100709350xy3qul/chunk_00023 moved=1 size=453181
+[19:26:10] chunks recibidos=24 total=24
+[19:26:10] Ensamblando archivo...
+[19:26:10] Ensamblado: /tmp/ot_chunks_f1780100709350xy3qul/assembled.mp4 size=24570429
+[19:26:10] ffmpeg=/usr/bin/ffmpeg
+[19:26:10] Ejecutando ffmpeg...
+[19:26:45] ffmpeg ret=0 outExists=1 outSize=7239940
+[19:26:45] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1a2ea2d8cc14.80572229.mp4 size=7239940
+[19:26:45] Guardado en BD: id=169 ruta=ot/temp/vid_6a1a2ea2d8cc14.80572229.mp4
+[19:26:45] Respuesta: {"status":"complete","compressed":true,"original_size":24570429,"final_size":7239940,"saved_db":true,"fotos_ot_id":"169","ruta":"ot\/temp\/vid_6a1a2ea2d8cc14.80572229.mp4","duracion":32,"final_size_mb":6.9}
+[18:48:37] chunk=0/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:37] mkdir tmpDir=/tmp/ot_chunks_f1780184914484lxk8ib/ ok=1
+[18:48:37] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00000 moved=1 size=1048576
+[18:48:37] chunks recibidos=1 total=13
+[18:48:39] chunk=1/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:39] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00001 moved=1 size=1048576
+[18:48:39] chunks recibidos=2 total=13
+[18:48:40] chunk=2/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:40] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00002 moved=1 size=1048576
+[18:48:40] chunks recibidos=3 total=13
+[18:48:41] chunk=3/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:41] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00003 moved=1 size=1048576
+[18:48:41] chunks recibidos=4 total=13
+[18:48:43] chunk=4/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:43] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00004 moved=1 size=1048576
+[18:48:43] chunks recibidos=5 total=13
+[18:48:45] chunk=5/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:45] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00005 moved=1 size=1048576
+[18:48:45] chunks recibidos=6 total=13
+[18:48:47] chunk=6/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:47] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00006 moved=1 size=1048576
+[18:48:47] chunks recibidos=7 total=13
+[18:48:48] chunk=7/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:48] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00007 moved=1 size=1048576
+[18:48:48] chunks recibidos=8 total=13
+[18:48:50] chunk=8/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:50] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00008 moved=1 size=1048576
+[18:48:50] chunks recibidos=9 total=13
+[18:48:51] chunk=9/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:51] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00009 moved=1 size=1048576
+[18:48:51] chunks recibidos=10 total=13
+[18:48:55] chunk=10/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:48:55] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00010 moved=1 size=1048576
+[18:48:55] chunks recibidos=11 total=13
+[18:49:00] chunk=11/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:49:00] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00011 moved=1 size=1048576
+[18:49:00] chunks recibidos=12 total=13
+[18:49:01] chunk=12/13 fileId=f1780184914484lxk8ib fileName=1000163252.mp4
+[18:49:01] chunk saved=/tmp/ot_chunks_f1780184914484lxk8ib/chunk_00012 moved=1 size=224815
+[18:49:01] chunks recibidos=13 total=13
+[18:49:01] Ensamblando archivo...
+[18:49:01] Ensamblado: /tmp/ot_chunks_f1780184914484lxk8ib/assembled.mp4 size=12807727
+[18:49:01] ffmpeg=/usr/bin/ffmpeg
+[18:49:01] Ejecutando ffmpeg...
+[18:49:29] ffmpeg ret=0 outExists=1 outSize=6477510
+[18:49:29] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1b776db48066.00980830.mp4 size=6477510
+[18:49:29] Guardado en BD: id=170 ruta=ot/temp/vid_6a1b776db48066.00980830.mp4
+[18:49:29] Respuesta: {"status":"complete","compressed":true,"original_size":12807727,"final_size":6477510,"saved_db":true,"fotos_ot_id":"170","ruta":"ot\/temp\/vid_6a1b776db48066.00980830.mp4","duracion":58,"final_size_mb":6.18}
+[18:53:02] chunk=0/3 fileId=f1780185179067l9v6af fileName=1000163408.mp4
+[18:53:02] mkdir tmpDir=/tmp/ot_chunks_f1780185179067l9v6af/ ok=1
+[18:53:02] chunk saved=/tmp/ot_chunks_f1780185179067l9v6af/chunk_00000 moved=1 size=1048576
+[18:53:02] chunks recibidos=1 total=3
+[18:53:04] chunk=1/3 fileId=f1780185179067l9v6af fileName=1000163408.mp4
+[18:53:04] chunk saved=/tmp/ot_chunks_f1780185179067l9v6af/chunk_00001 moved=1 size=1048576
+[18:53:04] chunks recibidos=2 total=3
+[18:53:04] chunk=2/3 fileId=f1780185179067l9v6af fileName=1000163408.mp4
+[18:53:04] chunk saved=/tmp/ot_chunks_f1780185179067l9v6af/chunk_00002 moved=1 size=943724
+[18:53:04] chunks recibidos=3 total=3
+[18:53:04] Ensamblando archivo...
+[18:53:04] Ensamblado: /tmp/ot_chunks_f1780185179067l9v6af/assembled.mp4 size=3040876
+[18:53:04] ffmpeg=/usr/bin/ffmpeg
+[18:53:04] Ejecutando ffmpeg...
+[18:53:13] ffmpeg ret=0 outExists=1 outSize=2430093
+[18:53:13] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1b7860d7a763.25727953.mp4 size=2430093
+[18:53:13] Guardado en BD: id=171 ruta=ot/temp/vid_6a1b7860d7a763.25727953.mp4
+[18:53:13] Respuesta: {"status":"complete","compressed":true,"original_size":3040876,"final_size":2430093,"saved_db":true,"fotos_ot_id":"171","ruta":"ot\/temp\/vid_6a1b7860d7a763.25727953.mp4","duracion":29,"final_size_mb":2.32}
+[18:57:47] chunk=0/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:47] mkdir tmpDir=/tmp/ot_chunks_f1780185463601kk4dix/ ok=1
+[18:57:47] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00000 moved=1 size=1048576
+[18:57:47] chunks recibidos=1 total=11
+[18:57:48] chunk=1/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:48] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00001 moved=1 size=1048576
+[18:57:48] chunks recibidos=2 total=11
+[18:57:49] chunk=2/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:49] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00002 moved=1 size=1048576
+[18:57:49] chunks recibidos=3 total=11
+[18:57:50] chunk=3/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:50] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00003 moved=1 size=1048576
+[18:57:50] chunks recibidos=4 total=11
+[18:57:51] chunk=4/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:51] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00004 moved=1 size=1048576
+[18:57:51] chunks recibidos=5 total=11
+[18:57:52] chunk=5/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:52] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00005 moved=1 size=1048576
+[18:57:52] chunks recibidos=6 total=11
+[18:57:53] chunk=6/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:53] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00006 moved=1 size=1048576
+[18:57:53] chunks recibidos=7 total=11
+[18:57:54] chunk=7/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:54] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00007 moved=1 size=1048576
+[18:57:54] chunks recibidos=8 total=11
+[18:57:55] chunk=8/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:55] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00008 moved=1 size=1048576
+[18:57:55] chunks recibidos=9 total=11
+[18:57:56] chunk=9/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:56] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00009 moved=1 size=1048576
+[18:57:56] chunks recibidos=10 total=11
+[18:57:57] chunk=10/11 fileId=f1780185463601kk4dix fileName=1000163521.mp4
+[18:57:57] chunk saved=/tmp/ot_chunks_f1780185463601kk4dix/chunk_00010 moved=1 size=632349
+[18:57:57] chunks recibidos=11 total=11
+[18:57:57] Ensamblando archivo...
+[18:57:57] Ensamblado: /tmp/ot_chunks_f1780185463601kk4dix/assembled.mp4 size=11118109
+[18:57:57] ffmpeg=/usr/bin/ffmpeg
+[18:57:57] Ejecutando ffmpeg...
+[18:58:24] ffmpeg ret=0 outExists=1 outSize=6648784
+[18:58:24] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1b79859ce819.50283257.mp4 size=6648784
+[18:58:24] Guardado en BD: id=172 ruta=ot/temp/vid_6a1b79859ce819.50283257.mp4
+[18:58:24] Respuesta: {"status":"complete","compressed":true,"original_size":11118109,"final_size":6648784,"saved_db":true,"fotos_ot_id":"172","ruta":"ot\/temp\/vid_6a1b79859ce819.50283257.mp4","duracion":65,"final_size_mb":6.34}
+[19:03:48] chunk=0/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:48] mkdir tmpDir=/tmp/ot_chunks_f1780185823933o0tb4a/ ok=1
+[19:03:48] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00000 moved=1 size=1048576
+[19:03:48] chunks recibidos=1 total=7
+[19:03:49] chunk=1/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:49] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00001 moved=1 size=1048576
+[19:03:49] chunks recibidos=2 total=7
+[19:03:51] chunk=2/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:51] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00002 moved=1 size=1048576
+[19:03:51] chunks recibidos=3 total=7
+[19:03:53] chunk=3/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:53] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00003 moved=1 size=1048576
+[19:03:53] chunks recibidos=4 total=7
+[19:03:55] chunk=4/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:55] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00004 moved=1 size=1048576
+[19:03:55] chunks recibidos=5 total=7
+[19:03:56] chunk=5/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:56] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00005 moved=1 size=1048576
+[19:03:56] chunks recibidos=6 total=7
+[19:03:57] chunk=6/7 fileId=f1780185823933o0tb4a fileName=1000163248.mp4
+[19:03:57] chunk saved=/tmp/ot_chunks_f1780185823933o0tb4a/chunk_00006 moved=1 size=440396
+[19:03:57] chunks recibidos=7 total=7
+[19:03:57] Ensamblando archivo...
+[19:03:57] Ensamblado: /tmp/ot_chunks_f1780185823933o0tb4a/assembled.mp4 size=6731852
+[19:03:57] ffmpeg=/usr/bin/ffmpeg
+[19:03:57] Ejecutando ffmpeg...
+[19:04:19] ffmpeg ret=0 outExists=1 outSize=5121239
+[19:04:19] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1b7aedb96281.43552947.mp4 size=5121239
+[19:04:19] Guardado en BD: id=173 ruta=ot/temp/vid_6a1b7aedb96281.43552947.mp4
+[19:04:19] Respuesta: {"status":"complete","compressed":true,"original_size":6731852,"final_size":5121239,"saved_db":true,"fotos_ot_id":"173","ruta":"ot\/temp\/vid_6a1b7aedb96281.43552947.mp4","duracion":47,"final_size_mb":4.88}
+[12:14:18] chunk=0/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:18] mkdir tmpDir=/tmp/ot_chunks_f1780247654735bx9qvm/ ok=1
+[12:14:18] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00000 moved=1 size=1048576
+[12:14:18] chunks recibidos=1 total=12
+[12:14:19] chunk=1/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:19] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00001 moved=1 size=1048576
+[12:14:19] chunks recibidos=2 total=12
+[12:14:20] chunk=2/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:20] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00002 moved=1 size=1048576
+[12:14:20] chunks recibidos=3 total=12
+[12:14:21] chunk=3/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:21] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00003 moved=1 size=1048576
+[12:14:21] chunks recibidos=4 total=12
+[12:14:22] chunk=4/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:22] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00004 moved=1 size=1048576
+[12:14:22] chunks recibidos=5 total=12
+[12:14:24] chunk=5/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:24] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00005 moved=1 size=1048576
+[12:14:24] chunks recibidos=6 total=12
+[12:14:25] chunk=6/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:25] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00006 moved=1 size=1048576
+[12:14:25] chunks recibidos=7 total=12
+[12:14:27] chunk=7/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:27] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00007 moved=1 size=1048576
+[12:14:27] chunks recibidos=8 total=12
+[12:14:28] chunk=8/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:28] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00008 moved=1 size=1048576
+[12:14:28] chunks recibidos=9 total=12
+[12:14:29] chunk=9/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:29] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00009 moved=1 size=1048576
+[12:14:29] chunks recibidos=10 total=12
+[12:14:30] chunk=10/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:30] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00010 moved=1 size=1048576
+[12:14:30] chunks recibidos=11 total=12
+[12:14:31] chunk=11/12 fileId=f1780247654735bx9qvm fileName=1000163692.mp4
+[12:14:31] chunk saved=/tmp/ot_chunks_f1780247654735bx9qvm/chunk_00011 moved=1 size=1035385
+[12:14:31] chunks recibidos=12 total=12
+[12:14:31] Ensamblando archivo...
+[12:14:31] Ensamblado: /tmp/ot_chunks_f1780247654735bx9qvm/assembled.mp4 size=12569721
+[12:14:31] ffmpeg=/usr/bin/ffmpeg
+[12:14:31] Ejecutando ffmpeg...
+[12:15:16] ffmpeg ret=0 outExists=1 outSize=5190133
+[12:15:16] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1c6c77a10d47.05929025.mp4 size=5190133
+[12:15:16] Guardado en BD: id=174 ruta=ot/temp/vid_6a1c6c77a10d47.05929025.mp4
+[12:15:16] Respuesta: {"status":"complete","compressed":true,"original_size":12569721,"final_size":5190133,"saved_db":true,"fotos_ot_id":"174","ruta":"ot\/temp\/vid_6a1c6c77a10d47.05929025.mp4","duracion":30,"final_size_mb":4.95}
+[12:15:59] chunk=0/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:15:59] mkdir tmpDir=/tmp/ot_chunks_f1780247756525e4b6ye/ ok=1
+[12:15:59] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00000 moved=1 size=1048576
+[12:15:59] chunks recibidos=1 total=12
+[12:16:00] chunk=1/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:00] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00001 moved=1 size=1048576
+[12:16:00] chunks recibidos=2 total=12
+[12:16:01] chunk=2/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:01] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00002 moved=1 size=1048576
+[12:16:01] chunks recibidos=3 total=12
+[12:16:02] chunk=3/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:02] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00003 moved=1 size=1048576
+[12:16:02] chunks recibidos=4 total=12
+[12:16:03] chunk=4/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:03] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00004 moved=1 size=1048576
+[12:16:03] chunks recibidos=5 total=12
+[12:16:04] chunk=5/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:04] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00005 moved=1 size=1048576
+[12:16:04] chunks recibidos=6 total=12
+[12:16:05] chunk=6/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:05] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00006 moved=1 size=1048576
+[12:16:05] chunks recibidos=7 total=12
+[12:16:06] chunk=7/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:06] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00007 moved=1 size=1048576
+[12:16:06] chunks recibidos=8 total=12
+[12:16:07] chunk=8/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:07] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00008 moved=1 size=1048576
+[12:16:07] chunks recibidos=9 total=12
+[12:16:08] chunk=9/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:08] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00009 moved=1 size=1048576
+[12:16:08] chunks recibidos=10 total=12
+[12:16:09] chunk=10/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:09] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00010 moved=1 size=1048576
+[12:16:09] chunks recibidos=11 total=12
+[12:16:11] chunk=11/12 fileId=f1780247756525e4b6ye fileName=1000163692.mp4
+[12:16:11] chunk saved=/tmp/ot_chunks_f1780247756525e4b6ye/chunk_00011 moved=1 size=1035385
+[12:16:11] chunks recibidos=12 total=12
+[12:16:11] Ensamblando archivo...
+[12:16:11] Ensamblado: /tmp/ot_chunks_f1780247756525e4b6ye/assembled.mp4 size=12569721
+[12:16:11] ffmpeg=/usr/bin/ffmpeg
+[12:16:11] Ejecutando ffmpeg...
+[12:16:54] ffmpeg ret=0 outExists=1 outSize=5190133
+[12:16:54] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1c6cdb0dd681.30676250.mp4 size=5190133
+[12:16:54] Guardado en BD: id=175 ruta=ot/temp/vid_6a1c6cdb0dd681.30676250.mp4
+[12:16:54] Respuesta: {"status":"complete","compressed":true,"original_size":12569721,"final_size":5190133,"saved_db":true,"fotos_ot_id":"175","ruta":"ot\/temp\/vid_6a1c6cdb0dd681.30676250.mp4","duracion":30,"final_size_mb":4.95}
+[12:59:32] chunk=0/5 fileId=f178025036969018dicq fileName=1000163350.mp4
+[12:59:32] mkdir tmpDir=/tmp/ot_chunks_f178025036969018dicq/ ok=1
+[12:59:32] chunk saved=/tmp/ot_chunks_f178025036969018dicq/chunk_00000 moved=1 size=1048576
+[12:59:32] chunks recibidos=1 total=5
+[12:59:33] chunk=1/5 fileId=f178025036969018dicq fileName=1000163350.mp4
+[12:59:33] chunk saved=/tmp/ot_chunks_f178025036969018dicq/chunk_00001 moved=1 size=1048576
+[12:59:33] chunks recibidos=2 total=5
+[12:59:34] chunk=2/5 fileId=f178025036969018dicq fileName=1000163350.mp4
+[12:59:34] chunk saved=/tmp/ot_chunks_f178025036969018dicq/chunk_00002 moved=1 size=1048576
+[12:59:34] chunks recibidos=3 total=5
+[12:59:40] chunk=3/5 fileId=f178025036969018dicq fileName=1000163350.mp4
+[12:59:40] chunk saved=/tmp/ot_chunks_f178025036969018dicq/chunk_00003 moved=1 size=1048576
+[12:59:40] chunks recibidos=4 total=5
+[12:59:41] chunk=4/5 fileId=f178025036969018dicq fileName=1000163350.mp4
+[12:59:41] chunk saved=/tmp/ot_chunks_f178025036969018dicq/chunk_00004 moved=1 size=250629
+[12:59:41] chunks recibidos=5 total=5
+[12:59:41] Ensamblando archivo...
+[12:59:41] Ensamblado: /tmp/ot_chunks_f178025036969018dicq/assembled.mp4 size=4444933
+[12:59:41] ffmpeg=/usr/bin/ffmpeg
+[12:59:41] Ejecutando ffmpeg...
+[12:59:55] ffmpeg ret=0 outExists=1 outSize=3458128
+[12:59:55] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1c770d43afb5.48121637.mp4 size=3458128
+[12:59:55] Guardado en BD: id=176 ruta=ot/temp/vid_6a1c770d43afb5.48121637.mp4
+[12:59:55] Respuesta: {"status":"complete","compressed":true,"original_size":4444933,"final_size":3458128,"saved_db":true,"fotos_ot_id":"176","ruta":"ot\/temp\/vid_6a1c770d43afb5.48121637.mp4","duracion":36,"final_size_mb":3.3}
+[13:06:27] chunk=0/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:27] mkdir tmpDir=/tmp/ot_chunks_f1780250784238zlyu9i/ ok=1
+[13:06:27] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00000 moved=1 size=1048576
+[13:06:27] chunks recibidos=1 total=124
+[13:06:28] chunk=1/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:28] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00001 moved=1 size=1048576
+[13:06:28] chunks recibidos=2 total=124
+[13:06:28] chunk=2/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:28] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00002 moved=1 size=1048576
+[13:06:28] chunks recibidos=3 total=124
+[13:06:29] chunk=3/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:29] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00003 moved=1 size=1048576
+[13:06:29] chunks recibidos=4 total=124
+[13:06:30] chunk=4/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:30] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00004 moved=1 size=1048576
+[13:06:30] chunks recibidos=5 total=124
+[13:06:31] chunk=5/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:31] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00005 moved=1 size=1048576
+[13:06:31] chunks recibidos=6 total=124
+[13:06:32] chunk=6/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:32] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00006 moved=1 size=1048576
+[13:06:32] chunks recibidos=7 total=124
+[13:06:33] chunk=7/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:33] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00007 moved=1 size=1048576
+[13:06:33] chunks recibidos=8 total=124
+[13:06:34] chunk=8/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:34] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00008 moved=1 size=1048576
+[13:06:34] chunks recibidos=9 total=124
+[13:06:35] chunk=9/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:35] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00009 moved=1 size=1048576
+[13:06:35] chunks recibidos=10 total=124
+[13:06:35] chunk=10/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:35] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00010 moved=1 size=1048576
+[13:06:35] chunks recibidos=11 total=124
+[13:06:36] chunk=11/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:36] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00011 moved=1 size=1048576
+[13:06:36] chunks recibidos=12 total=124
+[13:06:37] chunk=12/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:37] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00012 moved=1 size=1048576
+[13:06:37] chunks recibidos=13 total=124
+[13:06:38] chunk=13/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:38] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00013 moved=1 size=1048576
+[13:06:38] chunks recibidos=14 total=124
+[13:06:39] chunk=14/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:39] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00014 moved=1 size=1048576
+[13:06:39] chunks recibidos=15 total=124
+[13:06:40] chunk=15/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:40] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00015 moved=1 size=1048576
+[13:06:40] chunks recibidos=16 total=124
+[13:06:40] chunk=16/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:40] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00016 moved=1 size=1048576
+[13:06:40] chunks recibidos=17 total=124
+[13:06:41] chunk=17/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:41] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00017 moved=1 size=1048576
+[13:06:41] chunks recibidos=18 total=124
+[13:06:42] chunk=18/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:42] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00018 moved=1 size=1048576
+[13:06:42] chunks recibidos=19 total=124
+[13:06:43] chunk=19/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:43] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00019 moved=1 size=1048576
+[13:06:43] chunks recibidos=20 total=124
+[13:06:44] chunk=20/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:44] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00020 moved=1 size=1048576
+[13:06:44] chunks recibidos=21 total=124
+[13:06:45] chunk=21/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:45] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00021 moved=1 size=1048576
+[13:06:45] chunks recibidos=22 total=124
+[13:06:46] chunk=22/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:46] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00022 moved=1 size=1048576
+[13:06:46] chunks recibidos=23 total=124
+[13:06:46] chunk=23/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:46] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00023 moved=1 size=1048576
+[13:06:46] chunks recibidos=24 total=124
+[13:06:47] chunk=24/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:47] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00024 moved=1 size=1048576
+[13:06:47] chunks recibidos=25 total=124
+[13:06:48] chunk=25/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:48] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00025 moved=1 size=1048576
+[13:06:48] chunks recibidos=26 total=124
+[13:06:49] chunk=26/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:49] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00026 moved=1 size=1048576
+[13:06:49] chunks recibidos=27 total=124
+[13:06:50] chunk=27/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:50] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00027 moved=1 size=1048576
+[13:06:50] chunks recibidos=28 total=124
+[13:06:51] chunk=28/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:51] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00028 moved=1 size=1048576
+[13:06:51] chunks recibidos=29 total=124
+[13:06:51] chunk=29/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:51] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00029 moved=1 size=1048576
+[13:06:51] chunks recibidos=30 total=124
+[13:06:52] chunk=30/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:52] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00030 moved=1 size=1048576
+[13:06:52] chunks recibidos=31 total=124
+[13:06:53] chunk=31/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:53] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00031 moved=1 size=1048576
+[13:06:53] chunks recibidos=32 total=124
+[13:06:54] chunk=32/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:54] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00032 moved=1 size=1048576
+[13:06:54] chunks recibidos=33 total=124
+[13:06:55] chunk=33/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:55] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00033 moved=1 size=1048576
+[13:06:55] chunks recibidos=34 total=124
+[13:06:56] chunk=34/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:56] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00034 moved=1 size=1048576
+[13:06:56] chunks recibidos=35 total=124
+[13:06:57] chunk=35/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:57] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00035 moved=1 size=1048576
+[13:06:57] chunks recibidos=36 total=124
+[13:06:57] chunk=36/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:57] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00036 moved=1 size=1048576
+[13:06:57] chunks recibidos=37 total=124
+[13:06:58] chunk=37/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:58] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00037 moved=1 size=1048576
+[13:06:58] chunks recibidos=38 total=124
+[13:06:59] chunk=38/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:06:59] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00038 moved=1 size=1048576
+[13:06:59] chunks recibidos=39 total=124
+[13:07:00] chunk=39/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:00] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00039 moved=1 size=1048576
+[13:07:00] chunks recibidos=40 total=124
+[13:07:01] chunk=40/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:01] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00040 moved=1 size=1048576
+[13:07:01] chunks recibidos=41 total=124
+[13:07:01] chunk=41/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:01] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00041 moved=1 size=1048576
+[13:07:01] chunks recibidos=42 total=124
+[13:07:02] chunk=42/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:02] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00042 moved=1 size=1048576
+[13:07:02] chunks recibidos=43 total=124
+[13:07:03] chunk=43/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:03] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00043 moved=1 size=1048576
+[13:07:03] chunks recibidos=44 total=124
+[13:07:04] chunk=44/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:04] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00044 moved=1 size=1048576
+[13:07:04] chunks recibidos=45 total=124
+[13:07:05] chunk=45/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:05] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00045 moved=1 size=1048576
+[13:07:05] chunks recibidos=46 total=124
+[13:07:05] chunk=46/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:05] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00046 moved=1 size=1048576
+[13:07:05] chunks recibidos=47 total=124
+[13:07:06] chunk=47/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:06] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00047 moved=1 size=1048576
+[13:07:06] chunks recibidos=48 total=124
+[13:07:07] chunk=48/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:07] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00048 moved=1 size=1048576
+[13:07:07] chunks recibidos=49 total=124
+[13:07:08] chunk=49/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:08] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00049 moved=1 size=1048576
+[13:07:08] chunks recibidos=50 total=124
+[13:07:09] chunk=50/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:09] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00050 moved=1 size=1048576
+[13:07:09] chunks recibidos=51 total=124
+[13:07:10] chunk=51/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:10] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00051 moved=1 size=1048576
+[13:07:10] chunks recibidos=52 total=124
+[13:07:11] chunk=52/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:11] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00052 moved=1 size=1048576
+[13:07:11] chunks recibidos=53 total=124
+[13:07:11] chunk=53/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:11] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00053 moved=1 size=1048576
+[13:07:11] chunks recibidos=54 total=124
+[13:07:12] chunk=54/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:12] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00054 moved=1 size=1048576
+[13:07:12] chunks recibidos=55 total=124
+[13:07:13] chunk=55/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:13] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00055 moved=1 size=1048576
+[13:07:13] chunks recibidos=56 total=124
+[13:07:14] chunk=56/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:14] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00056 moved=1 size=1048576
+[13:07:14] chunks recibidos=57 total=124
+[13:07:15] chunk=57/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:15] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00057 moved=1 size=1048576
+[13:07:15] chunks recibidos=58 total=124
+[13:07:16] chunk=58/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:16] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00058 moved=1 size=1048576
+[13:07:16] chunks recibidos=59 total=124
+[13:07:16] chunk=59/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:16] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00059 moved=1 size=1048576
+[13:07:16] chunks recibidos=60 total=124
+[13:07:17] chunk=60/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:17] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00060 moved=1 size=1048576
+[13:07:17] chunks recibidos=61 total=124
+[13:07:18] chunk=61/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:18] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00061 moved=1 size=1048576
+[13:07:18] chunks recibidos=62 total=124
+[13:07:19] chunk=62/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:19] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00062 moved=1 size=1048576
+[13:07:19] chunks recibidos=63 total=124
+[13:07:20] chunk=63/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:20] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00063 moved=1 size=1048576
+[13:07:20] chunks recibidos=64 total=124
+[13:07:21] chunk=64/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:21] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00064 moved=1 size=1048576
+[13:07:21] chunks recibidos=65 total=124
+[13:07:22] chunk=65/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:22] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00065 moved=1 size=1048576
+[13:07:22] chunks recibidos=66 total=124
+[13:07:23] chunk=66/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:23] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00066 moved=1 size=1048576
+[13:07:23] chunks recibidos=67 total=124
+[13:07:23] chunk=67/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:23] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00067 moved=1 size=1048576
+[13:07:23] chunks recibidos=68 total=124
+[13:07:24] chunk=68/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:24] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00068 moved=1 size=1048576
+[13:07:24] chunks recibidos=69 total=124
+[13:07:25] chunk=69/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:25] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00069 moved=1 size=1048576
+[13:07:25] chunks recibidos=70 total=124
+[13:07:26] chunk=70/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:26] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00070 moved=1 size=1048576
+[13:07:26] chunks recibidos=71 total=124
+[13:07:26] chunk=71/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:26] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00071 moved=1 size=1048576
+[13:07:26] chunks recibidos=72 total=124
+[13:07:27] chunk=72/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:27] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00072 moved=1 size=1048576
+[13:07:27] chunks recibidos=73 total=124
+[13:07:28] chunk=73/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:28] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00073 moved=1 size=1048576
+[13:07:28] chunks recibidos=74 total=124
+[13:07:29] chunk=74/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:29] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00074 moved=1 size=1048576
+[13:07:29] chunks recibidos=75 total=124
+[13:07:30] chunk=75/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:30] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00075 moved=1 size=1048576
+[13:07:30] chunks recibidos=76 total=124
+[13:07:31] chunk=76/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:31] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00076 moved=1 size=1048576
+[13:07:31] chunks recibidos=77 total=124
+[13:07:32] chunk=77/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:32] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00077 moved=1 size=1048576
+[13:07:32] chunks recibidos=78 total=124
+[13:07:32] chunk=78/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:32] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00078 moved=1 size=1048576
+[13:07:32] chunks recibidos=79 total=124
+[13:07:33] chunk=79/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:33] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00079 moved=1 size=1048576
+[13:07:33] chunks recibidos=80 total=124
+[13:07:34] chunk=80/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:34] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00080 moved=1 size=1048576
+[13:07:34] chunks recibidos=81 total=124
+[13:07:35] chunk=81/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:35] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00081 moved=1 size=1048576
+[13:07:35] chunks recibidos=82 total=124
+[13:07:36] chunk=82/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:36] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00082 moved=1 size=1048576
+[13:07:36] chunks recibidos=83 total=124
+[13:07:37] chunk=83/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:37] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00083 moved=1 size=1048576
+[13:07:37] chunks recibidos=84 total=124
+[13:07:37] chunk=84/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:37] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00084 moved=1 size=1048576
+[13:07:37] chunks recibidos=85 total=124
+[13:07:38] chunk=85/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:38] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00085 moved=1 size=1048576
+[13:07:38] chunks recibidos=86 total=124
+[13:07:39] chunk=86/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:39] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00086 moved=1 size=1048576
+[13:07:39] chunks recibidos=87 total=124
+[13:07:40] chunk=87/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:40] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00087 moved=1 size=1048576
+[13:07:40] chunks recibidos=88 total=124
+[13:07:41] chunk=88/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:41] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00088 moved=1 size=1048576
+[13:07:41] chunks recibidos=89 total=124
+[13:07:42] chunk=89/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:42] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00089 moved=1 size=1048576
+[13:07:42] chunks recibidos=90 total=124
+[13:07:42] chunk=90/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:42] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00090 moved=1 size=1048576
+[13:07:42] chunks recibidos=91 total=124
+[13:07:43] chunk=91/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:43] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00091 moved=1 size=1048576
+[13:07:43] chunks recibidos=92 total=124
+[13:07:44] chunk=92/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:44] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00092 moved=1 size=1048576
+[13:07:44] chunks recibidos=93 total=124
+[13:07:45] chunk=93/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:45] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00093 moved=1 size=1048576
+[13:07:45] chunks recibidos=94 total=124
+[13:07:46] chunk=94/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:46] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00094 moved=1 size=1048576
+[13:07:46] chunks recibidos=95 total=124
+[13:07:47] chunk=95/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:47] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00095 moved=1 size=1048576
+[13:07:47] chunks recibidos=96 total=124
+[13:07:48] chunk=96/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:48] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00096 moved=1 size=1048576
+[13:07:48] chunks recibidos=97 total=124
+[13:07:48] chunk=97/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:48] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00097 moved=1 size=1048576
+[13:07:48] chunks recibidos=98 total=124
+[13:07:49] chunk=98/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:49] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00098 moved=1 size=1048576
+[13:07:49] chunks recibidos=99 total=124
+[13:07:50] chunk=99/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:50] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00099 moved=1 size=1048576
+[13:07:50] chunks recibidos=100 total=124
+[13:07:52] chunk=100/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:52] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00100 moved=1 size=1048576
+[13:07:52] chunks recibidos=101 total=124
+[13:07:53] chunk=101/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:53] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00101 moved=1 size=1048576
+[13:07:53] chunks recibidos=102 total=124
+[13:07:54] chunk=102/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:54] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00102 moved=1 size=1048576
+[13:07:54] chunks recibidos=103 total=124
+[13:07:54] chunk=103/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:54] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00103 moved=1 size=1048576
+[13:07:54] chunks recibidos=104 total=124
+[13:07:55] chunk=104/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:55] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00104 moved=1 size=1048576
+[13:07:55] chunks recibidos=105 total=124
+[13:07:56] chunk=105/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:56] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00105 moved=1 size=1048576
+[13:07:56] chunks recibidos=106 total=124
+[13:07:58] chunk=106/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:07:58] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00106 moved=1 size=1048576
+[13:07:58] chunks recibidos=107 total=124
+[13:08:00] chunk=107/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:00] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00107 moved=1 size=1048576
+[13:08:00] chunks recibidos=108 total=124
+[13:08:01] chunk=108/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:01] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00108 moved=1 size=1048576
+[13:08:01] chunks recibidos=109 total=124
+[13:08:02] chunk=109/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:02] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00109 moved=1 size=1048576
+[13:08:02] chunks recibidos=110 total=124
+[13:08:02] chunk=110/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:02] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00110 moved=1 size=1048576
+[13:08:02] chunks recibidos=111 total=124
+[13:08:03] chunk=111/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:03] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00111 moved=1 size=1048576
+[13:08:03] chunks recibidos=112 total=124
+[13:08:04] chunk=112/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:04] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00112 moved=1 size=1048576
+[13:08:04] chunks recibidos=113 total=124
+[13:08:05] chunk=113/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:05] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00113 moved=1 size=1048576
+[13:08:05] chunks recibidos=114 total=124
+[13:08:06] chunk=114/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:06] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00114 moved=1 size=1048576
+[13:08:06] chunks recibidos=115 total=124
+[13:08:06] chunk=115/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:06] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00115 moved=1 size=1048576
+[13:08:06] chunks recibidos=116 total=124
+[13:08:07] chunk=116/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:07] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00116 moved=1 size=1048576
+[13:08:07] chunks recibidos=117 total=124
+[13:08:08] chunk=117/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:08] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00117 moved=1 size=1048576
+[13:08:08] chunks recibidos=118 total=124
+[13:08:09] chunk=118/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:09] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00118 moved=1 size=1048576
+[13:08:09] chunks recibidos=119 total=124
+[13:08:10] chunk=119/124 fileId=f1780250784238zlyu9i fileName=1000163400.mp4
+[13:08:10] chunk saved=/tmp/ot_chunks_f1780250784238zlyu9i/chunk_00119 moved=1 size=1048576
+[13:08:10] chunks recibidos=120 total=124
+[13:13:04] chunk=0/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:04] mkdir tmpDir=/tmp/ot_chunks_f17802511819595ypv4u/ ok=1
+[13:13:04] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00000 moved=1 size=1048576
+[13:13:04] chunks recibidos=1 total=60
+[13:13:05] chunk=1/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:05] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00001 moved=1 size=1048576
+[13:13:05] chunks recibidos=2 total=60
+[13:13:06] chunk=2/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:06] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00002 moved=1 size=1048576
+[13:13:06] chunks recibidos=3 total=60
+[13:13:07] chunk=3/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:07] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00003 moved=1 size=1048576
+[13:13:07] chunks recibidos=4 total=60
+[13:13:08] chunk=4/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:08] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00004 moved=1 size=1048576
+[13:13:08] chunks recibidos=5 total=60
+[13:13:09] chunk=5/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:09] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00005 moved=1 size=1048576
+[13:13:09] chunks recibidos=6 total=60
+[13:13:10] chunk=6/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:10] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00006 moved=1 size=1048576
+[13:13:10] chunks recibidos=7 total=60
+[13:13:11] chunk=7/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:11] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00007 moved=1 size=1048576
+[13:13:11] chunks recibidos=8 total=60
+[13:13:11] chunk=8/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:11] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00008 moved=1 size=1048576
+[13:13:11] chunks recibidos=9 total=60
+[13:13:12] chunk=9/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:12] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00009 moved=1 size=1048576
+[13:13:12] chunks recibidos=10 total=60
+[13:13:13] chunk=10/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:13] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00010 moved=1 size=1048576
+[13:13:13] chunks recibidos=11 total=60
+[13:13:14] chunk=11/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:14] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00011 moved=1 size=1048576
+[13:13:14] chunks recibidos=12 total=60
+[13:13:15] chunk=12/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:15] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00012 moved=1 size=1048576
+[13:13:15] chunks recibidos=13 total=60
+[13:13:16] chunk=13/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:16] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00013 moved=1 size=1048576
+[13:13:16] chunks recibidos=14 total=60
+[13:13:17] chunk=14/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:17] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00014 moved=1 size=1048576
+[13:13:17] chunks recibidos=15 total=60
+[13:13:18] chunk=15/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:18] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00015 moved=1 size=1048576
+[13:13:18] chunks recibidos=16 total=60
+[13:13:19] chunk=16/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:19] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00016 moved=1 size=1048576
+[13:13:19] chunks recibidos=17 total=60
+[13:13:20] chunk=17/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:20] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00017 moved=1 size=1048576
+[13:13:20] chunks recibidos=18 total=60
+[13:13:21] chunk=18/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:21] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00018 moved=1 size=1048576
+[13:13:21] chunks recibidos=19 total=60
+[13:13:21] chunk=19/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:21] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00019 moved=1 size=1048576
+[13:13:21] chunks recibidos=20 total=60
+[13:13:22] chunk=20/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:22] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00020 moved=1 size=1048576
+[13:13:22] chunks recibidos=21 total=60
+[13:13:23] chunk=21/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:23] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00021 moved=1 size=1048576
+[13:13:23] chunks recibidos=22 total=60
+[13:13:24] chunk=22/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:24] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00022 moved=1 size=1048576
+[13:13:24] chunks recibidos=23 total=60
+[13:13:25] chunk=23/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:25] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00023 moved=1 size=1048576
+[13:13:25] chunks recibidos=24 total=60
+[13:13:26] chunk=24/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:26] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00024 moved=1 size=1048576
+[13:13:26] chunks recibidos=25 total=60
+[13:13:26] chunk=25/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:26] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00025 moved=1 size=1048576
+[13:13:26] chunks recibidos=26 total=60
+[13:13:27] chunk=26/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:27] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00026 moved=1 size=1048576
+[13:13:27] chunks recibidos=27 total=60
+[13:13:28] chunk=27/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:28] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00027 moved=1 size=1048576
+[13:13:28] chunks recibidos=28 total=60
+[13:13:29] chunk=28/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:29] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00028 moved=1 size=1048576
+[13:13:29] chunks recibidos=29 total=60
+[13:13:30] chunk=29/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:30] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00029 moved=1 size=1048576
+[13:13:30] chunks recibidos=30 total=60
+[13:13:31] chunk=30/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:31] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00030 moved=1 size=1048576
+[13:13:31] chunks recibidos=31 total=60
+[13:13:32] chunk=31/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:32] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00031 moved=1 size=1048576
+[13:13:32] chunks recibidos=32 total=60
+[13:13:32] chunk=32/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:32] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00032 moved=1 size=1048576
+[13:13:32] chunks recibidos=33 total=60
+[13:13:33] chunk=33/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:33] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00033 moved=1 size=1048576
+[13:13:33] chunks recibidos=34 total=60
+[13:13:34] chunk=34/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:34] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00034 moved=1 size=1048576
+[13:13:34] chunks recibidos=35 total=60
+[13:13:35] chunk=35/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:35] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00035 moved=1 size=1048576
+[13:13:35] chunks recibidos=36 total=60
+[13:13:36] chunk=36/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:36] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00036 moved=1 size=1048576
+[13:13:36] chunks recibidos=37 total=60
+[13:13:37] chunk=37/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:37] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00037 moved=1 size=1048576
+[13:13:37] chunks recibidos=38 total=60
+[13:13:37] chunk=38/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:37] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00038 moved=1 size=1048576
+[13:13:37] chunks recibidos=39 total=60
+[13:13:38] chunk=39/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:38] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00039 moved=1 size=1048576
+[13:13:38] chunks recibidos=40 total=60
+[13:13:39] chunk=40/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:39] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00040 moved=1 size=1048576
+[13:13:39] chunks recibidos=41 total=60
+[13:13:40] chunk=41/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:40] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00041 moved=1 size=1048576
+[13:13:40] chunks recibidos=42 total=60
+[13:13:41] chunk=42/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:41] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00042 moved=1 size=1048576
+[13:13:41] chunks recibidos=43 total=60
+[13:13:41] chunk=43/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:41] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00043 moved=1 size=1048576
+[13:13:41] chunks recibidos=44 total=60
+[13:13:42] chunk=44/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:42] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00044 moved=1 size=1048576
+[13:13:42] chunks recibidos=45 total=60
+[13:13:43] chunk=45/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:43] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00045 moved=1 size=1048576
+[13:13:43] chunks recibidos=46 total=60
+[13:13:44] chunk=46/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:44] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00046 moved=1 size=1048576
+[13:13:44] chunks recibidos=47 total=60
+[13:13:45] chunk=47/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:45] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00047 moved=1 size=1048576
+[13:13:45] chunks recibidos=48 total=60
+[13:13:46] chunk=48/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:46] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00048 moved=1 size=1048576
+[13:13:46] chunks recibidos=49 total=60
+[13:13:46] chunk=49/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:46] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00049 moved=1 size=1048576
+[13:13:46] chunks recibidos=50 total=60
+[13:13:47] chunk=50/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:47] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00050 moved=1 size=1048576
+[13:13:47] chunks recibidos=51 total=60
+[13:13:48] chunk=51/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:48] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00051 moved=1 size=1048576
+[13:13:48] chunks recibidos=52 total=60
+[13:13:49] chunk=52/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:49] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00052 moved=1 size=1048576
+[13:13:49] chunks recibidos=53 total=60
+[13:13:50] chunk=53/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:50] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00053 moved=1 size=1048576
+[13:13:50] chunks recibidos=54 total=60
+[13:13:51] chunk=54/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:51] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00054 moved=1 size=1048576
+[13:13:51] chunks recibidos=55 total=60
+[13:13:51] chunk=55/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:51] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00055 moved=1 size=1048576
+[13:13:51] chunks recibidos=56 total=60
+[13:13:52] chunk=56/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:52] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00056 moved=1 size=1048576
+[13:13:52] chunks recibidos=57 total=60
+[13:13:53] chunk=57/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:53] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00057 moved=1 size=1048576
+[13:13:53] chunks recibidos=58 total=60
+[13:13:54] chunk=58/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:54] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00058 moved=1 size=1048576
+[13:13:54] chunks recibidos=59 total=60
+[13:13:54] chunk=59/60 fileId=f17802511819595ypv4u fileName=1000163391.mp4
+[13:13:54] chunk saved=/tmp/ot_chunks_f17802511819595ypv4u/chunk_00059 moved=1 size=823440
+[13:13:54] chunks recibidos=60 total=60
+[13:13:54] Ensamblando archivo...
+[13:13:55] Ensamblado: /tmp/ot_chunks_f17802511819595ypv4u/assembled.mp4 size=62689424
+[13:13:55] ffmpeg=/usr/bin/ffmpeg
+[13:13:55] Ejecutando ffmpeg...
+[13:15:19] ffmpeg ret=0 outExists=1 outSize=18977297
+[13:15:19] Archivo final OK: /var/www/html/clinicadelscooter/assets/img/uploads/ot/temp/vid_6a1c7a62f3fae3.33835397.mp4 size=18977297
+[13:15:20] Guardado en BD: id=177 ruta=ot/temp/vid_6a1c7a62f3fae3.33835397.mp4
+[13:15:20] Respuesta: {"status":"complete","compressed":true,"original_size":62689424,"final_size":18977297,"saved_db":true,"fotos_ot_id":"177","ruta":"ot\/temp\/vid_6a1c7a62f3fae3.33835397.mp4","duracion":80,"final_size_mb":18.1}
