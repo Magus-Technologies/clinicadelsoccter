@@ -37,6 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $serie = '';
         $numero = 0;
         if (in_array($tipoDoc, ['boleta','factura'], true)) {
+            $items_productos_pre = array_filter($items, fn($i) => empty($i['es_ot']));
+            if (empty($items_productos_pre)) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success'=>false,
+                    'error'=>'Para Boleta/Factura debes cargar al menos un PRODUCTO. Si solo vas a cobrar una OT, usa "Nota de venta" o "Ticket".',
+                ]);
+                exit;
+            }
             try {
                 require_once __DIR__ . '/../../includes/sunat/SunatService.php';
                 $pdo = getDB();
@@ -428,8 +437,8 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
         <!-- Monto pagado (efectivo) -->
         <div class="mb-3" id="bloque-efectivo">
-          <label class="tr-form-label">Monto recibido (S/)</label>
-          <input type="number" id="monto-pagado" class="form-control form-control-sm currency-input" step="0.01"/>
+          <label class="tr-form-label">Monto recibido (S/) <span class="text-danger">*</span></label>
+          <input type="number" id="monto-pagado" class="form-control form-control-sm currency-input" step="0.01" required min="0"/>
           <div class="mt-1 small text-success" id="txt-vuelto"></div>
         </div>
 
@@ -570,6 +579,26 @@ function procesarVenta() {
       if (typeof feather !== 'undefined') feather.replace();
     }, 2000);
     return;
+  }
+  const tipoDocSel = document.getElementById('tipo-doc').value;
+  if (tipoDocSel === 'boleta' || tipoDocSel === 'factura') {
+    const hayProductoReal = carrito.some(i => !i.es_ot);
+    if (!hayProductoReal) {
+      alert('Para Boleta/Factura debes cargar al menos un PRODUCTO. Si solo vas a cobrar una OT, usa "Nota de venta" o "Ticket".');
+      return;
+    }
+  }
+  const montoPagado = parseFloat(document.getElementById('monto-pagado').value)||0;
+  const totalTxt = parseFloat(document.getElementById('txt-total').textContent.replace('S/ ',''))||0;
+  if (montoPagado <= 0) {
+    alert('Debes ingresar el Monto recibido.');
+    document.getElementById('monto-pagado').focus();
+    return;
+  }
+  if (montoPagado < totalTxt) {
+    if (!confirm('El monto recibido (S/ ' + montoPagado.toFixed(2) + ') es menor al total (S/ ' + totalTxt.toFixed(2) + '). ¿Continuar?')) {
+      return;
+    }
   }
   const btn = document.getElementById('btn-confirmar-venta');
   btn.disabled = true;
