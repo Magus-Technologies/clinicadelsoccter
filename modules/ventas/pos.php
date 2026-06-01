@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $numero = 0;
         if (in_array($tipoDoc, ['boleta','factura'], true)) {
             try {
+                require_once __DIR__ . '/../../includes/sunat/SunatService.php';
                 $pdo = getDB();
                 $pdo->beginTransaction();
                 $st = $pdo->prepare("SELECT id, serie, numero FROM documentos_empresa WHERE empresa_id=1 AND tipo=? AND activo=1 ORDER BY id ASC LIMIT 1 FOR UPDATE");
