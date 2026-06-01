@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/logger.php';
 requireLogin();
 requireRole([ROL_ADMIN, ROL_VENDEDOR]);
 
@@ -117,6 +118,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if ($pdo->inTransaction()) $pdo->rollBack();
                 $serie = '';
                 $numero = 0;
+                app_log('SUNAT try failed: '.$e->getMessage(), 'ERROR', [
+                    'trace' => $e->getTraceAsString(),
+                    'codigo' => $codigo ?? null,
+                    'items_count' => count($items ?? []),
+                ]);
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success'=>false,
@@ -216,6 +222,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
 
     } catch (Throwable $e) {
+        app_log('Procesar venta general error: '.$e->getMessage(), 'ERROR', [
+            'trace' => $e->getTraceAsString(),
+            'tipo_doc' => $tipoDoc ?? null,
+            'items_count' => count($items ?? []),
+        ]);
         header('Content-Type: application/json');
         echo json_encode(['success'=>false,'error'=>$e->getMessage()]);
         exit;
