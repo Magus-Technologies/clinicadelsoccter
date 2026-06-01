@@ -90,6 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                 if (!$sunatOk) {
                     $pdo->rollBack();
+                    app_log('SUNAT rechazo XML: '.$sunatMsg, 'WARN', [
+                        'venta_id' => $ventaId,
+                        'codigo' => $codigo,
+                        'tipo_doc' => $tipoDoc,
+                        'serie' => $serie,
+                        'numero' => $numero,
+                        'sunat_response' => $res,
+                    ]);
                     header('Content-Type: application/json');
                     echo json_encode([
                         'success'=>false,
