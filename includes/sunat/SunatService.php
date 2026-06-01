@@ -9,6 +9,7 @@
  */
 require_once __DIR__ . '/SunatClient.php';
 require_once __DIR__ . '/SunatBuilder.php';
+require_once __DIR__ . '/../logger.php';
 
 class SunatService
 {
