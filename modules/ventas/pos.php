@@ -47,11 +47,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $pdo->prepare("UPDATE documentos_empresa SET numero=? WHERE id=?")->execute([$numero, $cor['id']]);
                     $serie = $cor['serie'];
                 }
+
+                $pdo->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie,numero,subtotal,igv,descuento,total,metodo_pago,monto_pagado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+                   ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
+                $ventaId = $pdo->lastInsertId();
+
+                foreach ($items as $item) {
+                    $pid  = (int)$item['id'];
+                    $cant = (float)$item['cantidad'];
+                    $precio = (float)$item['precio'];
+                    $subtItem = $cant * $precio;
+
+                    $pdo->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
+                       ->execute([$ventaId,$pid,$cant,$precio,$subtItem]);
+
+                    $prod = $pdo->prepare("SELECT stock_actual FROM productos WHERE id=?");
+                    $prod->execute([$pid]);
+                    $antes = (float)$prod->fetchColumn();
+                    $despues = $antes - $cant;
+                    $pdo->prepare("UPDATE productos SET stock_actual=? WHERE id=?")->execute([$despues,$pid]);
+                    $pdo->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
+                       ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
+                }
+
+                $caja = $pdo->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
+                $caja->execute();
+                $cajaId = $caja->fetchColumn();
+                if ($cajaId) {
+                    $pdo->prepare("INSERT INTO movimientos_caja (caja_id,tipo,concepto,monto,referencia,usuario_id) VALUES (?,?,?,?,?,?)")
+                       ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
+                }
+
+                $sunat = new SunatService($pdo);
+                $res = $sunat->generarXml((int)$ventaId);
+                $sunatOk = $res['ok'];
+                $sunatMsg = $res['mensaje'] ?? '';
+
+                if (!$sunatOk) {
+                    $pdo->rollBack();
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success'=>false,
+                        'error'=>'SUNAT rechazo la generacion del XML: '.$sunatMsg,
+                        'sunat_reject'=>true,
+                    ]);
+                    exit;
+                }
+
                 $pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success'=>true,
+                    'codigo'=>$codigo,
+                    'total'=>$total,
+                    'venta_id'=>$ventaId,
+                    'sunat_xml'=>$sunatOk,
+                    'sunat_msg'=>$sunatMsg,
+                    'serie'=>$serie,
+                    'numero'=>$numero ? str_pad((string)$numero, 8, '0', STR_PAD_LEFT) : '',
+                ]);
+                exit;
+
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
                 $serie = '';
                 $numero = 0;
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success'=>false,
+                    'error'=>'Error al procesar venta SUNAT: '.$e->getMessage(),
+                ]);
+                exit;
             }
         }
 
