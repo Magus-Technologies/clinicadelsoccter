@@ -84,26 +84,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                        ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
                 }
 
-                $pdo->commit();
-
                 $sunat = new SunatService($pdo);
                 $res = $sunat->generarXml((int)$ventaId);
                 $sunatOk = $res['ok'];
                 $sunatMsg = $res['mensaje'] ?? '';
 
                 if (!$sunatOk) {
-                    $pdo2 = getDB();
-                    $pdo2->prepare("DELETE FROM movimientos_caja WHERE referencia=?")->execute([$codigo]);
-                    $pdo2->prepare("DELETE FROM venta_detalle WHERE venta_id=?")->execute([$ventaId]);
-                    $pdo2->prepare("DELETE FROM ventas WHERE id=?")->execute([$ventaId]);
-                    $pdo2->prepare("UPDATE documentos_empresa SET numero=numero-1 WHERE id=?")->execute([$cor['id']]);
-
-                    foreach ($items as $item) {
-                        $pid = (int)$item['id'];
-                        $cant = (float)$item['cantidad'];
-                        $pdo2->prepare("UPDATE productos SET stock_actual=stock_actual+? WHERE id=?")->execute([$cant,$pid]);
-                    }
-
+                    $pdo->rollBack();
                     header('Content-Type: application/json');
                     echo json_encode([
                         'success'=>false,
@@ -112,6 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     ]);
                     exit;
                 }
+
+                $pdo->commit();
 
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
