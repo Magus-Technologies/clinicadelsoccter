@@ -21,36 +21,57 @@ $venta->execute([$id]);
 $venta = $venta->fetch();
 if (!$venta) die('Venta no encontrada.');
 
+// Líneas de producto. LEFT JOIN porque una línea puede no tener producto,
+// y se excluyen las de OT: esas se listan aparte, más abajo.
 $detalle = $db->prepare("
     SELECT vd.*, p.nombre AS prod_nombre, p.codigo AS prod_codigo, c.nombre AS cat_nombre
     FROM venta_detalle vd
-    JOIN productos p ON p.id=vd.producto_id
-    JOIN categorias c ON c.id=p.categoria_id
-    WHERE vd.venta_id=? ORDER BY vd.id");
+    LEFT JOIN productos  p ON p.id = vd.producto_id
+    LEFT JOIN categorias c ON c.id = p.categoria_id
+    WHERE vd.venta_id = ? AND vd.ot_id IS NULL
+    ORDER BY vd.id");
 $detalle->execute([$id]);
 $detalle = $detalle->fetchAll();
 
-// Extraer OTs cobradas desde notas — soporta formato nuevo (##OT##) y antiguo (OT: ... |)
+// OTs cobradas en esta venta. La fuente es la relación venta_detalle.ot_id.
 $items_ot = [];
+$stOT = $db->prepare("
+    SELECT COALESCE(vd.concepto, p.nombre, o.codigo_ot) AS desc_ot, vd.subtotal
+    FROM venta_detalle vd
+    LEFT JOIN ordenes_trabajo o ON o.id = vd.ot_id
+    LEFT JOIN productos       p ON p.id = vd.producto_id
+    WHERE vd.venta_id = ? AND vd.ot_id IS NOT NULL
+    ORDER BY vd.id");
+$stOT->execute([$id]);
+foreach ($stOT->fetchAll() as $r) {
+    $items_ot[] = ['desc' => $r['desc_ot'], 'precio' => (float)$r['subtotal']];
+}
+
+// Ventas anteriores a la migración: las OTs viven en el texto de `notas`.
+// Solo se parsea si no hubo ninguna línea con ot_id, para no duplicarlas.
 $notas_limpias = '';
 if (!empty($venta['notas'])) {
     $notas_raw = $venta['notas'];
 
-    // Formato nuevo: ##OT##descripcion##PRECIO##monto##FIN##
+    // Formato intermedio: ##OT##descripcion##PRECIO##monto##FIN##
     if (strpos($notas_raw, '##OT##') !== false) {
-        preg_match_all('/##OT##(.+?)##PRECIO##([\d.]+)##FIN##/s', $notas_raw, $matches, PREG_SET_ORDER);
-        foreach ($matches as $m) {
-            $items_ot[] = ['desc' => trim($m[1]), 'precio' => (float)$m[2]];
+        if (empty($items_ot)) {
+            preg_match_all('/##OT##(.+?)##PRECIO##([\d.]+)##FIN##/s', $notas_raw, $matches, PREG_SET_ORDER);
+            foreach ($matches as $m) {
+                $items_ot[] = ['desc' => trim($m[1]), 'precio' => (float)$m[2]];
+            }
         }
         $notas_limpias = trim(preg_replace('/##OT##.+?##FIN##\s*/s', '', $notas_raw));
 
     // Formato antiguo: "OT: descripcion | OT: descripcion |"
     } elseif (strpos($notas_raw, 'OT:') !== false) {
+        $sinLineasOT = empty($items_ot);
         $partes = explode(' | ', $notas_raw);
         foreach ($partes as $p) {
             $p = trim($p);
             if (preg_match('/^OT:\s*(.+)$/i', $p, $m)) {
-                $items_ot[] = ['desc' => trim($m[1]), 'precio' => null];
+                // El texto de la OT nunca va a las notas: o es un ítem, o se descarta.
+                if ($sinLineasOT) $items_ot[] = ['desc' => trim($m[1]), 'precio' => null];
             } elseif ($p !== '') {
                 $notas_limpias .= $p . ' ';
             }

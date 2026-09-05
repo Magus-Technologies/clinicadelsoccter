@@ -160,10 +160,15 @@ class SunatService
 
     private function fetchItems(int $ventaId): array
     {
+        // Una línea puede ser un producto de inventario o una orden de
+        // trabajo. `nombre` y `codigo` se resuelven según cuál sea.
         $st = $this->db->prepare("
-            SELECT vd.*, p.codigo
+            SELECT vd.*,
+                   COALESCE(p.codigo, o.codigo_ot)              AS codigo,
+                   COALESCE(vd.concepto, p.nombre, o.codigo_ot) AS nombre
             FROM venta_detalle vd
-            LEFT JOIN productos p ON vd.producto_id = p.id
+            LEFT JOIN productos       p ON vd.producto_id = p.id
+            LEFT JOIN ordenes_trabajo o ON vd.ot_id       = o.id
             WHERE vd.venta_id = ?
         ");
         $st->execute([$ventaId]);

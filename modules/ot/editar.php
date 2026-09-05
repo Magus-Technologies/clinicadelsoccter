@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/stock_ot.php';
 requireLogin();
 
 $db   = getDB();
@@ -150,16 +151,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Registrar repuestos (borrar y reinsertar)
+    // Registrar repuestos (borrar y reinsertar).
+    // Antes de borrar hay que devolver al inventario lo que esta OT ya
+    // había descontado; si no, el stock queda descuadrado para siempre.
+    $yaDescontaba = (bool)$db->query("SELECT COUNT(*) FROM ot_repuestos WHERE ot_id={$id} AND stock_descontado=1")->fetchColumn();
+    if ($yaDescontaba) revertirStockOT($db, $id, (int)$user['id']);
+
     $db->prepare("DELETE FROM ot_repuestos WHERE ot_id=?")->execute([$id]);
-    $descs  = $_POST['rep_desc']   ?? [];
-    $cants  = $_POST['rep_cant']   ?? [];
-    $precios= $_POST['rep_precio'] ?? [];
+    $descs   = $_POST['rep_desc']    ?? [];
+    $cants   = $_POST['rep_cant']    ?? [];
+    $precios = $_POST['rep_precio']  ?? [];
+    $prodIds = $_POST['rep_prod_id'] ?? [];
     foreach ($descs as $i => $desc2) {
         $d = trim($desc2); $c = (float)($cants[$i]??1); $p = (float)($precios[$i]??0);
         if (!$d) continue;
-        $db->prepare("INSERT INTO ot_repuestos (ot_id,descripcion,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-           ->execute([$id, $d, $c, $p, round($c*$p,2)]);
+        // producto_id vincula el repuesto con el inventario. 0 = texto libre.
+        $pid = (int)($prodIds[$i] ?? 0) ?: null;
+        $db->prepare("INSERT INTO ot_repuestos (ot_id,producto_id,descripcion,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?,?)")
+           ->execute([$id, $pid, $d, $c, $p, round($c*$p,2)]);
+    }
+
+    // Si la OT ya estaba cobrada, la nueva lista de repuestos vuelve a salir.
+    if ($yaDescontaba) descontarStockOT($db, $id, (int)$user['id']);
+
+    // El cambio de estado desde este formulario también deja rastro.
+    // Sin esto, editar una OT le pisaba el estado en silencio.
+    if ($estado !== $ot['estado']) {
+        $db->prepare("INSERT INTO historial_ot (ot_id,usuario_id,estado_antes,estado_nuevo,comentario) VALUES (?,?,?,?,?)")
+           ->execute([$id, $user['id'], $ot['estado'], $estado, 'Estado cambiado desde la edición de la OT']);
     }
 
     setFlash('success', 'OT actualizada correctamente.');
@@ -330,6 +349,7 @@ require_once __DIR__ . '/../../includes/header.php';
           ?>
           <div class="rep-item" style="border-bottom:1px solid #f1f5f9; padding:10px 12px">
             <div class="mb-2">
+              <input type="hidden" name="rep_prod_id[]" value="<?= (int)($r['producto_id'] ?? 0) ?>"/>
               <input type="text" name="rep_desc[]" class="form-control form-control-sm" value="<?= sanitize($r['descripcion']) ?>" required placeholder="Descripción del servicio o repuesto"/>
             </div>
             <div class="d-flex gap-2 align-items-center">
@@ -750,7 +770,7 @@ function cargarServicioEditar(id) {
         if (vacia) vacia.remove();
         data.repuestos.forEach(r => {
           const desc = r.nombre + (r.codigo ? ' ['+r.codigo+']' : '');
-          agregarRepuestoConDatos(desc, r.cantidad, r.precio_referencial);
+          agregarRepuestoConDatos(desc, r.cantidad, r.precio_referencial, r.producto_id);
         });
         calcTotalesRep();
       }
@@ -759,13 +779,13 @@ function cargarServicioEditar(id) {
     .catch(() => {});
 }
 
-function agregarRepuestoConDatos(desc, cant, precio) {
+function agregarRepuestoConDatos(desc, cant, precio, prodId) {
   const sub = ((parseFloat(cant)||1) * (parseFloat(precio)||0)).toFixed(2);
-  _insertarRepItem(escH(desc||''), parseFloat(cant)||1, parseFloat(precio)||0, sub);
+  _insertarRepItem(escH(desc||''), parseFloat(cant)||1, parseFloat(precio)||0, sub, parseInt(prodId)||0);
   calcTotalesRep();
 }
 
-function _insertarRepItem(desc, cant, precio, sub) {
+function _insertarRepItem(desc, cant, precio, sub, prodId) {
   const cont  = document.getElementById('contenedor-repuestos');
   const vacia = document.getElementById('fila-vacia-rep');
   if (vacia) vacia.remove();
@@ -774,6 +794,7 @@ function _insertarRepItem(desc, cant, precio, sub) {
   div.style.cssText = 'border-bottom:1px solid #f1f5f9; padding:10px 12px';
   div.innerHTML = `
     <div class="mb-2">
+      <input type="hidden" name="rep_prod_id[]" value="${parseInt(prodId)||0}"/>
       <input type="text" name="rep_desc[]" class="form-control form-control-sm" value="${desc}" required placeholder="Descripción del servicio o repuesto"/>
     </div>
     <div class="d-flex gap-2 align-items-center">
@@ -801,7 +822,7 @@ function escH(s) {
 }
 
 function agregarRepuesto() {
-  _insertarRepItem('', 1, 0, '0.00');
+  _insertarRepItem('', 1, 0, '0.00', 0);
   const items = document.querySelectorAll('.rep-item input[name="rep_desc[]"]');
   if (items.length) items[items.length-1].focus();
 }
@@ -867,7 +888,8 @@ document.getElementById('buscar-inventario').addEventListener('input', function(
 });
 
 function agregarDesdeInventario(p) {
-  agregarRepuestoConDatos(p.nombre + (p.marca ? ' ' + p.marca : '') + (p.modelo ? ' ' + p.modelo : ''), 1, p.precio_venta);
+  // p.id se conserva: es el vínculo con inventario que permite descontar stock.
+  agregarRepuestoConDatos(p.nombre + (p.marca ? ' ' + p.marca : '') + (p.modelo ? ' ' + p.modelo : ''), 1, p.precio_venta, p.id);
   document.getElementById('buscar-inventario').value = '';
   document.getElementById('lista-inventario').style.display = 'none';
 }

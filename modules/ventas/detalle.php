@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/ventas.php';
 requireLogin();
 $db = getDB();
 
@@ -26,10 +27,16 @@ $venta->execute([$id]);
 $venta = $venta->fetch();
 if (!$venta) { setFlash('danger','Venta no encontrada (id='.$id.', codigo='.$codigo.')'); redirect(BASE_URL.'modules/ventas/index.php'); }
 
+// LEFT JOIN: una línea puede ser una OT (sin producto de inventario).
 $detalle = $db->prepare("
-    SELECT vd.*, p.nombre as prod_nombre, p.codigo as prod_codigo, p.marca
+    SELECT vd.*,
+           COALESCE(p.nombre, vd.concepto, o.codigo_ot, 'Concepto') AS prod_nombre,
+           COALESCE(p.codigo, o.codigo_ot, '—')                     AS prod_codigo,
+           COALESCE(p.marca, '—')                                   AS marca,
+           o.codigo_ot
     FROM venta_detalle vd
-    JOIN productos p ON p.id=vd.producto_id
+    LEFT JOIN productos p        ON p.id = vd.producto_id
+    LEFT JOIN ordenes_trabajo o  ON o.id = vd.ot_id
     WHERE vd.venta_id=? ORDER BY vd.id");
 $detalle->execute([$id]);
 $detalle = $detalle->fetchAll();
@@ -39,6 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action']??'') === 'anular'
     $user = currentUser();
     $db->prepare("UPDATE ventas SET estado='anulada' WHERE id=?")->execute([$id]);
     foreach ($detalle as $d) {
+        // Las líneas de OT no mueven inventario: no hay stock que devolver.
+        if (empty($d['producto_id'])) continue;
+
         $s = $db->prepare("SELECT stock_actual FROM productos WHERE id=?"); $s->execute([$d['producto_id']]);
         $antes = (float)$s->fetchColumn();
         $despues = $antes + $d['cantidad'];
@@ -46,21 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action']??'') === 'anular'
         $db->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
            ->execute([$d['producto_id'],'devolucion',$d['cantidad'],$antes,$despues,$d['precio_unit'],'Venta anulada',$venta['codigo'],$user['id']]);
     }
-    // Revertir OTs cobradas en esta venta — vuelven a estar pendientes de pago
-    if (!empty($venta['notas'])) {
-        preg_match_all('/##OT##.+?OT-\d{4}-(\d+).+?##FIN##/s', $venta['notas'], $m);
-        // Revertir por código de OT embebido en las notas
-        $db->prepare("
-            UPDATE ordenes_trabajo SET pagado=0, fecha_pago=NULL, metodo_pago=NULL
-            WHERE id IN (
-                SELECT id FROM (
-                    SELECT ot.id FROM ordenes_trabajo ot
-                    JOIN ventas v ON v.notas LIKE CONCAT('%', ot.codigo_ot, '%')
-                    WHERE v.id = ?
-                ) tmp
-            )
-        ")->execute([$id]);
-    }
+    // Las OTs cobradas en esta venta vuelven a estar pendientes de pago.
+    // Antes esto se resolvía parseando el texto de `ventas.notas`; ahora el
+    // vínculo es la FK venta_detalle.ot_id.
+    reabrirOTsDeVenta($db, $id, (int)$user['id'], $venta['codigo']);
+
     setFlash('success','Venta anulada y stock restaurado.');
     redirect(BASE_URL.'modules/ventas/detalle.php?id='.$id);
 }

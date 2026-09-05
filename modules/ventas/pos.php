@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../includes/logger.php';
+require_once __DIR__ . '/../../includes/ventas.php';
 requireLogin();
 requireRole([ROL_ADMIN, ROL_VENDEDOR]);
 
@@ -37,15 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $serie = '';
         $numero = 0;
         if (in_array($tipoDoc, ['boleta','factura'], true)) {
-            $items_productos_pre = array_filter($items, fn($i) => empty($i['es_ot']));
-            if (empty($items_productos_pre)) {
-                header('Content-Type: application/json');
-                echo json_encode([
-                    'success'=>false,
-                    'error'=>'Para Boleta/Factura debes cargar al menos un PRODUCTO. Si solo vas a cobrar una OT, usa "Nota de venta" o "Ticket".',
-                ]);
-                exit;
-            }
             try {
                 require_once __DIR__ . '/../../includes/sunat/SunatService.php';
                 $pdo = getDB();
@@ -63,26 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                    ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
                 $ventaId = $pdo->lastInsertId();
 
-                $items_productos_sunat = array_filter($items, fn($i) => empty($i['es_ot']));
-                $items_ot_sunat       = array_filter($items, fn($i) => !empty($i['es_ot']));
-
-                foreach ($items_productos_sunat as $item) {
-                    $pid  = (int)$item['id'];
-                    $cant = (float)$item['cantidad'];
-                    $precio = (float)$item['precio'];
-                    $subtItem = $cant * $precio;
-
-                    $pdo->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-                       ->execute([$ventaId,$pid,$cant,$precio,$subtItem]);
-
-                    $prod = $pdo->prepare("SELECT stock_actual FROM productos WHERE id=?");
-                    $prod->execute([$pid]);
-                    $antes = (float)$prod->fetchColumn();
-                    $despues = $antes - $cant;
-                    $pdo->prepare("UPDATE productos SET stock_actual=? WHERE id=?")->execute([$despues,$pid]);
-                    $pdo->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
-                       ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
-                }
+                // Las OTs entran como línea real de la boleta, con su ot_id.
+                // Si SUNAT rechaza, el rollback deshace también el cierre de la OT.
+                registrarLineasVenta($pdo, (int)$ventaId, $codigo, $items, (int)$user['id']);
+                cerrarOTsDeVenta($pdo, $items, $metPago, (int)$user['id'], $codigo);
 
                 $caja = $pdo->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
                 $caja->execute();
@@ -149,19 +125,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
 
-        // Separar items reales de items OT
-        $items_productos = array_filter($items, fn($i) => empty($i['es_ot']));
-        $items_ot        = array_filter($items, fn($i) => !empty($i['es_ot']));
+        // Las OTs ya no se serializan en `notas`: cada una es una línea de
+        // venta_detalle con su ot_id. `notas` vuelve a ser solo del usuario.
+        $notas_final = trim($_POST['notas'] ?? '') ?: null;
 
-        // Notas: incluir resumen de OTs cobradas con precio
-        $notas_ot = '';
-        foreach ($items_ot as $iot) {
-            $notas_ot .= '##OT##' . ($iot['nombre'] ?? '') . '##PRECIO##' . number_format((float)$iot['precio'], 2) . '##FIN## ';
-        }
-
-        // Notas manuales del usuario (campo notas del POST si existiera)
-        $notas_manual = trim($_POST['notas'] ?? '');
-        $notas_final  = trim($notas_ot . $notas_manual) ?: null;
+        $db->beginTransaction();
 
         $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie_doc,num_doc,subtotal,igv,descuento,total,metodo_pago,monto_pagado,notas) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
            ->execute([
@@ -173,26 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
            ]);
         $ventaId = $db->lastInsertId();
 
-        foreach ($items_productos as $item) {
-            $pid  = (int)($item['id'] ?? 0);
-            $cant = (float)($item['cantidad'] ?? 1);
-            $precio = (float)($item['precio'] ?? 0);
-            $subtItem = $cant * $precio;
-
-            // Saltar items sin producto válido
-            if ($pid <= 0) continue;
-
-            $db->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-               ->execute([$ventaId, $pid, $cant, $precio, $subtItem]);
-
-            $prod = $db->prepare("SELECT stock_actual FROM productos WHERE id=?");
-            $prod->execute([$pid]);
-            $antes = (float)$prod->fetchColumn();
-            $despues = $antes - $cant;
-            $db->prepare("UPDATE productos SET stock_actual=? WHERE id=?")->execute([$despues,$pid]);
-            $db->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
-               ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
-        }
+        registrarLineasVenta($db, (int)$ventaId, $codigo, $items, (int)$user['id']);
 
         $caja = $db->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
         $caja->execute();
@@ -202,13 +151,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
-        // Marcar como pagadas las OTs incluidas en esta venta
-        foreach ($items as $item) {
-            if (!empty($item['es_ot']) && !empty($item['ot_id'])) {
-                $db->prepare("UPDATE ordenes_trabajo SET pagado=1, fecha_pago=NOW(), metodo_pago=? WHERE id=? AND pagado=0")
-                   ->execute([$metPago, (int)$item['ot_id']]);
-            }
-        }
+        // Cierra las OTs cobradas: pagadas, en estado final y con historial.
+        cerrarOTsDeVenta($db, $items, $metPago, (int)$user['id'], $codigo);
+
+        $db->commit();
 
         $sunatOk = false;
         $sunatMsg = '';
@@ -239,6 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
 
     } catch (Throwable $e) {
+        if ($db->inTransaction()) $db->rollBack();
         app_log('Procesar venta general error: '.$e->getMessage(), 'ERROR', [
             'trace' => $e->getTraceAsString(),
             'tipo_doc' => $tipoDoc ?? null,
@@ -313,7 +260,14 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
         JOIN tipos_equipo te ON te.id = e.tipo_equipo_id
         LEFT JOIN servicios s ON s.id = ot.servicio_id
         WHERE ot.pagado = 0
-          AND ot.estado NOT IN ('cancelado')
+          AND ot.estado <> 'cancelado'
+          -- Una OT desaparece del buscador cuando ya tiene comprobante,
+          -- no cuando alguien la marca como cancelada a mano.
+          AND NOT EXISTS (
+              SELECT 1 FROM venta_detalle d
+              JOIN ventas v ON v.id = d.venta_id
+              WHERE d.ot_id = ot.id AND v.estado <> 'anulada'
+          )
           AND (ot.codigo_ot LIKE ? OR c.nombre LIKE ? OR ot.codigo_publico LIKE ?)
         ORDER BY ot.created_at DESC
         LIMIT 15
@@ -633,14 +587,8 @@ function procesarVenta() {
     }, 2000);
     return;
   }
-  const tipoDocSel = document.getElementById('tipo-doc').value;
-  if (tipoDocSel === 'boleta' || tipoDocSel === 'factura') {
-    const hayProductoReal = carrito.some(i => !i.es_ot);
-    if (!hayProductoReal) {
-      alert('Para Boleta/Factura debes cargar al menos un PRODUCTO. Si solo vas a cobrar una OT, usa "Nota de venta" o "Ticket".');
-      return;
-    }
-  }
+  // Una OT ya es una línea válida de boleta/factura: se emite como
+  // servicio, sin producto de inventario. Ya no hay que desagregarla a mano.
   const montoPagado = parseFloat(document.getElementById('monto-pagado').value)||0;
   const totalTxt = parseFloat(document.getElementById('txt-total').textContent.replace('S/ ',''))||0;
   if (montoPagado <= 0) {

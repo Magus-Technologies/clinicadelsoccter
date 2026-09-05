@@ -101,7 +101,10 @@ class SunatBuilder
         $out = [];
         foreach ($items as $i => $it) {
             $out[] = [
-                'cod_producto' => (string)($it['id'] ?? ($i + 1)),
+                // `codigo` es el código real del producto o de la OT.
+                // Antes se enviaba `id`, que es el autonumérico de la fila
+                // de venta_detalle y no identifica nada para SUNAT.
+                'cod_producto' => (string)($it['codigo'] ?? $it['id'] ?? ($i + 1)),
                 'unidad'       => 'NIU',
                 'descripcion'  => $it['concepto'] ?? $it['nombre'] ?? 'Producto',
                 'cantidad'     => (float)($it['cantidad'] ?? 1),

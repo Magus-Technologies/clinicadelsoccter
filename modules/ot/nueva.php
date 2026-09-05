@@ -106,14 +106,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Guardar repuestos precargados del servicio
-    $repDescs  = $_POST['rep_desc']   ?? [];
-    $repCants  = $_POST['rep_cant']   ?? [];
-    $repPrecios= $_POST['rep_precio'] ?? [];
+    $repDescs   = $_POST['rep_desc']    ?? [];
+    $repCants   = $_POST['rep_cant']    ?? [];
+    $repPrecios = $_POST['rep_precio']  ?? [];
+    $repProdIds = $_POST['rep_prod_id'] ?? [];
     foreach ($repDescs as $i => $rd) {
         $rd = trim($rd); $rc = (float)($repCants[$i]??1); $rp = (float)($repPrecios[$i]??0);
         if (!$rd) continue;
-        $db->prepare("INSERT INTO ot_repuestos (ot_id,descripcion,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-           ->execute([$otId, $rd, $rc, $rp, round($rc*$rp,2)]);
+        // producto_id vincula el repuesto con el inventario. 0 = texto libre.
+        $rpid = (int)($repProdIds[$i] ?? 0) ?: null;
+        $db->prepare("INSERT INTO ot_repuestos (ot_id,producto_id,descripcion,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?,?)")
+           ->execute([$otId, $rpid, $rd, $rc, $rp, round($rc*$rp,2)]);
     }
 
     setFlash('success',"OT $codigoOT creada. Código cliente: <strong>$codigoPublico</strong>");
@@ -1053,7 +1056,7 @@ function cargarServicio(id) {
       tbody.innerHTML = '';
       if (data.requiere && data.repuestos.length > 0) {
         bloque.style.display = '';
-        data.repuestos.forEach(r => agregarFilaRepOT(r.nombre + (r.codigo ? ' ['+r.codigo+']' : ''), r.cantidad, r.precio_referencial));
+        data.repuestos.forEach(r => agregarFilaRepOT(r.nombre + (r.codigo ? ' ['+r.codigo+']' : ''), r.cantidad, r.precio_referencial, r.producto_id));
         recalcTodosRep();
       } else {
         bloque.style.display = 'none';
@@ -1062,13 +1065,14 @@ function cargarServicio(id) {
     .catch(() => {});
 }
 
-function agregarFilaRepOT(desc, cant, precio) {
+function agregarFilaRepOT(desc, cant, precio, prodId) {
   const tbody = document.getElementById('tbody-rep-ot');
   const sub   = (parseFloat(cant) * parseFloat(precio)).toFixed(2);
   const tr    = document.createElement('tr');
   tr.className = 'rep-row-ot';
   tr.innerHTML = `
-    <td><input type="text" name="rep_desc[]" class="form-control form-control-sm" value="${escHtmlOT(desc)}" required/></td>
+    <td><input type="hidden" name="rep_prod_id[]" value="${parseInt(prodId)||0}"/>
+        <input type="text" name="rep_desc[]" class="form-control form-control-sm" value="${escHtmlOT(desc)}" required/></td>
     <td><input type="number" name="rep_cant[]" class="form-control form-control-sm text-center rep-cant-ot" value="${cant}" min="0.01" step="0.01" onchange="recalcFilaOT(this)"/></td>
     <td><input type="number" name="rep_precio[]" class="form-control form-control-sm text-end rep-precio-ot" value="${parseFloat(precio).toFixed(2)}" min="0" step="0.01" onchange="recalcFilaOT(this)"/></td>
     <td class="rep-sub-ot fw-semibold text-end small pe-2">S/ ${sub}</td>
@@ -1078,7 +1082,7 @@ function agregarFilaRepOT(desc, cant, precio) {
 
 function agregarRepuestoManual() {
   document.getElementById('bloque-rep-servicio').style.display = '';
-  agregarFilaRepOT('', 1, 0);
+  agregarFilaRepOT('', 1, 0, 0);
 }
 
 function recalcFilaOT(inp) {
