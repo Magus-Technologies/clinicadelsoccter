@@ -14,6 +14,11 @@ $__isLocal = (
     str_contains($__host, '.local')
 );
 
+// Entorno de ejecucion, expuesto como constante para que el resto del
+// codigo no vuelva a re-deducirlo. NO es una frontera de seguridad:
+// HTTP_HOST lo controla el cliente. Solo decide comodidades de desarrollo.
+define('SUNAT_ENTORNO_LOCAL', $__isLocal);
+
 if ($__isLocal) {
     define('SUNAT_API_URL', 'http://api-sunat-laravel.test/api/v1');
 } else {
@@ -37,7 +42,12 @@ function sunat_get_config(string $key, string $default = ''): string {
             }
         } catch (Throwable $e) { }
     }
-    return $cache[$key] ?? $default;
+    // Con `??` el default solo aplicaba si la clave NO existia. Pero las
+    // filas de configuracion existen creadas y vacias, asi que devolvia ''
+    // y los valores por defecto nunca entraban en juego. Una clave vacia
+    // es una clave sin configurar.
+    $valor = trim((string)($cache[$key] ?? ''));
+    return $valor !== '' ? $valor : $default;
 }
 
 /**
@@ -49,13 +59,49 @@ function sunat_modo(): string {
 
 /**
  * Credenciales SOL.
+ *
+ * Las credenciales de prueba de SUNAT (MODDATOS) se completan solas SOLO
+ * cuando se dan las dos condiciones a la vez:
+ *
+ *   1) la app corre en un host local, y
+ *   2) `sunat_modo` esta en beta.
+ *
+ * Las dos son necesarias a proposito. `sunat_modo` vive en la tabla
+ * `configuracion`, que viaja en el mismo dump entre local y el servidor:
+ * si el default dependiera solo de ese flag, el servidor real tambien
+ * empezaria a mandar MODDATOS al emitir. Exigir ademas host local deja el
+ * comportamiento del servidor exactamente como estaba.
+ *
+ * Fuera de local nunca se inventa nada: si faltan, sunat_config_faltante()
+ * lo dice con nombre y apellido.
+ *
+ * El RUC se toma siempre del configurado. No se fuerza el RUC de prueba
+ * porque el certificado digital esta emitido para el RUC real, y un
+ * comprobante firmado con un RUC distinto al del certificado es invalido.
  */
 function sunat_credenciales(): array {
+    $usarPrueba = SUNAT_ENTORNO_LOCAL && sunat_modo() === 'beta';
     return [
-        'ruc'     => sunat_get_config('empresa_ruc', ''),
-        'usuario' => sunat_get_config('sunat_usuario_sol', 'MODDATOS'),
-        'clave'   => sunat_get_config('sunat_clave_sol', 'MODDATOS'),
+        'ruc'     => sunat_get_config('empresa_ruc', $usarPrueba ? '20000000001' : ''),
+        'usuario' => sunat_get_config('sunat_usuario_sol', $usarPrueba ? 'MODDATOS' : ''),
+        'clave'   => sunat_get_config('sunat_clave_sol',   $usarPrueba ? 'MODDATOS' : ''),
     ];
+}
+
+/**
+ * Revisa que este cargado lo minimo para emitir. Devuelve la lista de
+ * campos faltantes, con el nombre que ve el usuario en Configuracion.
+ */
+function sunat_config_faltante(): array {
+    $cred    = sunat_credenciales();
+    $falta   = [];
+
+    if (trim($cred['ruc']) === '')     $falta[] = 'RUC de la empresa';
+    if (trim($cred['usuario']) === '') $falta[] = 'Usuario SOL';
+    if (trim($cred['clave']) === '')   $falta[] = 'Contraseña SOL';
+    if (trim(sunat_get_config('empresa_nombre')) === '') $falta[] = 'Razón social de la empresa';
+
+    return $falta;
 }
 
 /**

@@ -27,19 +27,32 @@ $topProd->execute([$desde,$hasta]);
 $topProd = $topProd->fetchAll();
 
 // Resumen financiero
-$totalVentas = $db->prepare("SELECT COALESCE(SUM(total),0) FROM ventas WHERE DATE(created_at) BETWEEN ? AND ? AND estado='completada'");
-$totalVentas->execute([$desde,$hasta]);
-$totalVentas = $totalVentas->fetchColumn();
+// El ingreso tiene una sola fuente: el comprobante emitido (`ventas`).
+// `ordenes_trabajo.precio_final` es presupuesto, no ingreso — sumarlo acá
+// contaba dos veces la misma plata cuando la OT se cobraba en una boleta.
+$totalIngresos = $db->prepare("SELECT COALESCE(SUM(total),0) FROM ventas WHERE DATE(created_at) BETWEEN ? AND ? AND estado='completada'");
+$totalIngresos->execute([$desde,$hasta]);
+$totalIngresos = $totalIngresos->fetchColumn();
 
-$totalRep = $db->prepare("SELECT COALESCE(SUM(precio_final),0) FROM ordenes_trabajo WHERE DATE(fecha_pago) BETWEEN ? AND ? AND pagado=1");
-$totalRep->execute([$desde,$hasta]);
-$totalRep = $totalRep->fetchColumn();
+// Desglose del MISMO ingreso: qué parte vino de servicio técnico y qué
+// parte de venta de productos. Son porciones, no sumandos.
+$desglose = $db->prepare("
+    SELECT COALESCE(SUM(CASE WHEN d.ot_id IS NOT NULL THEN d.subtotal ELSE 0 END),0) AS servicios,
+           COALESCE(SUM(CASE WHEN d.ot_id IS NULL     THEN d.subtotal ELSE 0 END),0) AS productos
+    FROM venta_detalle d
+    JOIN ventas v ON v.id = d.venta_id
+    WHERE DATE(v.created_at) BETWEEN ? AND ? AND v.estado='completada'
+");
+$desglose->execute([$desde,$hasta]);
+$desglose  = $desglose->fetch() ?: ['servicios'=>0,'productos'=>0];
+$totalRep  = (float)$desglose['servicios'];
+$totalProd = (float)$desglose['productos'];
 
 $totalEgr = $db->prepare("SELECT COALESCE(SUM(mv.monto),0) FROM movimientos_caja mv JOIN cajas c ON c.id=mv.caja_id WHERE mv.tipo='egreso' AND c.fecha BETWEEN ? AND ?");
 $totalEgr->execute([$desde,$hasta]);
 $totalEgr = $totalEgr->fetchColumn();
 
-$utilidad = $totalVentas + $totalRep - $totalEgr;
+$utilidad = $totalIngresos - $totalEgr;
 
 $pageTitle  = 'Reportes — '.APP_NAME;
 $breadcrumb = [['label'=>'Reportes','url'=>null]];
@@ -59,14 +72,17 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="row g-3 mb-4">
   <div class="col-md-3">
     <div class="kpi-card">
-      <div class="kpi-value text-primary" style="font-size:20px"><?= formatMoney($totalVentas) ?></div>
-      <div class="kpi-label">Ingresos por ventas</div>
+      <div class="kpi-value text-primary" style="font-size:20px"><?= formatMoney($totalIngresos) ?></div>
+      <div class="kpi-label">Ingresos totales</div>
     </div>
   </div>
   <div class="col-md-3">
     <div class="kpi-card">
       <div class="kpi-value text-success" style="font-size:20px"><?= formatMoney($totalRep) ?></div>
-      <div class="kpi-label">Ingresos por reparaciones</div>
+      <div class="kpi-label">Servicio técnico</div>
+      <div class="text-muted" style="font-size:11px">
+        incluido arriba · productos <?= formatMoney($totalProd) ?>
+      </div>
     </div>
   </div>
   <div class="col-md-3">

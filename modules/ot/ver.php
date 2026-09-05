@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/ventas.php';
 requireLogin();
 
 $db  = getDB();
@@ -34,10 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $coment = trim($_POST['comentario'] ?? '');
         $allowed = array_keys(ESTADOS_OT);
         if (in_array($nuevo, $allowed)) {
+            // El estado de cierre se lee de `estados_ot`, no está hardcodeado:
+            // 'entregado' ya no existe en la configuración y por eso
+            // fecha_entrega nunca se llegaba a completar.
             $extra = '';
-            $params = [$nuevo];
-            if ($nuevo === 'entregado') {
-                $extra = ', fecha_entrega = NOW()';
+            if ($nuevo === estadoCierreOT($db)) {
+                $extra = ', fecha_entrega = COALESCE(fecha_entrega, NOW())';
             }
             $db->prepare("UPDATE ordenes_trabajo SET estado = ? $extra WHERE id = ?")->execute([$nuevo, $id]);
             $db->prepare("INSERT INTO historial_ot (ot_id,usuario_id,estado_antes,estado_nuevo,comentario) VALUES (?,?,?,?,?)")

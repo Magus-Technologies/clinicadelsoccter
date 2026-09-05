@@ -36,3 +36,4 @@ certificados/
 *.tmp
 *.bak
 .r_scooter.sql
+.atl

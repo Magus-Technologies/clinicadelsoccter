@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../includes/logger.php';
+require_once __DIR__ . '/../../includes/ventas.php';
+require_once __DIR__ . '/../../includes/clientes.php';
 requireLogin();
 requireRole([ROL_ADMIN, ROL_VENDEDOR]);
 
@@ -37,15 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $serie = '';
         $numero = 0;
         if (in_array($tipoDoc, ['boleta','factura'], true)) {
-            $items_productos_pre = array_filter($items, fn($i) => empty($i['es_ot']));
-            if (empty($items_productos_pre)) {
-                header('Content-Type: application/json');
-                echo json_encode([
-                    'success'=>false,
-                    'error'=>'Para Boleta/Factura debes cargar al menos un PRODUCTO. Si solo vas a cobrar una OT, usa "Nota de venta" o "Ticket".',
-                ]);
-                exit;
-            }
             try {
                 require_once __DIR__ . '/../../includes/sunat/SunatService.php';
                 $pdo = getDB();
@@ -63,26 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                    ->execute([$codigo,$clienteId,$user['id'],$tipoDoc,$serie,$numero,$base,$igv,$descGlobal,$total,$metPago,$_POST['monto_pagado']??$total]);
                 $ventaId = $pdo->lastInsertId();
 
-                $items_productos_sunat = array_filter($items, fn($i) => empty($i['es_ot']));
-                $items_ot_sunat       = array_filter($items, fn($i) => !empty($i['es_ot']));
-
-                foreach ($items_productos_sunat as $item) {
-                    $pid  = (int)$item['id'];
-                    $cant = (float)$item['cantidad'];
-                    $precio = (float)$item['precio'];
-                    $subtItem = $cant * $precio;
-
-                    $pdo->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-                       ->execute([$ventaId,$pid,$cant,$precio,$subtItem]);
-
-                    $prod = $pdo->prepare("SELECT stock_actual FROM productos WHERE id=?");
-                    $prod->execute([$pid]);
-                    $antes = (float)$prod->fetchColumn();
-                    $despues = $antes - $cant;
-                    $pdo->prepare("UPDATE productos SET stock_actual=? WHERE id=?")->execute([$despues,$pid]);
-                    $pdo->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
-                       ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
-                }
+                // Las OTs entran como línea real de la boleta, con su ot_id.
+                // Si SUNAT rechaza, el rollback deshace también el cierre de la OT.
+                registrarLineasVenta($pdo, (int)$ventaId, $codigo, $items, (int)$user['id']);
+                cerrarOTsDeVenta($pdo, $items, $metPago, (int)$user['id'], $codigo);
 
                 $caja = $pdo->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
                 $caja->execute();
@@ -149,19 +126,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
 
-        // Separar items reales de items OT
-        $items_productos = array_filter($items, fn($i) => empty($i['es_ot']));
-        $items_ot        = array_filter($items, fn($i) => !empty($i['es_ot']));
+        // Las OTs ya no se serializan en `notas`: cada una es una línea de
+        // venta_detalle con su ot_id. `notas` vuelve a ser solo del usuario.
+        $notas_final = trim($_POST['notas'] ?? '') ?: null;
 
-        // Notas: incluir resumen de OTs cobradas con precio
-        $notas_ot = '';
-        foreach ($items_ot as $iot) {
-            $notas_ot .= '##OT##' . ($iot['nombre'] ?? '') . '##PRECIO##' . number_format((float)$iot['precio'], 2) . '##FIN## ';
-        }
-
-        // Notas manuales del usuario (campo notas del POST si existiera)
-        $notas_manual = trim($_POST['notas'] ?? '');
-        $notas_final  = trim($notas_ot . $notas_manual) ?: null;
+        $db->beginTransaction();
 
         $db->prepare("INSERT INTO ventas (codigo,cliente_id,usuario_id,tipo_doc,serie_doc,num_doc,subtotal,igv,descuento,total,metodo_pago,monto_pagado,notas) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
            ->execute([
@@ -173,26 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
            ]);
         $ventaId = $db->lastInsertId();
 
-        foreach ($items_productos as $item) {
-            $pid  = (int)($item['id'] ?? 0);
-            $cant = (float)($item['cantidad'] ?? 1);
-            $precio = (float)($item['precio'] ?? 0);
-            $subtItem = $cant * $precio;
-
-            // Saltar items sin producto válido
-            if ($pid <= 0) continue;
-
-            $db->prepare("INSERT INTO venta_detalle (venta_id,producto_id,cantidad,precio_unit,subtotal) VALUES (?,?,?,?,?)")
-               ->execute([$ventaId, $pid, $cant, $precio, $subtItem]);
-
-            $prod = $db->prepare("SELECT stock_actual FROM productos WHERE id=?");
-            $prod->execute([$pid]);
-            $antes = (float)$prod->fetchColumn();
-            $despues = $antes - $cant;
-            $db->prepare("UPDATE productos SET stock_actual=? WHERE id=?")->execute([$despues,$pid]);
-            $db->prepare("INSERT INTO kardex (producto_id,tipo,cantidad,stock_antes,stock_despues,precio_unit,motivo,referencia,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)")
-               ->execute([$pid,'salida',$cant,$antes,$despues,$precio,'Venta',$codigo,$user['id']]);
-        }
+        registrarLineasVenta($db, (int)$ventaId, $codigo, $items, (int)$user['id']);
 
         $caja = $db->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
         $caja->execute();
@@ -202,13 +152,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                ->execute([$cajaId,'ingreso','Venta '.$codigo,$total,$codigo,$user['id']]);
         }
 
-        // Marcar como pagadas las OTs incluidas en esta venta
-        foreach ($items as $item) {
-            if (!empty($item['es_ot']) && !empty($item['ot_id'])) {
-                $db->prepare("UPDATE ordenes_trabajo SET pagado=1, fecha_pago=NOW(), metodo_pago=? WHERE id=? AND pagado=0")
-                   ->execute([$metPago, (int)$item['ot_id']]);
-            }
-        }
+        // Cierra las OTs cobradas: pagadas, en estado final y con historial.
+        cerrarOTsDeVenta($db, $items, $metPago, (int)$user['id'], $codigo);
+
+        $db->commit();
 
         $sunatOk = false;
         $sunatMsg = '';
@@ -239,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
 
     } catch (Throwable $e) {
+        if ($db->inTransaction()) $db->rollBack();
         app_log('Procesar venta general error: '.$e->getMessage(), 'ERROR', [
             'trace' => $e->getTraceAsString(),
             'tipo_doc' => $tipoDoc ?? null,
@@ -279,11 +227,11 @@ if (isset($_GET['api']) && $_GET['api'] === 'crear_cliente_rapido') {
 
     // Verificar duplicado por DNI
     if ($ruc_dni !== '') {
-        $dup = $db->prepare("SELECT id, nombre FROM clientes WHERE ruc_dni = ? AND activo = 1 LIMIT 1");
+        $dup = $db->prepare("SELECT id, nombre, ruc_dni FROM clientes WHERE ruc_dni = ? AND activo = 1 LIMIT 1");
         $dup->execute([$ruc_dni]);
         $dup = $dup->fetch();
         if ($dup) {
-            echo json_encode(['ok' => true, 'id' => $dup['id'], 'nombre' => $dup['nombre'], 'existia' => true]);
+            echo json_encode(['ok' => true, 'id' => $dup['id'], 'nombre' => $dup['nombre'], 'ruc_dni' => $dup['ruc_dni'], 'existia' => true]);
             exit;
         }
     }
@@ -293,7 +241,9 @@ if (isset($_GET['api']) && $_GET['api'] === 'crear_cliente_rapido') {
     $db->prepare("INSERT INTO clientes (codigo,tipo,nombre,ruc_dni,segmento) VALUES (?,?,?,?,'nuevo')")
        ->execute([$codigo, $tipo, $nombre, $ruc_dni]);
     $newId = $db->lastInsertId();
-    echo json_encode(['ok' => true, 'id' => $newId, 'nombre' => $nombre, 'existia' => false]);
+    // Sin esto, num_doc queda vacío y toda factura a este cliente es rechazada.
+    sincronizarDocumentoCliente($db, (int)$newId);
+    echo json_encode(['ok' => true, 'id' => $newId, 'nombre' => $nombre, 'ruc_dni' => $ruc_dni, 'existia' => false]);
     exit;
 }
 
@@ -305,6 +255,7 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
         SELECT ot.id, ot.codigo_ot, ot.precio_final, ot.descuento, ot.costo_mano_obra,
                ot.estado, ot.pagado,
                c.id as cliente_id, c.nombre as cliente_nombre, c.telefono as cliente_tel,
+               c.ruc_dni as cliente_doc,
                CONCAT(te.nombre,' ',COALESCE(e.marca,''),' ',COALESCE(e.modelo,'')) as equipo_desc,
                s.nombre as servicio_nombre
         FROM ordenes_trabajo ot
@@ -313,7 +264,14 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
         JOIN tipos_equipo te ON te.id = e.tipo_equipo_id
         LEFT JOIN servicios s ON s.id = ot.servicio_id
         WHERE ot.pagado = 0
-          AND ot.estado NOT IN ('cancelado')
+          AND ot.estado <> 'cancelado'
+          -- Una OT desaparece del buscador cuando ya tiene comprobante,
+          -- no cuando alguien la marca como cancelada a mano.
+          AND NOT EXISTS (
+              SELECT 1 FROM venta_detalle d
+              JOIN ventas v ON v.id = d.venta_id
+              WHERE d.ot_id = ot.id AND v.estado <> 'anulada'
+          )
           AND (ot.codigo_ot LIKE ? OR c.nombre LIKE ? OR ot.codigo_publico LIKE ?)
         ORDER BY ot.created_at DESC
         LIMIT 15
@@ -462,6 +420,8 @@ require_once __DIR__ . '/../../includes/header.php';
             <option value="ticket">Ticket</option>
             <option value="sin_comprobante">Sin comprobante</option>
           </select>
+          <div id="aviso-comprobante" class="mt-2 p-2 rounded"
+               style="display:none;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;font-size:12px;line-height:1.4"></div>
         </div>
         <div id="correlativo-info" class="mb-3 text-primary fw-semibold" style="font-size:15px"></div>
         <!-- Descuento -->
@@ -633,14 +593,18 @@ function procesarVenta() {
     }, 2000);
     return;
   }
-  const tipoDocSel = document.getElementById('tipo-doc').value;
-  if (tipoDocSel === 'boleta' || tipoDocSel === 'factura') {
-    const hayProductoReal = carrito.some(i => !i.es_ot);
-    if (!hayProductoReal) {
-      alert('Para Boleta/Factura debes cargar al menos un PRODUCTO. Si solo vas a cobrar una OT, usa "Nota de venta" o "Ticket".');
-      return;
-    }
+  // Una OT ya es una línea válida de boleta/factura: se emite como
+  // servicio, sin producto de inventario. Ya no hay que desagregarla a mano.
+
+  // El RUC se chequea acá, no después del round-trip: el servidor validaba
+  // lo mismo pero recién al procesar, y el cajero perdía la venta entera.
+  const motivo = motivoFacturaInvalida();
+  if (motivo) {
+    avisarComprobante();
+    alert(motivo);
+    return;
   }
+
   const montoPagado = parseFloat(document.getElementById('monto-pagado').value)||0;
   const totalTxt = parseFloat(document.getElementById('txt-total').textContent.replace('S/ ',''))||0;
   if (montoPagado <= 0) {
@@ -724,7 +688,7 @@ document.getElementById('buscar-cliente-input').addEventListener('input', functi
         } else {
           lista.innerHTML = data.map(c => `
             <button type="button" class="list-group-item list-group-item-action py-2"
-                    onclick="seleccionarCliente(${c.id}, ${JSON.stringify(c.nombre).replace(/"/g,'&quot;')})">
+                    onclick="seleccionarCliente(${c.id}, ${JSON.stringify(c.nombre).replace(/"/g,'&quot;')}, ${JSON.stringify(c.ruc_dni || '').replace(/"/g,'&quot;')})">
               <div class="fw-semibold small">${c.nombre}</div>
               <div class="text-muted" style="font-size:11px">${c.telefono||''} ${c.ruc_dni?'· '+c.ruc_dni:''}</div>
             </button>`).join('');
@@ -800,12 +764,17 @@ function guardarClienteRapido() {
       if (data.error) { msg.innerHTML = '<span style="color:#ef4444">' + data.error + '</span>'; return; }
       const aviso = data.existia ? '⚠ Ya existía — seleccionado' : '✓ Registrado y seleccionado';
       msg.innerHTML = '<span style="color:#22c55e">' + aviso + '</span>';
-      seleccionarCliente(data.id, data.nombre);
+      seleccionarCliente(data.id, data.nombre, data.ruc_dni || '');
       setTimeout(ocultarFormRapido, 800);
     }).catch(()=>{ msg.innerHTML = '<span style="color:#ef4444">Error al guardar</span>'; });
 }
 
-function seleccionarCliente(id, nombre) {
+// Documento del cliente seleccionado. Se guarda para poder avisar sobre la
+// factura ANTES de mandar la venta, en vez de esperar el rechazo del server.
+let clienteDocSel = '';
+
+function seleccionarCliente(id, nombre, doc) {
+  clienteDocSel = String(doc || '').replace(/\D/g, '');
   document.getElementById('sel-cliente-venta').value = id;
   document.getElementById('buscar-cliente-input').value = '';
   document.getElementById('buscar-cliente-input').placeholder = nombre;
@@ -814,15 +783,53 @@ function seleccionarCliente(id, nombre) {
   document.getElementById('btn-limpiar-cliente').style.display = 'inline-flex';
   document.getElementById('lista-clientes').style.display = 'none';
   if (typeof feather !== 'undefined') feather.replace();
+  avisarComprobante();
 }
 
 function limpiarCliente() {
+  clienteDocSel = '';
   document.getElementById('sel-cliente-venta').value = '';
   document.getElementById('buscar-cliente-input').value = '';
   document.getElementById('buscar-cliente-input').placeholder = 'Buscar por nombre, teléfono o doc...';
   document.getElementById('cliente-seleccionado').style.display = 'none';
   document.getElementById('btn-limpiar-cliente').style.display = 'none';
   document.getElementById('lista-clientes').style.display = 'none';
+  avisarComprobante();
+}
+
+// Un RUC peruano tiene 11 dígitos y empieza en 10, 15, 17 o 20.
+function esRucValido(doc) {
+  return /^(10|15|17|20)\d{9}$/.test(String(doc || ''));
+}
+
+/**
+ * Motivo por el que este cliente no puede recibir factura, o '' si puede.
+ * Mismas reglas que SunatBuilder, para que el front y el server coincidan.
+ */
+function motivoFacturaInvalida() {
+  if (document.getElementById('tipo-doc').value !== 'factura') return '';
+  if (!document.getElementById('sel-cliente-venta').value) {
+    return 'La factura necesita un cliente con RUC. Seleccioná uno, o emití una boleta.';
+  }
+  if (clienteDocSel.length !== 11) {
+    return 'Este cliente tiene un documento de ' + (clienteDocSel.length || 0) + ' dígitos'
+         + (clienteDocSel ? ' (' + clienteDocSel + ')' : '') + '. '
+         + 'La factura requiere un RUC de 11 dígitos: corregí el cliente o emití una boleta.';
+  }
+  if (!esRucValido(clienteDocSel)) {
+    return 'El documento ' + clienteDocSel + ' tiene 11 dígitos pero no es un RUC válido '
+         + '(debe empezar en 10, 15, 17 o 20). Verificá el dato o emití una boleta.';
+  }
+  return '';
+}
+
+/** Avisa en pantalla apenas se detecta el problema, sin bloquear nada. */
+function avisarComprobante() {
+  const box = document.getElementById('aviso-comprobante');
+  if (!box) return;
+  const motivo = motivoFacturaInvalida();
+  box.textContent = motivo;
+  box.style.display = motivo ? 'block' : 'none';
 }
 
 // Cerrar dropdown cliente al hacer clic afuera
@@ -876,7 +883,7 @@ document.getElementById('buscar-ot-input').addEventListener('input', function() 
 
 function cargarOT(ot) {
   // 1. Seleccionar cliente automáticamente
-  seleccionarCliente(ot.cliente_id, ot.cliente_nombre);
+  seleccionarCliente(ot.cliente_id, ot.cliente_nombre, ot.cliente_doc || '');
 
   // 2. Cargar precio de la OT como item en el carrito
   limpiarCarrito();
@@ -915,8 +922,12 @@ function limpiarOT() {
 
 document.addEventListener('DOMContentLoaded', function() {
   const el = document.getElementById('tipo-doc');
-  if (el) el.addEventListener('change', mostrarCorrelativo);
+  if (el) el.addEventListener('change', function() {
+    mostrarCorrelativo();
+    avisarComprobante();
+  });
   mostrarCorrelativo();
+  avisarComprobante();
 });
 </script>
 JS;

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/clientes.php';
 requireLogin();
 $db = getDB();
 
@@ -20,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            $_POST['segmento']        ?? 'nuevo',
            trim($_POST['notas']      ?? ''),
        ]);
+    sincronizarDocumentoCliente($db, (int)$db->lastInsertId());
     setFlash('success', 'Cliente registrado con código '.$codigo);
     redirect(BASE_URL . 'modules/clientes/index.php');
 }

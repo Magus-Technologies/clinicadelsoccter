@@ -23,8 +23,15 @@ $s = $db->prepare("SELECT COALESCE(SUM(total),0) FROM ventas WHERE DATE(created_
 $s->execute([$hoy]);
 $kpi['ventas_hoy'] = $s->fetchColumn();
 
-// Ingresos reparaciones del día
-$s = $db->prepare("SELECT COALESCE(SUM(precio_final),0) FROM ordenes_trabajo WHERE DATE(fecha_pago)=? AND pagado=1");
+// Parte de los ingresos del día que vino de servicio técnico.
+// Es una porción de `ventas_hoy`, no un monto que se le sume: sumar
+// `ordenes_trabajo.precio_final` contaba dos veces la misma plata.
+$s = $db->prepare("
+    SELECT COALESCE(SUM(d.subtotal),0)
+    FROM venta_detalle d
+    JOIN ventas v ON v.id = d.venta_id
+    WHERE DATE(v.created_at)=? AND v.estado='completada' AND d.ot_id IS NOT NULL
+");
 $s->execute([$hoy]);
 $kpi['reparaciones_hoy'] = $s->fetchColumn();
 
@@ -134,7 +141,7 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
         <div>
           <div class="kpi-value" style="font-size:18px">S/<?= number_format($kpi['ventas_hoy'],0) ?></div>
-          <div class="kpi-label">Ventas hoy</div>
+          <div class="kpi-label">Ingresos hoy</div>
         </div>
       </div>
     </div>
@@ -147,7 +154,7 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
         <div>
           <div class="kpi-value" style="font-size:18px">S/<?= number_format($kpi['reparaciones_hoy'],0) ?></div>
-          <div class="kpi-label">Reparaciones hoy</div>
+          <div class="kpi-label">Servicio técnico <span class="text-muted">(incluido)</span></div>
         </div>
       </div>
     </div>

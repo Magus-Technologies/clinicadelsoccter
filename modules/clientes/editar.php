@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/clientes.php';
 requireLogin();
 $db = getDB();
 $id = (int)($_GET['id'] ?? 0);
@@ -39,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            isset($_POST['activo'])  ? 1 : 0,
            $id,
        ]);
+    sincronizarDocumentoCliente($db, $id);
     setFlash('success','Cliente actualizado correctamente.');
     redirect(BASE_URL.'modules/clientes/ver.php?id='.$id);
 }

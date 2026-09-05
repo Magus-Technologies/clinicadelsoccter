@@ -31,20 +31,44 @@ class SunatBuilder
         $numero = (string)($pago['numero'] ?? 1);
 
         // Cliente - facturas requieren RUC, boletas usan DNI o "varios"
-        $rzSocial = trim(($cliente['nombre'] ?? '') . ' ' . ($cliente['apellido'] ?? ''));
+        // Para RUC, SUNAT espera la razon social; si no se cargo se usa el nombre.
+        $rzSocial = trim((string)($cliente['razon_social'] ?? ''));
+        if ($rzSocial === '') {
+            $rzSocial = trim(($cliente['nombre'] ?? '') . ' ' . ($cliente['apellido'] ?? ''));
+        }
         $rzSocial = preg_replace('/\s+/', ' ', $rzSocial) ?: 'CLIENTE';
 
         if ($tipoDoc === '01') {
             // Factura → requiere RUC
-            $numDocCliente = $cliente['num_doc'] ?? '';
-            if (empty($numDocCliente) || strlen($numDocCliente) !== 11) {
-                throw new RuntimeException("La factura requiere RUC válido (11 dígitos).");
+            $numDocCliente = preg_replace('/\D/', '', (string)($cliente['num_doc'] ?? ''));
+
+            // Los mensajes dicen qué se recibió: un error de datos del
+            // cliente no debe parecer una falla del servicio SUNAT.
+            if (strlen($numDocCliente) !== 11) {
+                throw new RuntimeException(sprintf(
+                    'La factura requiere un RUC de 11 dígitos. El cliente "%s" tiene "%s" (%d dígitos). '
+                    . 'Corregí el documento del cliente o emití una boleta.',
+                    $rzSocial,
+                    $numDocCliente !== '' ? $numDocCliente : '(vacío)',
+                    strlen($numDocCliente)
+                ));
+            }
+            // Un RUC peruano siempre empieza en 10, 15, 17 o 20. Un número
+            // de 11 dígitos con otro prefijo suele ser carné de extranjería
+            // o un error de tipeo, y SUNAT lo rechaza con un error opaco.
+            if (!in_array(substr($numDocCliente, 0, 2), ['10', '15', '17', '20'], true)) {
+                throw new RuntimeException(sprintf(
+                    'El documento "%s" del cliente "%s" tiene 11 dígitos pero no es un RUC válido '
+                    . '(debe empezar en 10, 15, 17 o 20). Verificá el dato o emití una boleta.',
+                    $numDocCliente,
+                    $rzSocial
+                ));
             }
             $tipoDocCliente = '6';
         } else {
             // Boleta → usa DNI o "varios"
-            $numDocCliente = $cliente['num_doc'] ?? '';
-            if (!empty($numDocCliente) && strlen($numDocCliente) === 8) {
+            $numDocCliente = preg_replace('/\D/', '', (string)($cliente['num_doc'] ?? ''));
+            if (strlen($numDocCliente) === 8) {
                 $tipoDocCliente = '1';
             } else {
                 $tipoDocCliente = '0';
@@ -78,10 +102,13 @@ class SunatBuilder
      */
     private static function empresa(): array
     {
+        // Una sola fuente de verdad para las credenciales: sunat_credenciales()
+        // ya resuelve los valores de prueba segun el modo (beta / produccion).
+        $cred = sunat_credenciales();
         return [
-            'ruc'             => sunat_get_config('empresa_ruc', '20000000001'),
-            'usuario'         => sunat_get_config('sunat_usuario_sol', 'MODDATOS'),
-            'clave'           => sunat_get_config('sunat_clave_sol', 'MODDATOS'),
+            'ruc'             => $cred['ruc'],
+            'usuario'         => $cred['usuario'],
+            'clave'           => $cred['clave'],
             'razon_social'    => sunat_get_config('empresa_nombre', 'EMPRESA DE PRUEBAS S.A.C.'),
             'nombreComercial' => sunat_get_config('empresa_nombre', 'DentalSys'),
             'direccion'       => sunat_get_config('empresa_direccion', 'AV. PRUEBA 123'),
@@ -101,7 +128,10 @@ class SunatBuilder
         $out = [];
         foreach ($items as $i => $it) {
             $out[] = [
-                'cod_producto' => (string)($it['id'] ?? ($i + 1)),
+                // `codigo` es el código real del producto o de la OT.
+                // Antes se enviaba `id`, que es el autonumérico de la fila
+                // de venta_detalle y no identifica nada para SUNAT.
+                'cod_producto' => (string)($it['codigo'] ?? $it['id'] ?? ($i + 1)),
                 'unidad'       => 'NIU',
                 'descripcion'  => $it['concepto'] ?? $it['nombre'] ?? 'Producto',
                 'cantidad'     => (float)($it['cantidad'] ?? 1),

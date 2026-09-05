@@ -29,11 +29,16 @@ if ($tipo === 'venta') {
     $venta = $v->fetch();
     if (!$venta) { echo '<p class="text-danger p-3">Venta no encontrada</p>'; exit; }
 
+    // LEFT JOIN: una línea puede ser una OT y no tener producto asociado.
     $detalle = $db->prepare("
-        SELECT vd.*, p.nombre AS prod_nombre, p.codigo AS prod_codigo, cat.nombre AS cat_nombre
+        SELECT vd.*,
+               COALESCE(p.nombre, vd.concepto, o.codigo_ot) AS prod_nombre,
+               COALESCE(p.codigo, o.codigo_ot, '—')         AS prod_codigo,
+               COALESCE(cat.nombre, 'Servicio')             AS cat_nombre
         FROM venta_detalle vd
-        JOIN productos p ON p.id=vd.producto_id
-        JOIN categorias cat ON cat.id=p.categoria_id
+        LEFT JOIN productos       p   ON p.id   = vd.producto_id
+        LEFT JOIN categorias      cat ON cat.id = p.categoria_id
+        LEFT JOIN ordenes_trabajo o   ON o.id   = vd.ot_id
         WHERE vd.venta_id=? ORDER BY vd.id");
     $detalle->execute([$venta['id']]);
     $detalle = $detalle->fetchAll();
