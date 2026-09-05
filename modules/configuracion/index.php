@@ -159,8 +159,30 @@ require_once __DIR__ . '/../../includes/header.php';
             <option value="produccion" <?= cf('sunat_modo') === 'produccion' ? 'selected' : '' ?>>🚀 Producción</option>
           </select>
         </div>
-        <div class="mb-2"><label class="tr-form-label">Usuario SOL</label><input type="text" name="sunat_usuario_sol" class="form-control form-control-sm" value="<?= cf('sunat_usuario_sol') ?>"/></div>
-        <div class="mb-2"><label class="tr-form-label">Contraseña SOL</label><input type="password" name="sunat_clave_sol" class="form-control form-control-sm" value="<?= cf('sunat_clave_sol') ?>" placeholder="••••••"/></div>
+        <?php $enBeta = cf('sunat_modo') !== 'produccion'; ?>
+        <div class="mb-2">
+          <label class="tr-form-label">Usuario SOL</label>
+          <input type="text" name="sunat_usuario_sol" class="form-control form-control-sm"
+                 value="<?= cf('sunat_usuario_sol') ?>"
+                 placeholder="<?= $enBeta ? 'MODDATOS (por defecto en beta)' : 'Obligatorio en producción' ?>"/>
+        </div>
+        <div class="mb-2">
+          <label class="tr-form-label">Contraseña SOL</label>
+          <input type="password" name="sunat_clave_sol" class="form-control form-control-sm"
+                 value="<?= cf('sunat_clave_sol') ?>"
+                 placeholder="<?= $enBeta ? 'MODDATOS (por defecto en beta)' : '••••••' ?>"/>
+        </div>
+        <?php if ($enBeta): ?>
+          <div class="alert alert-info py-2 small mb-2">
+            En <strong>beta</strong>, si dejás usuario y contraseña vacíos se usan las credenciales
+            de prueba de SUNAT (<code>MODDATOS</code>). El RUC y el certificado siguen siendo los tuyos.
+          </div>
+        <?php else: ?>
+          <div class="alert alert-warning py-2 small mb-2">
+            En <strong>producción</strong> el usuario y la contraseña SOL son obligatorios.
+            Sin ellos, SUNAT rechaza todos los comprobantes.
+          </div>
+        <?php endif; ?>
         <?php $cert = cf('sunat_certificado'); ?>
         <?php if (!empty($cert) && strlen($cert) > 100): ?>
           <div class="alert alert-success py-1 small"><i data-feather="check-circle" style="width:13px"></i> Certificado cargado en BD</div>

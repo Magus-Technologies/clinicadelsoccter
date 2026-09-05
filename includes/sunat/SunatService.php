@@ -27,6 +27,12 @@ class SunatService
      */
     public function generarXml(int $ventaId): array
     {
+        // A proposito NO se validan aca las credenciales SOL: cada
+        // despliegue de la API exige campos distintos (el servidor de
+        // produccion acepta las credenciales vacias porque las tiene
+        // guardadas; el de desarrollo las pide en el payload). Duplicar esa
+        // regla del lado nuestro bloquearia emisiones que hoy funcionan.
+        // La API es la autoridad; describirError() traduce su respuesta.
         $venta = $this->fetchVenta($ventaId);
         if (!$venta) {
             return ['ok' => false, 'mensaje' => "Venta #$ventaId no encontrada."];
@@ -60,7 +66,7 @@ class SunatService
 
         $gen = $this->client->generarComprobante($payload);
         if (empty($gen['estado'])) {
-            $msg = $gen['mensaje'] ?? 'Error al generar XML.';
+            $msg = self::describirError($gen);
             $this->marcarRechazada($ventaId, $msg);
             return ['ok' => false, 'mensaje' => $msg, 'detalle' => $gen];
         }
@@ -109,7 +115,7 @@ class SunatService
         ]);
 
         if (empty($env['estado'])) {
-            $msg = $env['mensaje'] ?? 'Error al enviar a SUNAT.';
+            $msg = self::describirError($env);
             $this->marcarRechazada($ventaId, $msg);
             return ['ok' => false, 'mensaje' => $msg, 'detalle' => $env];
         }
@@ -143,6 +149,47 @@ class SunatService
 
     // ─── Métodos privados ───────────────────────────────────────
 
+    /**
+     * Convierte la respuesta de error de la API en un mensaje accionable.
+     *
+     * La API responde un titulo generico ("Los datos enviados no son
+     * validos.") y aparte un objeto `errores` con el detalle campo por
+     * campo. Mostrar solo el titulo deja al usuario sin saber que corregir.
+     */
+    public static function describirError(array $respuesta): string
+    {
+        $titulo = trim((string)($respuesta['mensaje'] ?? '')) ?: 'Error al generar el XML.';
+
+        $errores = $respuesta['errores'] ?? ($respuesta['detalle']['errores'] ?? null);
+        if (!is_array($errores) || !$errores) {
+            return $titulo;
+        }
+
+        // Nombres tal como los ve el usuario en la pantalla de Configuración.
+        $etiquetas = [
+            'empresa.usuario'      => 'Usuario SOL',
+            'empresa.clave'        => 'Contraseña SOL',
+            'empresa.ruc'          => 'RUC de la empresa',
+            'empresa.razon_social' => 'Razón social',
+            'empresa.direccion'    => 'Dirección de la empresa',
+            'cliente.num_doc'      => 'Documento del cliente',
+            'cliente.rzn_social'   => 'Nombre / razón social del cliente',
+            'cliente.direccion'    => 'Dirección del cliente',
+            'serie'                => 'Serie del comprobante',
+            'numero'               => 'Número del comprobante',
+            'detalles'             => 'Detalle del comprobante',
+        ];
+
+        $lineas = [];
+        foreach ($errores as $campo => $mensajes) {
+            $texto = is_array($mensajes) ? implode(' ', $mensajes) : (string)$mensajes;
+            $nombre = $etiquetas[$campo] ?? $campo;
+            $lineas[] = $nombre . ': ' . $texto;
+        }
+
+        return $titulo . ' — ' . implode(' | ', $lineas);
+    }
+
     private function fetchVenta(int $id): ?array
     {
         $st = $this->db->prepare("SELECT * FROM ventas WHERE id=?");
@@ -152,10 +199,46 @@ class SunatService
 
     private function fetchCliente(int $id): array
     {
-        if ($id <= 0) return ['nombre' => 'PUBLICO GENERAL', 'tipo_doc' => 'dni', 'num_doc' => '', 'razon_social' => ''];
+        $vacio = ['nombre' => 'PUBLICO GENERAL', 'tipo_doc' => 'dni', 'num_doc' => '', 'razon_social' => ''];
+        if ($id <= 0) return $vacio;
+
         $st = $this->db->prepare("SELECT * FROM clientes WHERE id=?");
         $st->execute([$id]);
-        return $st->fetch() ?: ['nombre' => 'PUBLICO GENERAL', 'tipo_doc' => 'dni', 'num_doc' => '', 'razon_social' => ''];
+        $cliente = $st->fetch();
+        if (!$cliente) return $vacio;
+
+        return self::normalizarDocumento($cliente);
+    }
+
+    /**
+     * Resuelve el documento de identidad del cliente.
+     *
+     * El sistema guarda el documento en `ruc_dni`, pero una migracion
+     * posterior agrego `num_doc` y `tipo_doc` para SUNAT sin actualizar
+     * los formularios que crean clientes. Resultado: `num_doc` quedo vacio
+     * en casi todos, y `tipo_doc` quedo en 'dni' incluso para RUCs.
+     *
+     * Aca se toma el documento de donde efectivamente este, y el tipo se
+     * deduce de su longitud, que es lo que SUNAT valida.
+     */
+    public static function normalizarDocumento(array $cliente): array
+    {
+        $doc = trim((string)($cliente['num_doc'] ?? ''));
+        if ($doc === '') $doc = trim((string)($cliente['ruc_dni'] ?? ''));
+        $doc = preg_replace('/\D/', '', $doc); // SUNAT solo acepta digitos
+
+        $cliente['num_doc']  = $doc;
+        $cliente['tipo_doc'] = strlen($doc) === 11 ? 'ruc'
+                             : (strlen($doc) === 8 ? 'dni'
+                             : ($cliente['tipo_doc'] ?? 'dni'));
+
+        // Para facturas SUNAT espera la razon social; si no se cargo, el
+        // nombre del cliente es el mejor dato disponible.
+        if (trim((string)($cliente['razon_social'] ?? '')) === '') {
+            $cliente['razon_social'] = trim((string)($cliente['nombre'] ?? ''));
+        }
+
+        return $cliente;
     }
 
     private function fetchItems(int $ventaId): array

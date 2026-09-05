@@ -8,6 +8,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/clientes.php';
 requireLogin();
 
 $db   = getDB();
@@ -31,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db->prepare("INSERT INTO clientes (codigo,nombre,ruc_dni,telefono,whatsapp,email,tipo) VALUES (?,?,?,?,?,?,?)")
            ->execute([$cCodigo,trim($_POST['cliente_nombre']),trim($_POST['cliente_dni']??''),trim($_POST['cliente_tel']??''),trim($_POST['cliente_wa']??''),trim($_POST['cliente_email']??''),$_POST['cliente_tipo']??'persona']);
         $cliente_id = $db->lastInsertId();
+        // Sin esto, num_doc queda vacío y toda factura a este cliente es rechazada.
+        sincronizarDocumentoCliente($db, (int)$cliente_id);
     }
 
     $equipo_id = (int)($_POST['equipo_id'] ?? 0);

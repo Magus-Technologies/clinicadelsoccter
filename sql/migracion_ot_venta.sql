@@ -132,7 +132,12 @@ UPDATE `estados_ot` SET `es_final` = 1 WHERE `clave` = 'archivado';
 -- =====================================================================
 
 -- 2.1 Tabla temporal con los pares detectados desde `ventas.notas`.
---     Se verifico que la relacion es 1:1 (ninguna venta agrupa 2+ OTs).
+--
+--     Entre las ventas COMPLETADAS la relacion es 1:1: ninguna agrupa dos
+--     OTs, y cada OT aparece en una sola venta. Hay 2 OTs que figuran en
+--     3 ventas cada una, pero las 6 estan anuladas (pruebas de mayo 2026);
+--     se les crea igual la linea para documentar que se anularon, y los
+--     pasos 2.3 y 2.4 las ignoran porque filtran por estado 'completada'.
 DROP TEMPORARY TABLE IF EXISTS _mig_pares;
 CREATE TEMPORARY TABLE _mig_pares (
     venta_id    INT UNSIGNED  NOT NULL,
@@ -273,11 +278,18 @@ UNION ALL
 SELECT 'Ingreso real (unica fuente: ventas)', ROUND(SUM(total),2)
 FROM `ventas` WHERE estado='completada'
 UNION ALL
--- `ventas.total` ya viene con el descuento global aplicado, mientras que
--- las lineas son pre-descuento. Por eso la comparacion resta `descuento`.
-SELECT 'Lineas - descuentos (debe igualar al anterior, salvo huerfanas)',
-       ROUND((SELECT SUM(d.subtotal) FROM `venta_detalle` d JOIN `ventas` v ON v.id=d.venta_id WHERE v.estado='completada')
-           - (SELECT SUM(v.descuento) FROM `ventas` v WHERE v.estado='completada'), 2)
+-- Reconciliacion POR VENTA. No se puede comparar en bloque restando
+-- `descuento`: las lineas de producto son pre-descuento, pero las lineas
+-- de OT que crea esta migracion usan `ventas.total`, que ya viene neto.
+-- Por eso se acepta cualquiera de las dos formas y se cuentan las que no
+-- cierran de ninguna. Ese es el numero que tiene que dar 0.
+SELECT 'Ventas que NO reconcilian (debe ser 0)', COUNT(*)
+FROM `ventas` v
+JOIN (SELECT venta_id, SUM(subtotal) lineas FROM `venta_detalle` GROUP BY venta_id) x
+  ON x.venta_id = v.id
+WHERE v.estado='completada'
+  AND ABS(x.lineas - v.total) >= 0.01
+  AND ABS(x.lineas - v.descuento - v.total) >= 0.01
 UNION ALL
 -- Ventas viejas de prueba, sin lineas y sin referencia a ninguna OT.
 -- No las inventa la migracion: ya estaban asi. Se listan para que el
