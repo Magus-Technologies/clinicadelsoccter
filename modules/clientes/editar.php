@@ -11,11 +11,24 @@ $c = $c->fetch();
 if (!$c) { setFlash('danger','Cliente no encontrado'); redirect(BASE_URL.'modules/clientes/index.php'); }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ruc_dni = trim($_POST['ruc_dni'] ?? '');
+
+    // Validar DNI/RUC duplicado (excluyendo el cliente actual)
+    if ($ruc_dni !== '') {
+        $dup = $db->prepare("SELECT id, nombre FROM clientes WHERE ruc_dni = ? AND id != ? AND activo = 1 LIMIT 1");
+        $dup->execute([$ruc_dni, $id]);
+        $dup = $dup->fetch();
+        if ($dup) {
+            setFlash('danger', 'Ya existe un cliente con el DNI/RUC <strong>' . sanitize($ruc_dni) . '</strong>: <strong>' . sanitize($dup['nombre']) . '</strong>. No se guardaron los cambios.');
+            redirect(BASE_URL . 'modules/clientes/editar.php?id=' . $id);
+        }
+    }
+
     $db->prepare("UPDATE clientes SET tipo=?,nombre=?,ruc_dni=?,email=?,telefono=?,whatsapp=?,direccion=?,distrito=?,segmento=?,notas=?,activo=? WHERE id=?")
        ->execute([
            $_POST['tipo']     ?? 'persona',
            trim($_POST['nombre']),
-           trim($_POST['ruc_dni']   ?? ''),
+           $ruc_dni,
            trim($_POST['email']     ?? ''),
            trim($_POST['telefono']  ?? ''),
            trim($_POST['whatsapp']  ?? ''),

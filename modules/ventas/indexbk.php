@@ -10,11 +10,11 @@ $tab  = $_GET['tab'] ?? 'historial';
 // ─── DESCARGAS XML / CDR ─────────────────────────────────────
 if (isset($_GET['accion']) && in_array($_GET['accion'], ['xml','cdr'], true) && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
-    $st = $db->prepare("SELECT tipo_doc,serie,numero,sunat_xml,sunat_cdr FROM ventas WHERE id=?");
+    $st = $db->prepare("SELECT tipo_doc,serie_doc,num_doc,sunat_xml,sunat_cdr FROM ventas WHERE id=?");
     $st->execute([$id]);
     $v = $st->fetch();
     if (!$v) { http_response_code(404); exit('No encontrado.'); }
-    $base = strtoupper($v['tipo_doc']).'-'.($v['serie']??'B001').'-'.str_pad((string)($v['numero']??0),8,'0',STR_PAD_LEFT);
+    $base = strtoupper($v['tipo_doc']).'-'.($v['serie_doc']??'B001').'-'.($v['num_doc']??'00000000');
     if ($_GET['accion'] === 'xml') {
         if (empty($v['sunat_xml'])) { http_response_code(404); exit('Sin XML.'); }
         header('Content-Type: application/xml; charset=utf-8');
@@ -69,7 +69,7 @@ if ($s_tipo) { $s_where .= " AND v.tipo_doc=?"; $s_params[] = $s_tipo; }
 if ($s_est === 'sin_xml') { $s_where .= " AND (v.sunat_xml IS NULL OR v.sunat_xml='')"; }
 elseif ($s_est) { $s_where .= " AND v.sunat_estado=?"; $s_params[] = $s_est; }
 if ($s_q) { $s_where .= " AND (c.nombre LIKE ? OR v.codigo LIKE ?)"; $b='%'.$s_q.'%'; $s_params[]=$b; $s_params[]=$b; }
-$st = $db->prepare("SELECT v.*,c.nombre AS cliente_nombre,c.num_doc FROM ventas v LEFT JOIN clientes c ON v.cliente_id=c.id $s_where ORDER BY v.created_at DESC LIMIT 200");
+$st = $db->prepare("SELECT v.*,c.nombre AS cliente_nombre,COALESCE(c.num_doc,c.ruc_dni,'') AS cliente_ruc_dni FROM ventas v LEFT JOIN clientes c ON v.cliente_id=c.id $s_where ORDER BY v.created_at DESC LIMIT 200");
 $st->execute($s_params);
 $comprobantes = $st->fetchAll();
 $kpi = $db->prepare("SELECT SUM(tipo_doc='factura') n_facturas,SUM(tipo_doc='boleta') n_boletas,SUM(sunat_estado='aceptado') n_acept,SUM(sunat_estado='rechazado') n_rech,SUM(sunat_estado='pendiente') n_pend,COALESCE(SUM(total),0) total FROM ventas WHERE tipo_doc IN ('boleta','factura') AND DATE(created_at) BETWEEN ? AND ?");
@@ -196,10 +196,14 @@ require_once __DIR__ . '/../../includes/header.php';
           <tr>
             <td>
               <span class="badge <?= $tc==='factura'?'bg-primary':'bg-info' ?>"><?= strtoupper($tc) ?></span>
-              <div class="small" style="font-size:11px"><?= sanitize($v['serie']??'') ?>-<?= str_pad((string)($v['numero']??0),8,'0',STR_PAD_LEFT) ?></div>
+              <?php
+                $s_doc = $v['serie'] ?? '';
+                $n_doc = $v['numero'] ? str_pad((string)$v['numero'], 8, '0', STR_PAD_LEFT) : '';
+              ?>
+              <div class="small" style="font-size:11px"><?= $s_doc ? sanitize($s_doc).'-'.sanitize($n_doc) : '<span class="text-muted">Sin comprobante</span>' ?></div>
               <small class="text-muted"><?= sanitize($v['codigo']) ?></small>
             </td>
-            <td class="small"><?= sanitize($v['cliente_nombre'] ?? 'Consumidor Final') ?><?php if(!empty($v['num_doc'])): ?><br><span class="text-muted"><?= sanitize($v['num_doc']) ?></span><?php endif; ?></td>
+            <td class="small"><?= sanitize($v['cliente_nombre'] ?? 'Consumidor Final') ?><?php if(!empty($v['cliente_ruc_dni'])): ?><br><span class="text-muted"><?= sanitize($v['cliente_ruc_dni']) ?></span><?php endif; ?></td>
             <td class="small text-muted"><?= formatDateTime($v['created_at']) ?></td>
             <td class="text-end fw-bold"><?= formatMoney((float)$v['total']) ?></td>
             <td><span class="badge <?= $bc ?>"><?= $se ? strtoupper($se) : 'SIN XML' ?></span></td>
@@ -213,10 +217,10 @@ require_once __DIR__ . '/../../includes/header.php';
                 <?php if(!empty($v['sunat_cdr'])): ?>
                   <a href="?accion=cdr&id=<?= $v['id'] ?>" class="btn btn-success btn-sm py-0 px-1" title="CDR"><i data-feather="file-text" style="width:13px;height:13px"></i></a>
                 <?php endif; ?>
-                <?php if(!empty($v['sunat_xml']) && $se!=='aceptado'): ?>
-                  <form method="POST" style="display:inline"><input type="hidden" name="accion" value="enviar_sunat"/><input type="hidden" name="id" value="<?= $v['id'] ?>"/><button class="btn btn-primary btn-sm py-0 px-1" title="Enviar SUNAT"><i data-feather="send" style="width:13px;height:13px"></i></button></form>
+                <?php if($se === 'pendiente' && !empty($v['sunat_xml'])): ?>
+                  <form method="POST" style="display:inline"><input type="hidden" name="accion" value="enviar_sunat"/><input type="hidden" name="id" value="<?= $v['id'] ?>"/><button class="btn btn-primary btn-sm py-0 px-1" title="Enviar a SUNAT"><i data-feather="send" style="width:13px;height:13px"></i></button></form>
                 <?php endif; ?>
-                <?php if(empty($v['sunat_xml']) || $se!=='aceptado'): ?>
+                <?php if(empty($v['sunat_xml']) || $se === 'rechazado'): ?>
                   <form method="POST" style="display:inline"><input type="hidden" name="accion" value="regenerar"/><input type="hidden" name="id" value="<?= $v['id'] ?>"/><button class="btn btn-outline-warning btn-sm py-0 px-1" title="Regenerar XML"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button></form>
                 <?php endif; ?>
               </div>

@@ -270,6 +270,33 @@ if (isset($_GET['api']) && $_GET['api'] === 'buscar_cliente') {
     exit;
 }
 
+// Crear cliente rápido desde POS (API)
+if (isset($_GET['api']) && $_GET['api'] === 'crear_cliente_rapido') {
+    header('Content-Type: application/json');
+    $nombre  = trim($_POST['nombre'] ?? '');
+    $ruc_dni = trim($_POST['ruc_dni'] ?? '');
+    if (!$nombre) { echo json_encode(['error' => 'El nombre es obligatorio']); exit; }
+
+    // Verificar duplicado por DNI
+    if ($ruc_dni !== '') {
+        $dup = $db->prepare("SELECT id, nombre FROM clientes WHERE ruc_dni = ? AND activo = 1 LIMIT 1");
+        $dup->execute([$ruc_dni]);
+        $dup = $dup->fetch();
+        if ($dup) {
+            echo json_encode(['ok' => true, 'id' => $dup['id'], 'nombre' => $dup['nombre'], 'existia' => true]);
+            exit;
+        }
+    }
+
+    $codigo = generarCodigoCliente($db);
+    $tipo   = strlen($ruc_dni) === 11 ? 'empresa' : 'persona';
+    $db->prepare("INSERT INTO clientes (codigo,tipo,nombre,ruc_dni,segmento) VALUES (?,?,?,?,'nuevo')")
+       ->execute([$codigo, $tipo, $nombre, $ruc_dni]);
+    $newId = $db->lastInsertId();
+    echo json_encode(['ok' => true, 'id' => $newId, 'nombre' => $nombre, 'existia' => false]);
+    exit;
+}
+
 // Buscar OTs para cobranza (API)
 if (isset($_GET['api']) && $_GET['api'] === 'buscar_ot') {
     header('Content-Type: application/json');
@@ -370,6 +397,33 @@ require_once __DIR__ . '/../../includes/header.php';
             </span>
           </div>
           <input type="hidden" id="sel-cliente-venta" value=""/>
+
+          <!-- Mini formulario cliente rápido -->
+          <div id="form-cliente-rapido" style="display:none; margin-top:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span style="font-size:11px; font-weight:600; color:#64748b; text-transform:uppercase">Cliente nuevo rápido</span>
+              <button type="button" class="btn-close btn-close-sm" onclick="ocultarFormRapido()" style="font-size:10px"></button>
+            </div>
+            <div class="row g-2">
+              <div class="col-5">
+                <div class="input-group input-group-sm">
+                  <input type="text" id="nuevo-doc" class="form-control form-control-sm" placeholder="DNI o RUC" maxlength="11" inputmode="numeric" autocomplete="off"/>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" onclick="consultarDocPOS()" title="Buscar en SUNAT/RENIEC">
+                    <i data-feather="search" style="width:12px;height:12px"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-7">
+                <input type="text" id="nuevo-nombre" class="form-control form-control-sm" placeholder="Nombre / Razón social *"/>
+              </div>
+              <div class="col-12">
+                <button type="button" class="btn btn-success btn-sm w-100" onclick="guardarClienteRapido()">
+                  <i data-feather="user-plus" style="width:13px;height:13px"></i> Registrar y seleccionar
+                </button>
+              </div>
+            </div>
+            <div id="nuevo-cliente-msg" class="mt-1" style="font-size:11px; min-height:1em"></div>
+          </div>
         </div>
 
         <!-- Importar OT para cobranza -->
@@ -480,9 +534,8 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <?php
-$pageScripts = <<<'JS'
+$pageScripts = '<script>const BASE_URL_JS = ' . json_encode(BASE_URL) . ';</script>' . <<<'JS'
 <script>
-const BASE_URL_JS = document.querySelector('meta[name=base-url]')?.content || '';
 let carrito = [];
 
 // Buscar productos
@@ -661,7 +714,13 @@ document.getElementById('buscar-cliente-input').addEventListener('input', functi
     fetch('pos.php?api=buscar_cliente&q=' + encodeURIComponent(q))
       .then(r=>r.json()).then(data => {
         if (!data.length) {
-          lista.innerHTML='<div class="list-group-item text-muted small py-2">Sin resultados</div>';
+          lista.innerHTML = `
+            <div class="list-group-item text-muted small py-2">Sin resultados para "${q}"</div>
+            <button type="button" class="list-group-item list-group-item-action py-2 text-success fw-semibold"
+                    onclick="mostrarFormRapido('${q.replace(/'/g,"\\'")}')">
+              <i data-feather="user-plus" style="width:13px;height:13px"></i> Registrar "${q}" como nuevo cliente
+            </button>`;
+          if (typeof feather !== 'undefined') setTimeout(()=>feather.replace(),50);
         } else {
           lista.innerHTML = data.map(c => `
             <button type="button" class="list-group-item list-group-item-action py-2"
@@ -674,6 +733,77 @@ document.getElementById('buscar-cliente-input').addEventListener('input', functi
       });
   }, 280);
 });
+
+function mostrarFormRapido(texto) {
+  document.getElementById('lista-clientes').style.display = 'none';
+  document.getElementById('buscar-cliente-input').value = '';
+  // Pre-rellenar: si es numérico va al DNI, si no al nombre
+  const esDoc = /^\d+$/.test(texto);
+  document.getElementById('nuevo-doc').value    = esDoc ? texto : '';
+  document.getElementById('nuevo-nombre').value = esDoc ? '' : texto;
+  document.getElementById('form-cliente-rapido').style.display = 'block';
+  document.getElementById('nuevo-cliente-msg').textContent = '';
+  if (typeof feather !== 'undefined') setTimeout(()=>feather.replace(),50);
+  setTimeout(()=> document.getElementById(esDoc?'nuevo-nombre':'nuevo-doc').focus(), 100);
+}
+
+function ocultarFormRapido() {
+  document.getElementById('form-cliente-rapido').style.display = 'none';
+  document.getElementById('nuevo-doc').value = '';
+  document.getElementById('nuevo-nombre').value = '';
+  document.getElementById('nuevo-cliente-msg').textContent = '';
+}
+
+function consultarDocPOS() {
+  const doc = document.getElementById('nuevo-doc').value.trim();
+  if (doc.length !== 8 && doc.length !== 11) {
+    document.getElementById('nuevo-cliente-msg').innerHTML = '<span style="color:#ef4444">Ingresa 8 dígitos (DNI) o 11 (RUC)</span>';
+    return;
+  }
+  document.getElementById('nuevo-cliente-msg').innerHTML = '<span style="color:#64748b">Consultando...</span>';
+  fetch(BASE_URL_JS + 'modules/clientes/api_documento.php?doc=' + encodeURIComponent(doc))
+    .then(r=>r.json()).then(data => {
+      if (data.ok) {
+        document.getElementById('nuevo-nombre').value = data.nombre;
+        document.getElementById('nuevo-cliente-msg').innerHTML = '<span style="color:#22c55e">✓ ' + data.nombre + '</span>';
+      } else {
+        document.getElementById('nuevo-nombre').value = '';
+        document.getElementById('nuevo-cliente-msg').innerHTML = '<span style="color:#f59e0b">No encontrado — ingresa el nombre manualmente</span>';
+        document.getElementById('nuevo-nombre').focus();
+      }
+    }).catch(()=>{
+      document.getElementById('nuevo-cliente-msg').innerHTML = '<span style="color:#ef4444">Error de conexión — ingresa el nombre manualmente</span>';
+      document.getElementById('nuevo-nombre').focus();
+    });
+}
+
+// Consultar automáticamente al completar DNI/RUC — sin necesidad del botón
+document.getElementById('nuevo-doc').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'');
+  document.getElementById('nuevo-cliente-msg').textContent = '';
+  document.getElementById('nuevo-nombre').value = '';
+  if (this.value.length === 8 || this.value.length === 11) consultarDocPOS();
+});
+
+function guardarClienteRapido() {
+  const nombre  = document.getElementById('nuevo-nombre').value.trim();
+  const ruc_dni = document.getElementById('nuevo-doc').value.trim();
+  const msg     = document.getElementById('nuevo-cliente-msg');
+  if (!nombre) { msg.innerHTML = '<span style="color:#ef4444">El nombre es obligatorio</span>'; return; }
+
+  msg.innerHTML = '<span style="color:#64748b">Guardando...</span>';
+  const fd = new FormData();
+  fd.append('nombre', nombre);
+  fd.append('ruc_dni', ruc_dni);
+  fetch('pos.php?api=crear_cliente_rapido', { method:'POST', body: fd })
+    .then(r=>r.json()).then(data => {
+      if (data.error) { msg.innerHTML = '<span style="color:#ef4444">' + data.error + '</span>'; return; }
+      const aviso = data.existia ? '⚠ Ya existía — seleccionado' : '✓ Registrado y seleccionado';
+      msg.innerHTML = '<span style="color:#22c55e">' + aviso + '</span>';
+      seleccionarCliente(data.id, data.nombre);
+      setTimeout(ocultarFormRapido, 800);
+    }).catch(()=>{ msg.innerHTML = '<span style="color:#ef4444">Error al guardar</span>'; });
+}
 
 function seleccionarCliente(id, nombre) {
   document.getElementById('sel-cliente-venta').value = id;

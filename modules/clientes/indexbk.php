@@ -4,31 +4,6 @@ require_once __DIR__ . '/../../config/app.php';
 requireLogin();
 
 $db = getDB();
-
-// Eliminar cliente
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'eliminar') {
-    $del_id = (int)($_POST['cliente_id'] ?? 0);
-    if ($del_id) {
-        // Verificar si tiene OTs o ventas asociadas
-        $tiene_ots = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE cliente_id = ?");
-        $tiene_ots->execute([$del_id]);
-        $tiene_ventas = $db->prepare("SELECT COUNT(*) FROM ventas WHERE cliente_id = ?");
-        $tiene_ventas->execute([$del_id]);
-
-        if ($tiene_ots->fetchColumn() > 0 || $tiene_ventas->fetchColumn() > 0) {
-            // Tiene historial — solo desactivar
-            $db->prepare("UPDATE clientes SET activo = 0 WHERE id = ?")->execute([$del_id]);
-            setFlash('warning', 'El cliente tiene historial de OTs o ventas. Se desactivó en lugar de eliminar.');
-        } else {
-            // Sin historial — eliminar definitivamente
-            $db->prepare("DELETE FROM clientes WHERE id = ?")->execute([$del_id]);
-            setFlash('success', 'Cliente eliminado correctamente.');
-        }
-    }
-    redirect(BASE_URL . 'modules/clientes/index.php');
-}
-
-$db = getDB();
 $q  = trim($_GET['q'] ?? '');
 $seg = $_GET['segmento'] ?? '';
 
@@ -104,10 +79,6 @@ require_once __DIR__ . '/../../includes/header.php';
             <div class="btn-group btn-group-sm">
               <a href="<?= BASE_URL ?>modules/clientes/ver.php?id=<?= $c['id'] ?>" class="btn btn-outline-primary"><i data-feather="eye" style="width:13px;height:13px"></i></a>
               <a href="<?= BASE_URL ?>modules/clientes/editar.php?id=<?= $c['id'] ?>" class="btn btn-outline-secondary"><i data-feather="edit-2" style="width:13px;height:13px"></i></a>
-              <button type="button" class="btn btn-outline-danger"
-                      onclick="confirmarEliminar(<?= $c['id'] ?>, '<?= sanitize(addslashes($c['nombre'])) ?>', <?= (int)$c['total_ots'] ?>, <?= (int)$c['total_ventas'] ?>)">
-                <i data-feather="trash-2" style="width:13px;height:13px"></i>
-              </button>
             </div>
           </td>
         </tr>
@@ -117,52 +88,3 @@ require_once __DIR__ . '/../../includes/header.php';
   </div>
 </div>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
-
-<!-- Modal confirmar eliminación -->
-<div class="modal fade" id="modal-eliminar" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title text-danger">
-          <i data-feather="alert-triangle" style="width:18px;height:18px" class="me-2"></i>
-          Eliminar cliente
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>¿Estás seguro que deseas eliminar al cliente <strong id="modal-nombre-cliente"></strong>?</p>
-        <div id="aviso-historial" class="alert alert-warning py-2 small" style="display:none">
-          <i data-feather="info" style="width:13px;height:13px"></i>
-          Este cliente tiene historial de OTs/ventas. <strong>Se desactivará</strong> en lugar de eliminarse permanentemente.
-        </div>
-        <div id="aviso-definitivo" class="alert alert-danger py-2 small" style="display:none">
-          Esta acción es <strong>irreversible</strong>. El cliente será eliminado permanentemente.
-        </div>
-      </div>
-      <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form method="POST" id="form-eliminar" style="display:inline">
-          <input type="hidden" name="action" value="eliminar"/>
-          <input type="hidden" name="cliente_id" id="input-cliente-id" value=""/>
-          <button type="submit" class="btn btn-danger">
-            <i data-feather="trash-2" style="width:14px;height:14px"></i>
-            <span id="btn-eliminar-texto">Eliminar</span>
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function confirmarEliminar(id, nombre, totalOts, totalVentas) {
-  document.getElementById('input-cliente-id').value = id;
-  document.getElementById('modal-nombre-cliente').textContent = nombre;
-  const tieneHistorial = (totalOts > 0 || totalVentas > 0);
-  document.getElementById('aviso-historial').style.display  = tieneHistorial ? 'block' : 'none';
-  document.getElementById('aviso-definitivo').style.display = tieneHistorial ? 'none'  : 'block';
-  document.getElementById('btn-eliminar-texto').textContent = tieneHistorial ? 'Desactivar' : 'Eliminar';
-  new bootstrap.Modal(document.getElementById('modal-eliminar')).show();
-  if (typeof feather !== 'undefined') setTimeout(() => feather.replace(), 100);
-}
-</script>

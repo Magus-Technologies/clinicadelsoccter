@@ -6,6 +6,18 @@ if (isLoggedIn()) redirect(BASE_URL . 'modules/dashboard/index.php');
 
 $error = '';
 
+// Logo de la empresa (configurado en Plantilla de impresión → clave print_logo)
+$logoEmpresa = '';
+try {
+    $stLogo = getDB()->query("SELECT valor FROM configuracion WHERE clave='print_logo' LIMIT 1");
+    $row = $stLogo ? $stLogo->fetch() : null;
+    if ($row && !empty($row['valor'])) {
+        $logoEmpresa = UPLOAD_URL . $row['valor'];
+    }
+} catch (\Throwable $e) {
+    $logoEmpresa = '';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email    = trim($_POST['email']    ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -110,6 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border: 3px solid rgba(255,255,255,.3);
       box-shadow: 0 8px 32px rgba(0,0,0,.2);
       margin-bottom: 24px;
+    }
+    /* Variante para el LOGO de la empresa: se muestra completo sobre fondo claro */
+    .hero-logo {
+      object-fit: contain;
+      background: #fff;
+      padding: 18px;
     }
     .hero-welcome {
       color: rgba(255,255,255,.8);
@@ -335,7 +353,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- Panel izquierdo -->
   <div class="panel-left">
     <div class="panel-left-inner">
-      <img src="<?= BASE_URL ?>assets/img/login-hero.jpeg" alt="TechRepair" class="hero-img"/>
+      <?php if ($logoEmpresa): ?>
+      <img src="<?= sanitize($logoEmpresa) ?>" alt="<?= APP_NAME ?>" class="hero-img hero-logo"/>
+      <?php else: ?>
+      <img src="<?= BASE_URL ?>assets/img/login-hero.jpeg" alt="<?= APP_NAME ?>" class="hero-img"/>
+      <?php endif; ?>
       <div class="hero-welcome">Bienvenido de nuevo</div>
       <div class="hero-title"><?= APP_NAME ?></div>
       <div class="hero-sub">Sistema de gestión técnica<br>para reparación de equipos electrónicos</div>

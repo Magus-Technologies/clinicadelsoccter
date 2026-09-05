@@ -79,6 +79,120 @@ function currentUser(): array {
 }
 
 // ----------------------------------------------------------
+// Permisos por perfil  (módulo: modules/permisos/index.php)
+// ----------------------------------------------------------
+
+/** Roles del sistema: clave => etiqueta visible */
+function getRolesSistema(): array {
+    return [
+        ROL_ADMIN    => 'Administrador',
+        ROL_TECNICO  => 'Técnico',
+        ROL_VENDEDOR => 'Vendedor',
+    ];
+}
+
+/**
+ * Catálogo de módulos permisables.
+ * El Dashboard NO está aquí a propósito: es la pantalla de inicio y
+ * siempre está disponible para cualquier usuario logueado (evita bloqueos).
+ */
+function getModulosCatalogo(): array {
+    return [
+        'ot'                  => ['label'=>'Órdenes de trabajo',  'icono'=>'clipboard',      'grupo'=>'Reparaciones'],
+        'ot_nueva'            => ['label'=>'Nueva OT',            'icono'=>'plus-circle',    'grupo'=>'Reparaciones'],
+        'ventas_pos'          => ['label'=>'Punto de venta',      'icono'=>'shopping-cart',  'grupo'=>'Ventas'],
+        'ventas'              => ['label'=>'Ventas',              'icono'=>'list',           'grupo'=>'Ventas'],
+        'clientes'            => ['label'=>'Clientes',            'icono'=>'users',          'grupo'=>'Clientes'],
+        'catalogo'            => ['label'=>'Catálogo público',    'icono'=>'shopping-bag',   'grupo'=>'Catálogo'],
+        'inventario'          => ['label'=>'Productos',           'icono'=>'package',        'grupo'=>'Inventario'],
+        'compras'             => ['label'=>'Compras',             'icono'=>'truck',          'grupo'=>'Inventario'],
+        'kardex'              => ['label'=>'Kardex',              'icono'=>'bar-chart-2',    'grupo'=>'Inventario'],
+        'categorias'          => ['label'=>'Categorías',          'icono'=>'grid',           'grupo'=>'Inventario'],
+        'servicios'           => ['label'=>'Servicios',           'icono'=>'briefcase',      'grupo'=>'Servicios'],
+        'whatsapp'            => ['label'=>'WhatsApp',            'icono'=>'message-circle', 'grupo'=>'Comunicaciones'],
+        'caja'                => ['label'=>'Caja',                'icono'=>'dollar-sign',    'grupo'=>'Administración'],
+        'reportes'            => ['label'=>'Reportes',            'icono'=>'trending-up',    'grupo'=>'Administración'],
+        'garantias'           => ['label'=>'Garantías',           'icono'=>'shield',         'grupo'=>'Administración'],
+        'usuarios'            => ['label'=>'Usuarios',            'icono'=>'user-check',     'grupo'=>'Administración'],
+        'estados'             => ['label'=>'Estados OT',          'icono'=>'tag',            'grupo'=>'Administración'],
+        'plantilla_impresion' => ['label'=>'Plantilla impresión', 'icono'=>'printer',        'grupo'=>'Administración'],
+        'configuracion'       => ['label'=>'Configuración',       'icono'=>'settings',       'grupo'=>'Administración'],
+    ];
+}
+
+/**
+ * Permisos por defecto — se usan SOLO si la tabla rol_permisos aún no
+ * existe o no tiene registro para ese módulo. Replican el comportamiento
+ * que el sistema tenía hardcodeado, así nunca queda todo bloqueado.
+ */
+function permisosPorDefecto(): array {
+    return [
+        ROL_ADMIN    => array_keys(getModulosCatalogo()),
+        ROL_TECNICO  => ['ot','ot_nueva','catalogo','inventario','compras','kardex','servicios','clientes','whatsapp'],
+        ROL_VENDEDOR => ['ot','ot_nueva','ventas_pos','ventas','clientes','whatsapp'],
+    ];
+}
+
+/** Permisos guardados en BD para un rol: ['modulo' => bool]. Cacheado por request. */
+function getPermisosRol(string $rol): array {
+    static $cache = [];
+    if (isset($cache[$rol])) return $cache[$rol];
+    $perms = [];
+    try {
+        $st = getDB()->prepare("SELECT modulo, permitido FROM rol_permisos WHERE rol = ?");
+        $st->execute([$rol]);
+        foreach ($st->fetchAll() as $r) {
+            $perms[$r['modulo']] = (bool)$r['permitido'];
+        }
+    } catch (\Throwable $e) {
+        $perms = []; // tabla aún no creada → se usarán los defaults
+    }
+    $cache[$rol] = $perms;
+    return $perms;
+}
+
+/** ¿El rol indicado (o el usuario actual) puede acceder a este módulo? */
+function puede(string $modulo, ?string $rol = null): bool {
+    $rol = $rol ?? ($_SESSION['user_rol'] ?? '');
+    if ($rol === '') return false;
+
+    // El administrador es superusuario: acceso total siempre.
+    // Esto evita que un admin se bloquee a sí mismo por error.
+    if ($rol === ROL_ADMIN) return true;
+
+    $perms = getPermisosRol($rol);
+    if (array_key_exists($modulo, $perms)) return $perms[$modulo];
+
+    $def = permisosPorDefecto();
+    return in_array($modulo, $def[$rol] ?? [], true);
+}
+
+/** Guarda de acceso por módulo. Reemplaza a requireRole() en los módulos. */
+function requierePermiso(string $modulo): void {
+    requireLogin();
+    if (puede($modulo)) return;
+
+    $cat    = getModulosCatalogo();
+    $nombre = $cat[$modulo]['label'] ?? $modulo;
+    http_response_code(403);
+    echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>'
+       . '<meta name="viewport" content="width=device-width,initial-scale=1"/>'
+       . '<title>Acceso denegado</title>'
+       . '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>'
+       . '</head><body class="bg-light">'
+       . '<div class="container" style="max-width:520px;margin-top:12vh">'
+       . '<div class="card shadow-sm border-0"><div class="card-body text-center p-4">'
+       . '<div style="font-size:44px;line-height:1">🔒</div>'
+       . '<h5 class="fw-bold mt-2 mb-2">Acceso denegado</h5>'
+       . '<p class="text-muted small mb-1">Tu perfil no tiene permiso para entrar a '
+       . '<strong>' . sanitize($nombre) . '</strong>.</p>'
+       . '<p class="text-muted small mb-3">Si necesitas acceso, solicítalo al administrador.</p>'
+       . '<a href="' . BASE_URL . 'modules/dashboard/index.php" class="btn btn-primary btn-sm">Volver al inicio</a>'
+       . '</div></div></div></body></html>';
+    exit;
+}
+
+// ----------------------------------------------------------
 // Generadores de códigos
 // ----------------------------------------------------------
 function generarCodigoOT(PDO $db): string {

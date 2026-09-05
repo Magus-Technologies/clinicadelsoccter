@@ -13,6 +13,17 @@ requireLogin();
 $db   = getDB();
 $user = currentUser();
 
+// Datos de empresa para el banner del modo tablet
+$empresaCfg = [];
+try {
+    foreach ($db->query("SELECT clave,valor FROM configuracion WHERE clave IN ('empresa_nombre','empresa_telefono','empresa_direccion')") as $r) {
+        $empresaCfg[$r['clave']] = $r['valor'];
+    }
+} catch (\Throwable $e) { /* si falla, se usan valores por defecto abajo */ }
+$empresaNombreTablet = $empresaCfg['empresa_nombre']   ?? APP_NAME;
+$empresaTelTablet    = $empresaCfg['empresa_telefono'] ?? '';
+$empresaDirTablet    = $empresaCfg['empresa_direccion']?? '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cliente_id = (int)($_POST['cliente_id'] ?? 0);
     if (!$cliente_id && !empty($_POST['cliente_nombre'])) {
@@ -44,11 +55,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $costoRep = (float)($_POST['costo_repuestos'] ?? 0);
     $costoMO  = (float)($_POST['costo_mano_obra']  ?? 0);
     $total    = $costoRep + $costoMO;
-    $tecnico  = $_POST['tecnico_id'] ? (int)$_POST['tecnico_id'] : null;
+    $tecnicos_ids      = array_map('intval', $_POST['tecnicos_ids'] ?? []);
+    $tecnico           = $tecnicos_ids[0] ?? ($_POST['tecnico_id'] ? (int)$_POST['tecnico_id'] : null);
 
     $db->prepare("INSERT INTO ordenes_trabajo (codigo_ot,codigo_publico,cliente_id,equipo_id,servicio_id,tecnico_id,usuario_creador_id,estado,problema_reportado,diagnostico_inicial,checklist,costo_repuestos,costo_mano_obra,costo_total,precio_final,fecha_estimada,firma_cliente,garantia_dias) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
        ->execute([$codigoOT,$codigoPublico,$cliente_id,$equipo_id,$_POST['servicio_id']?:(null),$tecnico,$user['id'],'ingresado',trim($_POST['problema_reportado']??''),trim($_POST['diagnostico_inicial']??''),json_encode($checklist,JSON_UNESCAPED_UNICODE),$costoRep,$costoMO,$total,$total,$_POST['fecha_estimada']?:null,$_POST['firma_cliente']?:null,(int)($_POST['garantia_dias']??30)]);
     $otId = $db->lastInsertId();
+
+    // Guardar técnicos múltiples en tabla pivot
+    try {
+        foreach ($tecnicos_ids as $i => $tid) {
+            if ($tid > 0) {
+                $db->prepare("INSERT IGNORE INTO ot_tecnicos (ot_id, tecnico_id) VALUES (?,?)")
+                   ->execute([$otId, $tid]);
+            }
+        }
+    } catch (\Throwable $e) {
+        // Si la tabla aún no existe, ignorar silenciosamente
+    }
 
     $db->prepare("INSERT INTO historial_ot (ot_id,usuario_id,estado_nuevo,comentario) VALUES (?,?,?,?)")
        ->execute([$otId,$user['id'],'ingresado','OT creada']);
@@ -102,12 +126,181 @@ $tecnicos       = $db->query("SELECT id,CONCAT(nombre,' ',apellido) as nombre FR
 $clientes       = $db->query("SELECT id,codigo,nombre,telefono FROM clientes WHERE activo=1 ORDER BY nombre")->fetchAll();
 $checklistItems = $db->query("SELECT * FROM checklist_items WHERE activo=1 ORDER BY orden")->fetchAll();
 
+// Agrupar por categoría en un orden de despliegue fijo y lógico
+$ordenCategorias = ['Estado de ingreso','Frenos','Ruedas y rodaje','Detalles','Repuestos','Otros'];
+$checklistPorCategoria = [];
+foreach ($ordenCategorias as $cat) { $checklistPorCategoria[$cat] = []; }
+foreach ($checklistItems as $item) {
+    $cat = $item['categoria'] ?? 'Otros';
+    if (!isset($checklistPorCategoria[$cat])) $checklistPorCategoria[$cat] = [];
+    $checklistPorCategoria[$cat][] = $item;
+}
+// Quitar categorías vacías para no mostrar encabezados sin contenido
+$checklistPorCategoria = array_filter($checklistPorCategoria, fn($items) => count($items) > 0);
+
 $pageTitle  = 'Nueva OT — '.APP_NAME;
 $breadcrumb = [['label'=>'Órdenes de trabajo','url'=>BASE_URL.'modules/ot/index.php'],['label'=>'Nueva OT','url'=>null]];
 require_once __DIR__ . '/../../includes/header.php';
 ?>
 
-<h5 class="fw-bold mb-4">Nueva orden de trabajo</h5>
+<style>
+/* Checklist agrupado por categoría */
+.checklist-categoria { margin-bottom: 10px; }
+.checklist-categoria-header {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  color: #6b7280; background: #f8fafc; padding: 5px 8px; border-radius: 5px; margin-bottom: 4px;
+  border-left: 3px solid #4f46e5;
+}
+
+/* ── MODO TABLET ── */
+body.tablet-mode {
+  font-size: 17px;
+}
+body.tablet-mode .tr-card { border-radius: 14px; margin-bottom: 18px !important; }
+body.tablet-mode .tr-card-header { padding: 16px 18px; font-size: 16px; }
+body.tablet-mode .tr-card-body { padding: 18px; }
+body.tablet-mode .form-control,
+body.tablet-mode .form-select { font-size: 16px; padding: 10px 12px; min-height: 46px; }
+body.tablet-mode label.tr-form-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+
+body.tablet-mode .checklist-categoria-header { font-size: 13px; padding: 8px 10px; }
+body.tablet-mode .checklist-item {
+  padding: 10px 6px; border-bottom: 1px solid #f1f5f9;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+}
+body.tablet-mode .checklist-item .small { font-size: 14px; font-weight: 500; flex: 1 1 100%; }
+body.tablet-mode .checklist-item .btn-group label { font-size: 14px !important; padding: 8px 14px !important; }
+body.tablet-mode .checklist-item .btn-outline-secondary,
+body.tablet-mode .checklist-item .btn-outline-primary,
+body.tablet-mode .checklist-item .btn-outline-danger { padding: 8px 10px !important; }
+body.tablet-mode .checklist-item .btn-outline-secondary svg,
+body.tablet-mode .checklist-item .btn-outline-primary svg,
+body.tablet-mode .checklist-item .btn-outline-danger svg { width: 15px !important; height: 15px !important; }
+
+/* Columnas apiladas y más anchas en tablet */
+body.tablet-mode .row.g-3 > [class*="col-"] { flex: 0 0 100%; max-width: 100%; }
+
+/* Acento rojo/negro consistente con la identidad del taller en modo tablet */
+body.tablet-mode .btn-primary {
+  background: linear-gradient(135deg,#dc2626,#991b1b) !important;
+  border-color: #991b1b !important;
+}
+body.tablet-mode .tr-card-header {
+  background: #f8fafc; border-bottom: 2px solid #111827;
+}
+
+/* Botón flotante de guardar en modo tablet */
+#barra-tablet-guardar {
+  display: none; position: sticky; bottom: 0; z-index: 1030;
+  background: #fff; border-top: 2px solid #e5e7eb; padding: 12px 16px;
+  margin: 0 -12px; box-shadow: 0 -4px 12px rgba(0,0,0,.06);
+}
+body.tablet-mode #barra-tablet-guardar { display: flex; gap: 10px; }
+body.tablet-mode #btn-submit-normal { display: none; }
+
+/* ── Banner "INGRESO" tipo formulario físico ── */
+#banner-tablet-ingreso {
+  display: none;
+  grid-template-columns: 140px 90px 1fr;
+  align-items: stretch;
+  border: 2px solid #111827;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  min-height: 78px;
+}
+body.tablet-mode #banner-tablet-ingreso { display: grid; }
+.banner-ingreso-izq {
+  background: linear-gradient(135deg,#111827,#1f2937);
+  color: #fff; font-weight: 900; font-size: 18px; letter-spacing: 1px;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.banner-ingreso-centro {
+  background: #f8fafc; display: flex; align-items: center; justify-content: center;
+  border-left: 2px solid #111827; border-right: 2px solid #111827;
+}
+.banner-ingreso-centro img { max-width: 64px; max-height: 64px; border-radius: 50%; }
+.banner-ingreso-der {
+  background: linear-gradient(135deg,#dc2626,#991b1b);
+  color: #fff; padding: 10px 16px; display: flex; flex-direction: column; justify-content: center; gap: 2px;
+}
+.banner-empresa-nombre { font-weight: 800; font-size: 16px; text-transform: uppercase; }
+.banner-empresa-dir { font-size: 11px; opacity: .9; }
+.banner-empresa-tel { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+
+/* ── Checklist en columnas por categoría (modo tablet) — estilo "mampostería" ── */
+body.tablet-mode #checklist-container {
+  column-count: 3;
+  column-gap: 12px;
+}
+@media (max-width: 900px) {
+  body.tablet-mode #checklist-container { column-count: 2; }
+}
+@media (max-width: 560px) {
+  body.tablet-mode #checklist-container { column-count: 1; }
+}
+body.tablet-mode .checklist-categoria {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  overflow: hidden; margin-bottom: 12px;
+  break-inside: avoid; -webkit-column-break-inside: avoid;
+  display: inline-block; width: 100%;
+}
+body.tablet-mode .checklist-categoria-header {
+  background: #111827; color: #fff; text-align: center;
+  border-left: none; border-radius: 0; margin-bottom: 0;
+  padding: 7px 6px; font-size: 11px;
+}
+body.tablet-mode .checklist-categoria[data-categoria="Estado de ingreso"] .checklist-categoria-header {
+  background: linear-gradient(135deg,#dc2626,#991b1b);
+}
+body.tablet-mode .checklist-item {
+  flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 8px 10px; border-bottom: 1px solid #f1f5f9;
+}
+body.tablet-mode .checklist-item .small { font-size: 12.5px; }
+/* Ocultar el grupo de 3 botones (Bueno/Malo/N-A) y mostrar 1 checkbox grande */
+body.tablet-mode .checklist-item .btn-group { display: none !important; }
+body.tablet-mode .checklist-item .checklist-reorder-btns { display: none !important; } /* ocultar reordenar en captura rápida */
+.tablet-check-wrap { display: none; align-items: center; gap: 8px; }
+body.tablet-mode .tablet-check-wrap { display: flex; }
+.tablet-check-wrap input[type="checkbox"] {
+  width: 24px; height: 24px; accent-color: #dc2626; cursor: pointer;
+}
+.tablet-check-wrap label { font-size: 12px; color: #6b7280; cursor: pointer; }
+#chk-obs-wrap {
+  display: none;
+}
+body.tablet-mode #chk-obs-wrap { display: block; grid-column: 1 / -1; }
+body.tablet-mode #checklist-container > .mt-2 { display: none; } /* ocultamos la observación duplicada, usamos el wrap de abajo */
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="fw-bold mb-0">Nueva orden de trabajo</h5>
+  <button type="button" class="btn btn-outline-dark btn-sm" onclick="toggleModoTablet()" id="btn-toggle-tablet">
+    <i data-feather="tablet" style="width:14px;height:14px"></i> Modo Tablet
+  </button>
+</div>
+
+<!-- Banner tipo "INGRESO" — solo visible en Modo Tablet -->
+<div id="banner-tablet-ingreso" style="display:none">
+  <div class="banner-ingreso-izq">INGRESO</div>
+  <div class="banner-ingreso-centro">
+    <?php if (!empty($empresaCfg['logo'])): ?>
+    <img src="<?= BASE_URL . sanitize($empresaCfg['logo']) ?>" alt="logo"/>
+    <?php else: ?>
+    <i data-feather="tool" style="width:34px;height:34px;color:#fff"></i>
+    <?php endif; ?>
+  </div>
+  <div class="banner-ingreso-der">
+    <div class="banner-empresa-nombre"><?= sanitize($empresaNombreTablet) ?></div>
+    <?php if ($empresaDirTablet): ?><div class="banner-empresa-dir"><?= sanitize($empresaDirTablet) ?></div><?php endif; ?>
+    <?php if ($empresaTelTablet): ?>
+    <div class="banner-empresa-tel">
+      <i data-feather="phone" style="width:13px;height:13px"></i> <?= sanitize($empresaTelTablet) ?>
+    </div>
+    <?php endif; ?>
+  </div>
+</div>
 
 <form method="POST" enctype="multipart/form-data" id="form-nueva-ot">
 <div class="row g-3">
@@ -244,7 +437,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <span class="fw-semibold small">Videos del equipo</span>
           </div>
           <span class="badge bg-info text-dark" style="font-size:10px">
-            🎬 Compresión automática · Sin límite de tamaño
+            🎬 Máx 10 MB por video · se comprime automáticamente
           </span>
         </div>
         <div class="video-drop-zone" id="video-drop"
@@ -253,7 +446,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     transition:border-color .2s,background .2s">
           <i data-feather="film" style="width:28px;height:28px;color:#818cf8"></i>
           <p class="mb-0 mt-2 small fw-semibold" style="color:#6366f1">Arrastra videos aquí o haz clic</p>
-          <p class="text-muted small mb-0" style="font-size:11px">MP4, MOV, AVI, MKV — cualquier tamaño</p>
+          <p class="text-muted small mb-0" style="font-size:11px">MP4, MOV, AVI, MKV — solo videos de hasta 10 MB</p>
           <input type="file" id="input-videos" multiple
                  accept="video/mp4,video/quicktime,video/avi,video/webm,.mp4,.mov,.avi,.mkv,.webm,.3gp"
                  style="display:none"/>
@@ -295,31 +488,56 @@ require_once __DIR__ . '/../../includes/header.php';
         </button>
       </div>
       <div class="tr-card-body p-2" id="checklist-container">
-        <?php foreach($checklistItems as $item): ?>
-        <div class="checklist-item" id="chk-row-<?= $item['id'] ?>">
-          <span class="small" id="chk-label-<?= $item['id'] ?>"><?= sanitize($item['nombre']) ?></span>
-          <div class="d-flex align-items-center gap-1">
-            <div class="btn-group btn-group-sm" role="group">
-              <?php foreach(['bueno'=>'Bueno','malo'=>'Malo','no_aplica'=>'N/A'] as $val=>$txt): ?>
-              <input type="radio" class="btn-check" name="check_item_<?= $item['id'] ?>" id="c_<?= $item['id'] ?>_<?= $val ?>" value="<?= $val ?>" <?= $val==='no_aplica'?'checked':'' ?>>
-              <label class="btn btn-outline-<?= $val==='bueno'?'success':($val==='malo'?'danger':'secondary') ?> btn-sm py-0"
-                     for="c_<?= $item['id'] ?>_<?= $val ?>" style="font-size:11px"><?= $txt ?></label>
-              <?php endforeach; ?>
+        <?php foreach($checklistPorCategoria as $categoria => $items): ?>
+        <div class="checklist-categoria" data-categoria="<?= sanitize($categoria) ?>">
+          <div class="checklist-categoria-header"><?= sanitize($categoria) ?></div>
+          <?php foreach($items as $item): ?>
+          <div class="checklist-item" id="chk-row-<?= $item['id'] ?>" data-categoria="<?= sanitize($categoria) ?>">
+            <span class="small" id="chk-label-<?= $item['id'] ?>"><?= sanitize($item['nombre']) ?></span>
+            <!-- Checkbox grande — solo visible en Modo Tablet, sincroniza con los radios de abajo -->
+            <div class="tablet-check-wrap">
+              <input type="checkbox" id="tabchk_<?= $item['id'] ?>" onchange="syncTabletCheck(<?= $item['id'] ?>, this.checked)">
+              <label for="tabchk_<?= $item['id'] ?>">Revisado / OK</label>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm py-0 px-1" title="Editar"
-                    onclick="editarChecklistItem(<?= $item['id'] ?>, this)">
-              <i data-feather="edit-2" style="width:11px;height:11px"></i>
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" title="Eliminar"
-                    onclick="eliminarChecklistItem(<?= $item['id'] ?>, this)">
-              <i data-feather="trash-2" style="width:11px;height:11px"></i>
-            </button>
+            <div class="d-flex align-items-center gap-1">
+              <div class="btn-group btn-group-sm" role="group">
+                <?php foreach(['bueno'=>'Bueno','malo'=>'Malo','no_aplica'=>'N/A'] as $val=>$txt): ?>
+                <input type="radio" class="btn-check" name="check_item_<?= $item['id'] ?>" id="c_<?= $item['id'] ?>_<?= $val ?>" value="<?= $val ?>" <?= $val==='no_aplica'?'checked':'' ?>>
+                <label class="btn btn-outline-<?= $val==='bueno'?'success':($val==='malo'?'danger':'secondary') ?> btn-sm py-0"
+                       for="c_<?= $item['id'] ?>_<?= $val ?>" style="font-size:11px"><?= $txt ?></label>
+                <?php endforeach; ?>
+              </div>
+              <span class="checklist-reorder-btns d-inline-flex align-items-center gap-1">
+                <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1" title="Subir"
+                        onclick="moverChecklistItem(<?= $item['id'] ?>,'up',this)">
+                  <i data-feather="arrow-up" style="width:11px;height:11px"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1" title="Bajar"
+                        onclick="moverChecklistItem(<?= $item['id'] ?>,'down',this)">
+                  <i data-feather="arrow-down" style="width:11px;height:11px"></i>
+                </button>
+              </span>
+              <button type="button" class="btn btn-outline-primary btn-sm py-0 px-1 checklist-reorder-btns" title="Editar"
+                      onclick="editarChecklistItem(<?= $item['id'] ?>, this)">
+                <i data-feather="edit-2" style="width:11px;height:11px"></i>
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1 checklist-reorder-btns" title="Eliminar"
+                      onclick="eliminarChecklistItem(<?= $item['id'] ?>, this)">
+                <i data-feather="trash-2" style="width:11px;height:11px"></i>
+              </button>
+            </div>
           </div>
+          <?php endforeach; ?>
         </div>
         <?php endforeach; ?>
         <div class="mt-2">
           <label class="tr-form-label small">Observación</label>
-          <textarea name="check_obs" class="form-control form-control-sm" rows="2" placeholder="Golpes, rayones, partes faltantes..."></textarea>
+          <textarea name="check_obs" class="form-control form-control-sm" rows="2" placeholder="Golpes, rayones, partes faltantes..." id="check_obs_normal"></textarea>
+        </div>
+        <!-- Observación duplicada para Modo Tablet (ocupa todo el ancho del grid) -->
+        <div id="chk-obs-wrap">
+          <label class="tr-form-label small">Observaciones de ingreso</label>
+          <textarea class="form-control" rows="3" placeholder="Golpes, rayones, partes faltantes..." id="check_obs_tablet" oninput="document.getElementById('check_obs_normal').value=this.value"></textarea>
         </div>
       </div>
     </div>
@@ -328,11 +546,22 @@ require_once __DIR__ . '/../../includes/header.php';
     <div class="tr-card mb-3">
       <div class="tr-card-header"><h6 class="mb-0"><i data-feather="settings" class="me-2" style="width:16px;height:16px"></i>Asignación</h6></div>
       <div class="tr-card-body">
-        <div class="mb-2"><label class="tr-form-label">Técnico asignado</label>
-          <select name="tecnico_id" class="form-select form-select-sm">
-            <option value="">Sin asignar</option>
-            <?php foreach($tecnicos as $t): ?><option value="<?= $t['id'] ?>"><?= sanitize($t['nombre']) ?></option><?php endforeach; ?>
-          </select>
+        <div class="mb-2"><label class="tr-form-label">Técnicos asignados</label>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px;max-height:160px;overflow-y:auto">
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="checkbox" name="tecnicos_ids[]" value="" id="tec_ninguno" checked disabled style="display:none">
+            </div>
+            <?php foreach($tecnicos as $t): ?>
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="checkbox" name="tecnicos_ids[]"
+                     value="<?= $t['id'] ?>" id="ntec_<?= $t['id'] ?>">
+              <label class="form-check-label small" for="ntec_<?= $t['id'] ?>">
+                <?= sanitize($t['nombre']) ?>
+              </label>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <div class="text-muted small mt-1">El primero marcado será el técnico principal</div>
         </div>
         <div class="mb-2"><label class="tr-form-label">Fecha estimada de entrega</label><input type="date" name="fecha_estimada" class="form-control form-control-sm" min="<?= date('Y-m-d') ?>"/></div>
         <div class="mb-2"><label class="tr-form-label">Garantía (días)</label><input type="number" name="garantia_dias" class="form-control form-control-sm" value="30" min="0"/></div>
@@ -379,10 +608,20 @@ require_once __DIR__ . '/../../includes/header.php';
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary w-100 btn-lg">
+    <button type="submit" class="btn btn-primary w-100 btn-lg" id="btn-submit-normal">
       <i data-feather="save" style="width:18px;height:18px"></i> Crear orden de trabajo
     </button>
   </div>
+</div>
+
+<!-- Barra fija de guardar (solo visible en Modo Tablet) -->
+<div id="barra-tablet-guardar">
+  <button type="button" class="btn btn-outline-secondary" onclick="toggleModoTablet()" style="flex:0 0 auto">
+    <i data-feather="x" style="width:16px;height:16px"></i>
+  </button>
+  <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+    <i data-feather="save" style="width:18px;height:18px"></i> Guardar orden de trabajo
+  </button>
 </div>
 </form>
 
@@ -445,7 +684,17 @@ require_once __DIR__ . '/../../includes/header.php';
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <input type="text" id="input-nuevo-check" class="form-control" placeholder="Ej: Micrófono funcional"/>
+        <label class="tr-form-label small">Nombre del ítem</label>
+        <input type="text" id="input-nuevo-check" class="form-control mb-2" placeholder="Ej: Micrófono funcional"/>
+        <label class="tr-form-label small">Categoría</label>
+        <select id="select-nuevo-check-categoria" class="form-select">
+          <option value="Estado de ingreso">Estado de ingreso</option>
+          <option value="Frenos">Frenos</option>
+          <option value="Ruedas y rodaje">Ruedas y rodaje</option>
+          <option value="Detalles" selected>Detalles</option>
+          <option value="Repuestos">Repuestos</option>
+          <option value="Otros">Otros</option>
+        </select>
       </div>
       <div class="modal-footer py-2">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
@@ -636,6 +885,7 @@ initFirma('firma-canvas', 'firma_cliente');
   if (!dropZone || !input || !previewDiv) return;
 
   var CHUNK_SIZE   = 1 * 1024 * 1024; // 1MB por chunk (bajo el límite de 2MB)
+  var MAX_VIDEO_MB = 10;   // límite máximo por video
   var uploadedIds  = [];   // IDs de fotos_ot insertadas por el servidor
   var uploading    = 0;    // cuántos videos están subiendo
 
@@ -659,6 +909,13 @@ initFirma('firma-canvas', 'firma_cliente');
       var ext = file.name.split('.').pop().toLowerCase();
       if (!validExts.includes(ext)) {
         alert('Formato no válido: ' + file.name); return;
+      }
+      var mb = file.size / 1024 / 1024;
+      if (mb > MAX_VIDEO_MB) {
+        alert('El video "' + file.name + '" pesa ' + mb.toFixed(1) + ' MB.\n\n'
+            + 'Solo se permiten videos de hasta ' + MAX_VIDEO_MB + ' MB. '
+            + 'Recórtalo o comprímelo antes de subirlo.');
+        return;
       }
       startChunkUpload(file);
     });
@@ -1044,25 +1301,31 @@ function agregarChecklistItem() {
 }
 
 document.getElementById('btn-confirmar-check').addEventListener('click', async function() {
-  const valor = document.getElementById('input-nuevo-check').value.trim();
+  const valor     = document.getElementById('input-nuevo-check').value.trim();
+  const categoria = document.getElementById('select-nuevo-check-categoria').value;
   if (!valor) return;
 
   const fd = new FormData();
-  fd.append('accion', 'checklist_item');
-  fd.append('valor',  valor);
+  fd.append('accion',    'checklist_item');
+  fd.append('valor',     valor);
+  fd.append('categoria', categoria);
 
   const r = await fetch('api_agregar.php', { method:'POST', body: fd });
   const d = await r.json();
 
   if (d.ok) {
     const container = document.getElementById('checklist-container');
-    const obsDiv    = container.querySelector('div.mt-2');
     const id        = d.id;
     const div       = document.createElement('div');
     div.className   = 'checklist-item';
     div.id          = 'chk-row-' + id;
+    div.dataset.categoria = categoria;
     div.innerHTML   = `
       <span class="small" id="chk-label-${id}">${escHtml(d.nombre)}</span>
+      <div class="tablet-check-wrap">
+        <input type="checkbox" id="tabchk_${id}" onchange="syncTabletCheck(${id}, this.checked)">
+        <label for="tabchk_${id}">Revisado / OK</label>
+      </div>
       <div class="d-flex align-items-center gap-1">
         <div class="btn-group btn-group-sm" role="group">
           ${['bueno','malo','no_aplica'].map((v,i) => `
@@ -1071,20 +1334,88 @@ document.getElementById('btn-confirmar-check').addEventListener('click', async f
                    for="c_${id}_${v}" style="font-size:11px">${['Bueno','Malo','N/A'][i]}</label>
           `).join('')}
         </div>
-        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-1" title="Editar"
+        <span class="checklist-reorder-btns d-inline-flex align-items-center gap-1">
+          <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1" title="Subir" onclick="moverChecklistItem(${id},'up',this)">
+            <i data-feather="arrow-up" style="width:11px;height:11px"></i>
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1" title="Bajar" onclick="moverChecklistItem(${id},'down',this)">
+            <i data-feather="arrow-down" style="width:11px;height:11px"></i>
+          </button>
+        </span>
+        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-1 checklist-reorder-btns" title="Editar"
                 onclick="editarChecklistItem(${id}, this)">
           <i data-feather="edit-2" style="width:11px;height:11px"></i>
         </button>
-        <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" title="Eliminar"
+        <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1 checklist-reorder-btns" title="Eliminar"
                 onclick="eliminarChecklistItem(${id}, this)">
           <i data-feather="trash-2" style="width:11px;height:11px"></i>
         </button>
       </div>`;
-    container.insertBefore(div, obsDiv);
+
+
+    // Buscar si ya existe el bloque de esa categoría; si no, crearlo al final
+    let catBlock = container.querySelector(`.checklist-categoria[data-categoria="${categoria}"]`);
+    if (!catBlock) {
+      catBlock = document.createElement('div');
+      catBlock.className = 'checklist-categoria';
+      catBlock.dataset.categoria = categoria;
+      catBlock.innerHTML = `<div class="checklist-categoria-header">${escHtml(categoria)}</div>`;
+      const obsDiv = container.querySelector('div.mt-2');
+      container.insertBefore(catBlock, obsDiv);
+    }
+    catBlock.appendChild(div);
+
     bootstrap.Modal.getInstance(document.getElementById('modal-checklist')).hide();
     feather.replace();
+  } else {
+    alert(d.error || 'Error al agregar ítem');
   }
 });
+
+// ── Reordenar ítem (sube/baja dentro de su categoría) ────
+async function moverChecklistItem(id, direccion, btn) {
+  const fd = new FormData();
+  fd.append('accion',     'reordenar_checklist_item');
+  fd.append('id',         id);
+  fd.append('direccion',  direccion);
+
+  const r = await fetch('api_agregar.php', { method:'POST', body: fd });
+  const d = await r.json();
+  if (!d.ok) { alert(d.error || 'Error al reordenar'); return; }
+  if (!d.moved) return; // ya estaba en el extremo, nada que hacer
+
+  const fila = document.getElementById('chk-row-' + id);
+  if (!fila) return;
+  if (direccion === 'up') {
+    const anterior = fila.previousElementSibling;
+    if (anterior) fila.parentNode.insertBefore(fila, anterior);
+  } else {
+    const siguiente = fila.nextElementSibling;
+    if (siguiente) fila.parentNode.insertBefore(siguiente, fila);
+  }
+}
+
+// Sincroniza el checkbox grande del Modo Tablet con los radios reales (bueno/no_aplica)
+function syncTabletCheck(id, marcado) {
+  const radioBueno = document.getElementById('c_' + id + '_bueno');
+  const radioNA     = document.getElementById('c_' + id + '_no_aplica');
+  if (marcado) { if (radioBueno) radioBueno.checked = true; }
+  else         { if (radioNA)    radioNA.checked = true; }
+}
+
+// ── Modo Tablet: mismo formulario, vista más grande y táctil ──
+function toggleModoTablet() {
+  document.body.classList.toggle('tablet-mode');
+  const activo = document.body.classList.contains('tablet-mode');
+  const btn = document.getElementById('btn-toggle-tablet');
+  if (btn) {
+    btn.innerHTML = activo
+      ? '<i data-feather="monitor" style="width:14px;height:14px"></i> Modo Normal'
+      : '<i data-feather="tablet" style="width:14px;height:14px"></i> Modo Tablet';
+    feather.replace();
+  }
+  if (activo) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 document.getElementById('input-nuevo-check').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-confirmar-check').click(); }

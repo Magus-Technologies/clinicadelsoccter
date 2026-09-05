@@ -9,7 +9,7 @@ $db     = getDB();
 $accion = $_POST['accion'] ?? '';
 $valor  = trim($_POST['valor'] ?? '');
 
-$accionesNoRequierenValor = ['eliminar_tipo_equipo','eliminar_marca','eliminar_checklist_item','reordenar_checklist_item'];
+$accionesNoRequierenValor = ['eliminar_tipo_equipo','eliminar_marca','eliminar_checklist_item'];
 if (!$valor && !in_array($accion, $accionesNoRequierenValor)) { echo json_encode(['error'=>'Valor vacío']); exit; }
 
 switch ($accion) {
@@ -36,19 +36,15 @@ switch ($accion) {
         break;
 
     case 'checklist_item':
-        $categoria = trim($_POST['categoria'] ?? 'Otros') ?: 'Otros';
         $existe = $db->prepare("SELECT id FROM checklist_items WHERE nombre=?");
         $existe->execute([$valor]);
         $id = $existe->fetchColumn();
         if (!$id) {
-            // El orden se calcula dentro de su propia categoría, así aparece al final de su grupo
-            $st = $db->prepare("SELECT COALESCE(MAX(orden),0)+1 FROM checklist_items WHERE categoria=?");
-            $st->execute([$categoria]);
-            $maxOrden = $st->fetchColumn();
-            $db->prepare("INSERT INTO checklist_items (nombre,categoria,orden) VALUES (?,?,?)")->execute([$valor,$categoria,$maxOrden]);
+            $maxOrden = $db->query("SELECT COALESCE(MAX(orden),0)+1 FROM checklist_items")->fetchColumn();
+            $db->prepare("INSERT INTO checklist_items (nombre,orden) VALUES (?,?)")->execute([$valor,$maxOrden]);
             $id = $db->lastInsertId();
         }
-        echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor,'categoria'=>$categoria]);
+        echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor]);
         break;
 
     case 'editar_tipo_equipo':
@@ -85,11 +81,7 @@ switch ($accion) {
     case 'editar_checklist_item':
         $id = (int)($_POST['id'] ?? 0);
         if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
-        if (isset($_POST['categoria']) && trim($_POST['categoria']) !== '') {
-            $db->prepare("UPDATE checklist_items SET nombre=?, categoria=? WHERE id=?")->execute([$valor, trim($_POST['categoria']), $id]);
-        } else {
-            $db->prepare("UPDATE checklist_items SET nombre=? WHERE id=?")->execute([$valor, $id]);
-        }
+        $db->prepare("UPDATE checklist_items SET nombre=? WHERE id=?")->execute([$valor, $id]);
         echo json_encode(['ok'=>true,'id'=>$id,'nombre'=>$valor]);
         break;
 
@@ -98,33 +90,6 @@ switch ($accion) {
         if (!$id) { echo json_encode(['error'=>'ID inválido']); exit; }
         $db->prepare("DELETE FROM checklist_items WHERE id=?")->execute([$id]);
         echo json_encode(['ok'=>true]);
-        break;
-
-    // Mover un ítem un lugar hacia arriba o abajo DENTRO de su misma categoría
-    case 'reordenar_checklist_item':
-        $id  = (int)($_POST['id'] ?? 0);
-        $dir = $_POST['direccion'] ?? ''; // 'up' | 'down'
-        if (!$id || !in_array($dir, ['up','down'], true)) { echo json_encode(['error'=>'Parámetros inválidos']); exit; }
-
-        $actual = $db->prepare("SELECT id,categoria,orden FROM checklist_items WHERE id=?");
-        $actual->execute([$id]);
-        $actual = $actual->fetch();
-        if (!$actual) { echo json_encode(['error'=>'Ítem no encontrado']); exit; }
-
-        if ($dir === 'up') {
-            $vecino = $db->prepare("SELECT id,orden FROM checklist_items WHERE categoria=? AND orden < ? ORDER BY orden DESC LIMIT 1");
-        } else {
-            $vecino = $db->prepare("SELECT id,orden FROM checklist_items WHERE categoria=? AND orden > ? ORDER BY orden ASC LIMIT 1");
-        }
-        $vecino->execute([$actual['categoria'], $actual['orden']]);
-        $vecino = $vecino->fetch();
-
-        if (!$vecino) { echo json_encode(['ok'=>true,'moved'=>false]); exit; } // ya está en el extremo
-
-        // Intercambiar los valores de orden
-        $db->prepare("UPDATE checklist_items SET orden=? WHERE id=?")->execute([$vecino['orden'], $actual['id']]);
-        $db->prepare("UPDATE checklist_items SET orden=? WHERE id=?")->execute([$actual['orden'], $vecino['id']]);
-        echo json_encode(['ok'=>true,'moved'=>true]);
         break;
 
     default:

@@ -52,18 +52,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         setFlash('success','Presupuesto aprobado.');
         redirect(BASE_URL . 'modules/ot/ver.php?id=' . $id);
     }
-    if ($_POST['action'] === 'registrar_pago') {
-        $db->prepare("UPDATE ordenes_trabajo SET pagado=1, metodo_pago=?, fecha_pago=NOW() WHERE id=?")
-           ->execute([$_POST['metodo_pago'], $id]);
-        // Movimiento de caja
-        $cajaAbierta = $db->prepare("SELECT id FROM cajas WHERE fecha=CURDATE() AND estado='abierta' ORDER BY id DESC LIMIT 1");
-        $cajaAbierta->execute();
-        $caja = $cajaAbierta->fetchColumn();
-        if ($caja) {
-            $db->prepare("INSERT INTO movimientos_caja (caja_id,tipo,concepto,monto,referencia,usuario_id) VALUES (?,?,?,?,?,?)")
-               ->execute([$caja,'ingreso','Pago reparación ' . $ot['codigo_ot'], $ot['precio_final'], $ot['codigo_ot'], $user['id']]);
+    if ($_POST['action'] === 'asignar_tecnicos') {
+        $tecnicosSel = array_values(array_unique(array_filter(array_map('intval', $_POST['tecnicos'] ?? []))));
+        $db->prepare("DELETE FROM ot_tecnicos WHERE ot_id=?")->execute([$id]);
+        if (!empty($tecnicosSel)) {
+            $stTec = $db->prepare("INSERT IGNORE INTO ot_tecnicos (ot_id,tecnico_id) VALUES (?,?)");
+            foreach ($tecnicosSel as $tid) { $stTec->execute([$id, $tid]); }
         }
-        setFlash('success','Pago registrado correctamente.');
+        // Mantener tecnico_id (referencia) sincronizado con el primero de la lista
+        $db->prepare("UPDATE ordenes_trabajo SET tecnico_id=? WHERE id=?")
+           ->execute([$tecnicosSel[0] ?? null, $id]);
+        // Registrar en historial
+        $nombresTec = [];
+        if (!empty($tecnicosSel)) {
+            $ph = implode(',', array_fill(0, count($tecnicosSel), '?'));
+            $stN = $db->prepare("SELECT CONCAT(nombre,' ',apellido) FROM usuarios WHERE id IN ($ph)");
+            $stN->execute($tecnicosSel);
+            $nombresTec = $stN->fetchAll(PDO::FETCH_COLUMN);
+        }
+        $coment = $nombresTec ? ('Técnicos asignados: ' . implode(', ', $nombresTec)) : 'Se quitaron todos los técnicos';
+        $db->prepare("INSERT INTO historial_ot (ot_id,usuario_id,estado_antes,estado_nuevo,comentario) VALUES (?,?,?,?,?)")
+           ->execute([$id, $user['id'], $ot['estado'], $ot['estado'], $coment]);
+        setFlash('success', 'Técnicos actualizados correctamente.');
         redirect(BASE_URL . 'modules/ot/ver.php?id=' . $id);
     }
 }
@@ -105,6 +115,22 @@ $checklist = $ot['checklist'] ? json_decode($ot['checklist'], true) : [];
 
 // Técnicos para reasignar
 $tecnicos = $db->query("SELECT id,CONCAT(nombre,' ',apellido) as nombre FROM usuarios WHERE rol='tecnico' AND activo=1")->fetchAll();
+
+// Técnicos actualmente asignados a esta OT
+$stAsig = $db->prepare("
+    SELECT ot2.tecnico_id, CONCAT(u.nombre,' ',u.apellido) AS nombre
+    FROM ot_tecnicos ot2 JOIN usuarios u ON u.id = ot2.tecnico_id
+    WHERE ot2.ot_id = ? ORDER BY u.nombre");
+$stAsig->execute([$id]);
+$tecnicosAsignados = $stAsig->fetchAll();
+$idsAsignados = array_map(fn($r) => (int)$r["tecnico_id"], $tecnicosAsignados);
+// Compatibilidad: si no hay registros en ot_tecnicos pero sí tecnico_id
+if (empty($tecnicosAsignados) && !empty($ot['tecnico_id'])) {
+    $idsAsignados = [(int)$ot['tecnico_id']];
+    if (!empty($ot['tecnico_nombre'])) {
+        $tecnicosAsignados = [['tecnico_id' => (int)$ot['tecnico_id'], 'nombre' => $ot['tecnico_nombre']]];
+    }
+}
 
 $pageTitle  = $ot['codigo_ot'] . ' — ' . APP_NAME;
 $breadcrumb = [
@@ -400,11 +426,48 @@ $eInfo = ESTADOS_OT[$estado] ?? ['label'=>ucfirst(str_replace('_',' ',$estado)),
     </div>
     <?php endif; ?>
 
+    <!-- Reasignar técnicos (rápido) -->
+    <?php if (!(isset($eInfo['es_final']) && $eInfo['es_final'])): ?>
+    <div class="tr-card mb-3">
+      <div class="tr-card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 small fw-semibold">TÉCNICOS</h6>
+        <button type="button" class="btn btn-outline-primary btn-sm py-0" onclick="toggleReasignar()">
+          <i data-feather="edit-2" style="width:13px;height:13px"></i> Cambiar
+        </button>
+      </div>
+      <div class="tr-card-body" id="box-reasignar" style="display:none">
+        <form method="POST">
+          <input type="hidden" name="action" value="asignar_tecnicos"/>
+          <div class="border rounded p-2 mb-2" style="max-height:180px;overflow-y:auto;background:#fafafa">
+            <?php if (empty($tecnicos)): ?>
+              <div class="text-muted small">No hay técnicos activos.</div>
+            <?php else: foreach($tecnicos as $t): ?>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="tecnicos[]" value="<?= $t['id'] ?>"
+                     id="rt-<?= $t['id'] ?>" <?= in_array((int)$t['id'], $idsAsignados, true) ? 'checked' : '' ?>>
+              <label class="form-check-label small" for="rt-<?= $t['id'] ?>"><?= sanitize($t['nombre']) ?></label>
+            </div>
+            <?php endforeach; endif; ?>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-100">Guardar técnicos</button>
+        </form>
+      </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Técnico y fechas -->
     <div class="tr-card mb-3">
       <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">ASIGNACIÓN</h6></div>
       <div class="tr-card-body">
-        <div class="small mb-1"><strong>Técnico:</strong> <?= sanitize($ot['tecnico_nombre'] ?? 'Sin asignar') ?></div>
+        <div class="small mb-1"><strong>Técnico<?= count($tecnicosAsignados) > 1 ? 's' : '' ?>:</strong>
+          <?php if (empty($tecnicosAsignados)): ?>
+            <span class="text-muted">Sin asignar</span>
+          <?php else: ?>
+            <?php foreach ($tecnicosAsignados as $ta): ?>
+              <span class="badge bg-light text-dark border me-1 mb-1"><?= sanitize($ta['nombre']) ?></span>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
         <div class="small mb-1"><strong>Creado por:</strong> <?= sanitize($ot['creador_nombre']) ?></div>
         <div class="small mb-1"><strong>F. ingreso:</strong> <?= formatDateTime($ot['fecha_ingreso']) ?></div>
         <div class="small mb-1"><strong>F. estimada:</strong>
@@ -433,5 +496,14 @@ $eInfo = ESTADOS_OT[$estado] ?? ['label'=>ucfirst(str_replace('_',' ',$estado)),
 
   </div>
 </div>
+
+<script>
+function toggleReasignar() {
+  var box = document.getElementById('box-reasignar');
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+  if (window.feather) feather.replace();
+}
+</script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

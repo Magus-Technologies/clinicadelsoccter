@@ -17,7 +17,7 @@ $where  = [];
 $params = [];
 
 if ($f_estado)      { $where[] = 'ot.estado = ?';            $params[] = $f_estado; }
-if ($f_tecnico)     { $where[] = 'ot.tecnico_id = ?';         $params[] = $f_tecnico; }
+if ($f_tecnico)     { $where[] = '(ot.tecnico_id = ? OR EXISTS(SELECT 1 FROM ot_tecnicos ot2 WHERE ot2.ot_id=ot.id AND ot2.tecnico_id=?))'; $params[] = $f_tecnico; $params[] = $f_tecnico; }
 if ($f_desde)       { $where[] = 'DATE(ot.created_at) >= ?';  $params[] = $f_desde; }
 if ($f_hasta)       { $where[] = 'DATE(ot.created_at) <= ?';  $params[] = $f_hasta; }
 if ($f_servicio_id) { $where[] = 'ot.servicio_id = ?';        $params[] = $f_servicio_id; }
@@ -40,7 +40,11 @@ $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 $ots = $db->prepare("
   SELECT ot.*, c.nombre as cliente_nombre, c.telefono as cliente_tel,
          te.nombre as tipo_equipo, e.marca, e.modelo,
-         CONCAT(u.nombre,' ',u.apellido) as tecnico_nombre,
+         COALESCE(
+           (SELECT GROUP_CONCAT(CONCAT(u2.nombre,' ',u2.apellido) ORDER BY ot2.tecnico_id SEPARATOR ' / ')
+            FROM ot_tecnicos ot2 JOIN usuarios u2 ON u2.id = ot2.tecnico_id WHERE ot2.ot_id = ot.id),
+           CONCAT(u.nombre,' ',u.apellido)
+         ) as tecnicos_nombres,
          s.nombre as servicio_nombre, s.categoria as servicio_categoria
   FROM ordenes_trabajo ot
   JOIN clientes c    ON c.id  = ot.cliente_id
@@ -190,7 +194,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <span class="text-muted">—</span>
             <?php endif; ?>
           </td>
-          <td class="small"><?= sanitize($ot['tecnico_nombre'] ?? '—') ?></td>
+          <td class="small"><?= sanitize($ot['tecnicos_nombres'] ?? '—') ?></td>
           <td><?= estadoOTBadge($ot['estado']) ?></td>
           <td class="small <?= ($ot['fecha_estimada'] && $ot['fecha_estimada'] < date('Y-m-d') && !(ESTADOS_OT[$ot['estado']]['es_final'] ?? false)) ? 'text-danger fw-semibold' : '' ?>">
             <?= $ot['fecha_estimada'] ? formatDate($ot['fecha_estimada']) : '—' ?>

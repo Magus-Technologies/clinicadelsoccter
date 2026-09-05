@@ -19,6 +19,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link href="<?= BASE_URL ?>assets/css/app.css" rel="stylesheet"/>
+  <style>
+    /* Botón de cerrar sesión — visible y claro en el sidebar */
+    .tr-logout-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; margin-top: 10px; padding: 9px 12px;
+      border-radius: 8px; font-size: 13px; font-weight: 600;
+      color: #fecaca; background: rgba(239,68,68,.14);
+      border: 1px solid rgba(239,68,68,.35);
+      text-decoration: none;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .tr-logout-btn:hover { background:#dc2626; color:#fff; border-color:#dc2626; }
+    .tr-logout-btn svg { width:16px; height:16px; }
+    /* En modo colapsado: mostrar solo el ícono, centrado (sobreescribe el display:none previo) */
+    .tr-sidebar.collapsed .tr-logout-btn { display:flex !important; padding:9px 0; margin-top:8px; }
+    .tr-sidebar.collapsed .tr-logout-btn span { display:none; }
+  </style>
   <script>window.BASE_URL = '<?= BASE_URL ?>';</script>
 </head>
 <body class="tr-body">
@@ -41,28 +58,38 @@
       <i data-feather="home"></i><span>Dashboard</span>
     </a>
 
-    <?php if(in_array($rol,[ROL_ADMIN,ROL_TECNICO,ROL_VENDEDOR])): ?>
+    <?php /* El menú se arma según los permisos del perfil (modules/permisos) */ ?>
+
+    <?php if (puede('ot') || puede('ot_nueva')): ?>
     <div class="tr-nav-group">Reparaciones</div>
-    <a href="<?= BASE_URL ?>modules/ot/index.php"
-       class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'/ot/')!==false?'active':'' ?>">
-      <i data-feather="clipboard"></i><span>Órdenes de trabajo</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/ot/nueva.php" class="tr-nav-item">
-      <i data-feather="plus-circle"></i><span>Nueva OT</span>
-    </a>
+      <?php if (puede('ot')): ?>
+      <a href="<?= BASE_URL ?>modules/ot/index.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'/ot/')!==false?'active':'' ?>">
+        <i data-feather="clipboard"></i><span>Órdenes de trabajo</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('ot_nueva')): ?>
+      <a href="<?= BASE_URL ?>modules/ot/nueva.php" class="tr-nav-item">
+        <i data-feather="plus-circle"></i><span>Nueva OT</span>
+      </a>
+      <?php endif; ?>
     <?php endif; ?>
 
-    <?php if(in_array($rol,[ROL_ADMIN,ROL_VENDEDOR])): ?>
+    <?php if (puede('ventas_pos') || puede('ventas')): ?>
     <div class="tr-nav-group">Ventas</div>
-    <a href="<?= BASE_URL ?>modules/ventas/pos.php" class="tr-nav-item">
-      <i data-feather="shopping-cart"></i><span>Punto de venta</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/ventas/index.php" class="tr-nav-item">
-      <i data-feather="list"></i><span>Ventas</span>
-    </a>
+      <?php if (puede('ventas_pos')): ?>
+      <a href="<?= BASE_URL ?>modules/ventas/pos.php" class="tr-nav-item">
+        <i data-feather="shopping-cart"></i><span>Punto de venta</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('ventas')): ?>
+      <a href="<?= BASE_URL ?>modules/ventas/index.php" class="tr-nav-item">
+        <i data-feather="list"></i><span>Ventas</span>
+      </a>
+      <?php endif; ?>
     <?php endif; ?>
 
-    <?php if(in_array($rol,[ROL_ADMIN,ROL_TECNICO])): ?>
+    <?php if (puede('catalogo')): ?>
     <div class="tr-nav-group">Catálogo público</div>
     <a href="<?= BASE_URL ?>modules/catalogo/index.php"
        class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'catalogo')!==false?'active':'' ?>">
@@ -71,32 +98,50 @@
     <a href="<?= BASE_URL ?>public/catalogo/" target="_blank" class="tr-nav-item">
       <i data-feather="external-link"></i><span>Ver catálogo</span>
     </a>
-
-    <div class="tr-nav-group">Inventario</div>
-    <a href="<?= BASE_URL ?>modules/inventario/index.php" class="tr-nav-item">
-      <i data-feather="package"></i><span>Productos</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/compras/index.php"
-       class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'compras')!==false?'active':'' ?>">
-      <i data-feather="truck"></i><span>Compras</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/inventario/kardex.php" class="tr-nav-item">
-      <i data-feather="bar-chart-2"></i><span>Kardex</span>
-    </a>
     <?php endif; ?>
 
+    <?php if (puede('inventario') || puede('compras') || puede('kardex') || puede('categorias')): ?>
+    <div class="tr-nav-group">Inventario</div>
+      <?php if (puede('inventario')): ?>
+      <a href="<?= BASE_URL ?>modules/inventario/index.php" class="tr-nav-item">
+        <i data-feather="package"></i><span>Productos</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('compras')): ?>
+      <a href="<?= BASE_URL ?>modules/compras/index.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'compras')!==false?'active':'' ?>">
+        <i data-feather="truck"></i><span>Compras</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('kardex')): ?>
+      <a href="<?= BASE_URL ?>modules/inventario/kardex.php" class="tr-nav-item">
+        <i data-feather="bar-chart-2"></i><span>Kardex</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('categorias')): ?>
+      <a href="<?= BASE_URL ?>modules/categorias/index.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'categorias')!==false?'active':'' ?>">
+        <i data-feather="grid"></i><span>Categorías</span>
+      </a>
+      <?php endif; ?>
+    <?php endif; ?>
+
+    <?php if (puede('whatsapp')): ?>
     <div class="tr-nav-group">Comunicaciones</div>
     <a href="<?= BASE_URL ?>modules/whatsapp/index.php"
        class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'whatsapp')!==false?'active':'' ?>">
       <i data-feather="message-circle"></i><span>WhatsApp</span>
     </a>
+    <?php endif; ?>
 
+    <?php if (puede('clientes')): ?>
     <div class="tr-nav-group">Clientes</div>
     <a href="<?= BASE_URL ?>modules/clientes/index.php" class="tr-nav-item">
       <i data-feather="users"></i><span>Clientes</span>
     </a>
+    <?php endif; ?>
 
-    <?php if(in_array($rol,[ROL_ADMIN,ROL_TECNICO])): ?>
+    <?php if (puede('servicios')): ?>
     <div class="tr-nav-group">Servicios</div>
     <a href="<?= BASE_URL ?>modules/servicios/index.php"
        class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'servicios')!==false?'active':'' ?>">
@@ -104,45 +149,72 @@
     </a>
     <?php endif; ?>
 
-    <?php if($rol === ROL_ADMIN): ?>
+    <?php
+    $adminItems = ['caja','reportes','usuarios','garantias','estados','plantilla_impresion','configuracion'];
+    $verAdmin   = false;
+    foreach ($adminItems as $__m) { if (puede($__m)) { $verAdmin = true; break; } }
+    ?>
+    <?php if ($verAdmin || $rol === ROL_ADMIN): ?>
     <div class="tr-nav-group">Administración</div>
-    <a href="<?= BASE_URL ?>modules/caja/index.php" class="tr-nav-item">
-      <i data-feather="dollar-sign"></i><span>Caja</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/reportes/index.php" class="tr-nav-item">
-      <i data-feather="trending-up"></i><span>Reportes</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/tecnicos/index.php" class="tr-nav-item">
-      <i data-feather="user-check"></i><span>Técnicos</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/garantias/index.php" class="tr-nav-item">
-      <i data-feather="shield"></i><span>Garantías</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/estados/index.php"
-       class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'estados')!==false?'active':'' ?>">
-      <i data-feather="tag"></i><span>Estados OT</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/configuracion/plantilla_impresion.php"
-       class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'plantilla_impresion')!==false?'active':'' ?>">
-      <i data-feather="printer"></i><span>Plantilla impresión</span>
-    </a>
-    <a href="<?= BASE_URL ?>modules/configuracion/index.php" class="tr-nav-item">
-      <i data-feather="settings"></i><span>Configuración</span>
-    </a>
+      <?php if (puede('caja')): ?>
+      <a href="<?= BASE_URL ?>modules/caja/index.php" class="tr-nav-item">
+        <i data-feather="dollar-sign"></i><span>Caja</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('reportes')): ?>
+      <a href="<?= BASE_URL ?>modules/reportes/index.php" class="tr-nav-item">
+        <i data-feather="trending-up"></i><span>Reportes</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('usuarios')): ?>
+      <a href="<?= BASE_URL ?>modules/usuarios/index.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'usuarios')!==false?'active':'' ?>">
+        <i data-feather="user-check"></i><span>Usuarios</span>
+      </a>
+      <?php endif; ?>
+      <?php if ($rol === ROL_ADMIN): ?>
+      <a href="<?= BASE_URL ?>modules/permisos/index.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'permisos')!==false?'active':'' ?>">
+        <i data-feather="lock"></i><span>Permisos</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('garantias')): ?>
+      <a href="<?= BASE_URL ?>modules/garantias/index.php" class="tr-nav-item">
+        <i data-feather="shield"></i><span>Garantías</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('estados')): ?>
+      <a href="<?= BASE_URL ?>modules/estados/index.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'estados')!==false?'active':'' ?>">
+        <i data-feather="tag"></i><span>Estados OT</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('plantilla_impresion')): ?>
+      <a href="<?= BASE_URL ?>modules/configuracion/plantilla_impresion.php"
+         class="tr-nav-item <?= strpos($_SERVER['REQUEST_URI'],'plantilla_impresion')!==false?'active':'' ?>">
+        <i data-feather="printer"></i><span>Plantilla impresión</span>
+      </a>
+      <?php endif; ?>
+      <?php if (puede('configuracion')): ?>
+      <a href="<?= BASE_URL ?>modules/configuracion/index.php" class="tr-nav-item">
+        <i data-feather="settings"></i><span>Configuración</span>
+      </a>
+      <?php endif; ?>
     <?php endif; ?>
   </nav>
 
   <div class="tr-sidebar-footer">
     <div class="d-flex align-items-center gap-2">
       <div class="tr-avatar"><?= strtoupper(substr($u['nombre'],0,1)) ?></div>
-      <div class="flex-grow-1 small">
+      <div class="flex-grow-1 small" style="min-width:0">
         <div class="fw-semibold text-truncate"><?= sanitize($u['nombre']) ?></div>
         <div class="text-muted" style="font-size:11px"><?= ucfirst($u['rol']) ?></div>
       </div>
-      <a href="<?= BASE_URL ?>modules/auth/logout.php" title="Cerrar sesión">
-        <i data-feather="log-out" class="text-muted"></i>
-      </a>
     </div>
+    <a href="<?= BASE_URL ?>modules/auth/logout.php" class="tr-logout-btn"
+       title="Cerrar sesión" onclick="return confirm('¿Cerrar sesión?');">
+      <i data-feather="log-out"></i><span>Cerrar sesión</span>
+    </a>
   </div>
 </div>
 

@@ -38,17 +38,19 @@ $s = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE DATE_FORMAT(create
 $s->execute([$mes]);
 $kpi['ot_mes'] = $s->fetchColumn();
 
-// OTs por estado para kanban
+// OTs por estado para kanban (incluye servicio para colorear)
 $stmt = $db->query("
   SELECT ot.id, ot.codigo_ot, ot.estado, ot.fecha_estimada,
          CONCAT(c.nombre) as cliente_nombre,
          CONCAT(te.nombre,' ',COALESCE(e.marca,''),' ',COALESCE(e.modelo,'')) as equipo_desc,
-         CONCAT(u.nombre,' ',u.apellido) as tecnico_nombre
+         CONCAT(u.nombre,' ',u.apellido) as tecnico_nombre,
+         s.nombre as servicio_nombre, s.categoria as servicio_categoria
   FROM ordenes_trabajo ot
   JOIN clientes c ON c.id = ot.cliente_id
   JOIN equipos e ON e.id = ot.equipo_id
   JOIN tipos_equipo te ON te.id = e.tipo_equipo_id
   LEFT JOIN usuarios u ON u.id = ot.tecnico_id
+  LEFT JOIN servicios s ON s.id = ot.servicio_id
   WHERE ot.estado NOT IN ('entregado','cancelado')
   ORDER BY ot.fecha_ingreso DESC
   LIMIT 60
@@ -172,9 +174,53 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <!-- Kanban board -->
+<?php
+// Colores de borde por categoría de servicio
+$srv_border = [
+  'mantenimiento' => '#22c55e',   // verde
+  'diagnostico'   => '#06b6d4',   // celeste
+  'instalacion'   => '#f59e0b',   // amarillo
+  'reparacion'    => '#ef4444',   // rojo
+  ''              => '#94a3b8',   // gris (sin servicio)
+];
+$srv_bg = [
+  'mantenimiento' => 'rgba(34,197,94,0.07)',
+  'diagnostico'   => 'rgba(6,182,212,0.07)',
+  'instalacion'   => 'rgba(245,158,11,0.07)',
+  'reparacion'    => 'rgba(239,68,68,0.07)',
+  ''              => 'transparent',
+];
+$srv_label_color = [
+  'mantenimiento' => '#15803d',
+  'diagnostico'   => '#0e7490',
+  'instalacion'   => '#b45309',
+  'reparacion'    => '#b91c1c',
+  ''              => '#64748b',
+];
+?>
 <div class="tr-card mb-4">
   <div class="tr-card-header">
-    <h6 class="mb-0 fw-semibold"><i data-feather="trello" class="me-2" style="width:17px;height:17px"></i>Estado de órdenes activas</h6>
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <h6 class="mb-0 fw-semibold"><i data-feather="trello" class="me-2" style="width:17px;height:17px"></i>Estado de órdenes activas</h6>
+      <!-- Leyenda de colores -->
+      <div class="d-flex flex-wrap gap-3" style="font-size:11px; color:#6b7280">
+        <span class="d-flex align-items-center gap-1">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#22c55e"></span> Mantenimiento
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#06b6d4"></span> Diagnóstico
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#f59e0b"></span> Instalación
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ef4444"></span> Reparación
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#94a3b8"></span> Sin servicio
+        </span>
+      </div>
+    </div>
     <a href="<?= BASE_URL ?>modules/ot/nueva.php" class="btn btn-primary btn-sm">
       <i data-feather="plus" style="width:14px;height:14px"></i> Nueva OT
     </a>
@@ -188,8 +234,22 @@ require_once __DIR__ . '/../../includes/header.php';
           <span class="badge bg-<?= $col['info']['color'] ?>"><?= count($col['items']) ?></span>
         </div>
         <div class="kanban-items" id="kanban-<?= $estado ?>">
-          <?php foreach ($col['items'] as $ot): ?>
-          <div class="kanban-card" onclick="window.location='<?= BASE_URL ?>modules/ot/ver.php?id=<?= $ot['id'] ?>'">
+          <?php
+          $visibles = array_slice($col['items'], 0, 5);
+          $resto    = count($col['items']) - 5;
+          foreach ($visibles as $ot):
+            $cat    = $ot['servicio_categoria'] ?: '';
+            $border = $srv_border[$cat] ?? $srv_border[''];
+            $bg     = $srv_bg[$cat]     ?? 'transparent';
+            $lcolor = $srv_label_color[$cat] ?? $srv_label_color[''];
+          ?>
+          <div class="kanban-card" onclick="window.location='<?= BASE_URL ?>modules/ot/ver.php?id=<?= $ot['id'] ?>'"
+               style="border-left: 4px solid <?= $border ?>; background: <?= $bg ?>; cursor:pointer">
+            <?php if ($ot['servicio_nombre']): ?>
+            <div style="font-size:10px; font-weight:600; color:<?= $lcolor ?>; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">
+              <?= sanitize($ot['servicio_nombre']) ?>
+            </div>
+            <?php endif; ?>
             <div class="fw-semibold text-primary small"><?= sanitize($ot['codigo_ot']) ?></div>
             <div class="text-truncate"><?= sanitize($ot['cliente_nombre']) ?></div>
             <div class="text-muted small text-truncate"><?= sanitize($ot['equipo_desc']) ?></div>
@@ -205,6 +265,13 @@ require_once __DIR__ . '/../../includes/header.php';
             <?php endif; ?>
           </div>
           <?php endforeach; ?>
+          <?php if ($resto > 0): ?>
+          <a href="<?= BASE_URL ?>modules/ot/index.php?estado=<?= $estado ?>"
+             class="d-block text-center text-muted small py-2 text-decoration-none"
+             style="border:1px dashed #cbd5e1; border-radius:6px; margin-top:4px">
+            +<?= $resto ?> más — Ver todas
+          </a>
+          <?php endif; ?>
         </div>
       </div>
       <?php endforeach; ?>

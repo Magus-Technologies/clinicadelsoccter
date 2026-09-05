@@ -11,11 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         'empresa_nombre','empresa_ruc','empresa_direccion','empresa_telefono','empresa_email',
         'igv_porcentaje','garantia_defecto_dias','whatsapp_api_token','whatsapp_phone_id',
         'smtp_host','smtp_user','smtp_pass','smtp_port','moneda','moneda_simbolo',
-        'sunat_usuario_sol','sunat_clave_sol','sunat_modo',
+        'sunat_usuario_sol','sunat_clave_sol','sunat_modo','terminos_condiciones',
     ];
     foreach ($campos as $c) {
         if (isset($_POST[$c])) {
-            $db->prepare("UPDATE configuracion SET valor=? WHERE clave=?")->execute([trim($_POST[$c]),$c]);
+            $db->prepare("INSERT INTO configuracion (clave,valor) VALUES (?,?) ON DUPLICATE KEY UPDATE valor=VALUES(valor)")
+               ->execute([$c, trim($_POST[$c])]);
         }
     }
 
@@ -107,6 +108,9 @@ require_once __DIR__ . '/../../includes/header.php';
 <ul class="nav nav-tabs mb-3" role="tablist">
   <li class="nav-item"><button class="nav-link <?= $tab==='general'?'active':'' ?>" data-bs-toggle="tab" data-bs-target="#tab-general" type="button">General</button></li>
   <li class="nav-item"><button class="nav-link <?= $tab==='series'?'active':'' ?>" data-bs-toggle="tab" data-bs-target="#tab-series" type="button">Series</button></li>
+  <li class="nav-item"><button class="nav-link <?= $tab==='terminos'?'active':'' ?>" data-bs-toggle="tab" data-bs-target="#tab-terminos" type="button">
+    <i data-feather="file-text" style="width:13px;height:13px" class="me-1"></i>Términos y condiciones
+  </button></li>
 </ul>
 
 <div class="tab-content">
@@ -249,5 +253,69 @@ require_once __DIR__ . '/../../includes/header.php';
 </form>
 </div>
 
+<!-- ── TAB TÉRMINOS Y CONDICIONES ── -->
+<div class="tab-pane fade <?= $tab==='terminos'?'show active':'' ?>" id="tab-terminos">
+<form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="action" value="guardar">
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="tr-card mb-3">
+      <div class="tr-card-header">
+        <h6 class="mb-0 small fw-semibold">
+          <i data-feather="file-text" class="me-2" style="width:15px;height:15px"></i>
+          TÉRMINOS Y CONDICIONES DEL SERVICIO
+        </h6>
+      </div>
+      <div class="tr-card-body">
+        <div class="alert alert-info py-2 small mb-3">
+          Este texto aparecerá en una pestaña dentro del portal público de seguimiento de reparación
+          (el mismo link que recibe el cliente con su código de consulta). Puedes usar saltos de línea
+          para separar puntos o cláusulas.
+        </div>
+        <label class="tr-form-label">Contenido</label>
+        <textarea name="terminos_condiciones" class="form-control" rows="18"
+                  placeholder="Ej:&#10;1. El cliente acepta que el equipo será revisado y diagnosticado antes de confirmar el presupuesto.&#10;2. La garantía cubre únicamente el repuesto y/o servicio especificado en la orden de trabajo.&#10;3. Equipos no recogidos después de 30 días podrán generar costos de almacenaje..."><?= cf('terminos_condiciones') ?></textarea>
+        <div class="text-muted small mt-1">
+          <span id="contador-terminos">0</span> caracteres
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="tr-card mb-3">
+      <div class="tr-card-header"><h6 class="mb-0 small fw-semibold">VISTA PREVIA</h6></div>
+      <div class="tr-card-body" style="background:#fafbfc">
+        <div style="font-size:12px; color:#6b7280; white-space:pre-wrap; line-height:1.6" id="preview-terminos">
+          <?= cf('terminos_condiciones') ?: '<span class="text-muted">Aún no has escrito términos y condiciones.</span>' ?>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-light border small">
+      <i data-feather="link" style="width:13px;height:13px"></i>
+      El cliente verá esto al ingresar su código en:<br>
+      <code style="font-size:11px">/public/estado.php?codigo=XXXXXXXX</code>
+    </div>
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary"><i data-feather="save" style="width:15px;height:15px"></i> Guardar términos y condiciones</button>
+  </div>
 </div>
+</form>
+</div>
+
+</div>
+<script>
+const txtTerminos = document.querySelector('textarea[name="terminos_condiciones"]');
+const contador    = document.getElementById('contador-terminos');
+const preview     = document.getElementById('preview-terminos');
+function actualizarPreview() {
+  if (!txtTerminos) return;
+  contador.textContent = txtTerminos.value.length;
+  preview.textContent  = txtTerminos.value || 'Aún no has escrito términos y condiciones.';
+}
+if (txtTerminos) {
+  txtTerminos.addEventListener('input', actualizarPreview);
+  actualizarPreview();
+}
+</script>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

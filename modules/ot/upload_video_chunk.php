@@ -2,10 +2,19 @@
 /**
  * upload_video_chunk.php — Recibe chunks de video y los ensambla
  */
+ob_start(); // Capturar cualquier output accidental (warnings, notices)
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
 
+// Limpiar cualquier output previo y forzar JSON
+ob_clean();
 header('Content-Type: application/json');
+
+// Evitar que errores PHP rompan el JSON
+set_error_handler(function($errno, $errstr) {
+    // Ignorar warnings/notices silenciosamente en producción
+    return true;
+});
 
 // Log para debug
 function logChunk(string $msg): void {
@@ -16,6 +25,8 @@ function logChunk(string $msg): void {
 if (!isLoggedIn()) {
     echo json_encode(['error' => 'No autorizado']); exit;
 }
+
+try {
 
 $chunkIndex  = (int)($_POST['chunkIndex']  ?? 0);
 $totalChunks = (int)($_POST['totalChunks'] ?? 1);
@@ -197,3 +208,10 @@ $result['final_size_mb'] = round($result['final_size'] / 1024 / 1024, 2);
 
 logChunk("Respuesta: " . json_encode($result));
 echo json_encode($result);
+
+} catch (\Throwable $e) {
+    ob_clean();
+    header('Content-Type: application/json');
+    logChunk("EXCEPCION GLOBAL: " . $e->getMessage());
+    echo json_encode(['error' => 'Error interno: ' . $e->getMessage()]);
+}

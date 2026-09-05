@@ -14,7 +14,7 @@ $s = $db->query("SELECT COUNT(*) FROM ordenes_trabajo WHERE estado NOT IN ('entr
 $kpi['ot_activas'] = $s->fetchColumn();
 
 // Listas para entregar hoy o antes
-$s = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE estado='listo' AND fecha_estimada <= ?");
+$s = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE estado='para_recojo' AND fecha_estimada <= ?");
 $s->execute([$hoy]);
 $kpi['listas'] = $s->fetchColumn();
 
@@ -38,7 +38,14 @@ $s = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE DATE_FORMAT(create
 $s->execute([$mes]);
 $kpi['ot_mes'] = $s->fetchColumn();
 
+// Conteo EXACTO por estado (independiente de cuántas tarjetas se muestren)
+$conteoPorEstado = [];
+$cst = $db->query("SELECT estado, COUNT(*) as total FROM ordenes_trabajo WHERE estado NOT IN ('entregado','cancelado') GROUP BY estado");
+foreach ($cst as $r) { $conteoPorEstado[$r['estado']] = (int)$r['total']; }
+
 // OTs por estado para kanban (incluye servicio para colorear)
+// Sin LIMIT global: se trae todo lo activo y se recorta por columna en PHP,
+// así ninguna columna se queda vacía por culpa de OTs más antiguas en otras columnas.
 $stmt = $db->query("
   SELECT ot.id, ot.codigo_ot, ot.estado, ot.fecha_estimada,
          CONCAT(c.nombre) as cliente_nombre,
@@ -52,18 +59,18 @@ $stmt = $db->query("
   LEFT JOIN usuarios u ON u.id = ot.tecnico_id
   LEFT JOIN servicios s ON s.id = ot.servicio_id
   WHERE ot.estado NOT IN ('entregado','cancelado')
-  ORDER BY ot.fecha_ingreso DESC
-  LIMIT 60
+  ORDER BY ot.estado, ot.fecha_ingreso DESC
 ");
 $ots_raw = $stmt->fetchAll();
 
-// Agrupar por estado
+// Agrupar por estado — se traen TODAS las OTs (no se recortan), luego se desglosan en el HTML
 $kanban = [];
 foreach (ESTADOS_OT as $key => $info) {
     if (in_array($key, ['entregado','cancelado'])) continue;
-    $kanban[$key] = ['info' => $info, 'items' => []];
+    $kanban[$key] = ['info' => $info, 'items' => [], 'total' => $conteoPorEstado[$key] ?? 0];
 }
 foreach ($ots_raw as $ot) {
+    if (!isset($kanban[$ot['estado']])) continue; // estado inactivo o no configurado en estados_ot
     $kanban[$ot['estado']]['items'][] = $ot;
 }
 
@@ -231,7 +238,7 @@ $srv_label_color = [
       <div class="kanban-col">
         <div class="kanban-col-header bg-<?= $col['info']['color'] ?> bg-opacity-10 text-<?= $col['info']['color'] ?>">
           <span><?= $col['info']['label'] ?></span>
-          <span class="badge bg-<?= $col['info']['color'] ?>"><?= count($col['items']) ?></span>
+          <span class="badge bg-<?= $col['info']['color'] ?>"><?= $col['total'] ?></span>
         </div>
         <div class="kanban-items" id="kanban-<?= $estado ?>">
           <?php foreach ($col['items'] as $ot):
@@ -240,7 +247,8 @@ $srv_label_color = [
             $bg     = $srv_bg[$cat]     ?? 'transparent';
             $lcolor = $srv_label_color[$cat] ?? $srv_label_color[''];
           ?>
-          <div class="kanban-card" onclick="window.location='<?= BASE_URL ?>modules/ot/ver.php?id=<?= $ot['id'] ?>'"
+          <div class="kanban-card"
+               onclick="window.location='<?= BASE_URL ?>modules/ot/ver.php?id=<?= $ot['id'] ?>'"
                style="border-left: 4px solid <?= $border ?>; background: <?= $bg ?>; cursor:pointer">
             <?php if ($ot['servicio_nombre']): ?>
             <div style="font-size:10px; font-weight:600; color:<?= $lcolor ?>; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">

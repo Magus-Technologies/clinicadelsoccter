@@ -45,7 +45,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
     redirect(BASE_URL.'modules/ventas/index.php?tab=sunat');
 }
 
-// ─── DATOS TAB HISTORIAL ─────────────────────────────────────
+// ─── REPORTE EXPORTAR ────────────────────────────────────────
+if (isset($_GET['reporte_export'])) {
+    $r_desde  = $_GET['r_desde'] ?? date('Y-m-01');
+    $r_hasta  = $_GET['r_hasta'] ?? date('Y-m-d');
+    $r_tipo   = $_GET['r_tipo']  ?? '';
+    $r_estado = $_GET['r_estado'] ?? '';
+
+    $rWhere  = ['DATE(v.created_at) BETWEEN ? AND ?'];
+    $rParams = [$r_desde, $r_hasta];
+    if ($r_tipo)   { $rWhere[] = 'v.tipo_doc = ?';  $rParams[] = $r_tipo; }
+    if ($r_estado) { $rWhere[] = 'v.estado = ?';    $rParams[] = $r_estado; }
+
+    $rSt = $db->prepare("
+        SELECT v.codigo, v.tipo_doc,
+               COALESCE(NULLIF(v.serie_doc,''), v.serie, '') AS serie_doc,
+               COALESCE(NULLIF(v.num_doc,''),  CASE WHEN v.numero > 0 THEN LPAD(v.numero,8,'0') ELSE '' END, '') AS num_doc,
+               COALESCE(c.nombre,'Consumidor Final') AS cliente,
+               COALESCE(c.ruc_dni,'') AS ruc_dni,
+               v.subtotal, v.igv, v.descuento, v.total,
+               v.metodo_pago, v.estado, v.created_at
+        FROM ventas v
+        LEFT JOIN clientes c ON c.id = v.cliente_id
+        WHERE " . implode(' AND ', $rWhere) . "
+        ORDER BY v.created_at ASC
+        LIMIT 5000
+    ");
+    $rSt->execute($rParams);
+    $rData = $rSt->fetchAll();
+
+    $gran_total = array_sum(array_map(fn($r) => $r['estado'] === 'anulada' ? 0 : (float)$r['total'], $rData));
+    $gran_base  = array_sum(array_map(fn($r) => $r['estado'] === 'anulada' ? 0 : (float)$r['subtotal'], $rData));
+    $gran_igv   = array_sum(array_map(fn($r) => $r['estado'] === 'anulada' ? 0 : (float)$r['igv'], $rData));
+
+    // ── EXPORTAR EXCEL ──
+    if ($_GET['reporte_export'] === 'excel') {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_ventas_'.$r_desde.'_'.$r_hasta.'.csv"');
+        header('Cache-Control: max-age=0');
+        echo "\xEF\xBB\xBF"; // BOM UTF-8 para que Excel reconozca tildes
+        $sep = ';';
+        $cols = ['N° Documento','Tipo','Cliente','DNI/RUC','Fecha','Base Imponible','IGV','Descuento','Total','Método Pago','Estado'];
+        echo implode($sep, $cols) . "\n";
+        foreach ($rData as $r) {
+            $ndoc = ($r['serie_doc'] && $r['num_doc']) ? $r['serie_doc'].'-'.$r['num_doc'] : '—';
+            echo implode($sep, [
+                $ndoc,
+                strtoupper($r['tipo_doc']),
+                '"' . str_replace('"','""',$r['cliente']) . '"',
+                $r['ruc_dni'],
+                date('d/m/Y H:i', strtotime($r['created_at'])),
+                number_format((float)$r['subtotal'], 2, '.', ''),
+                number_format((float)$r['igv'],      2, '.', ''),
+                number_format((float)$r['descuento'],2, '.', ''),
+                number_format((float)$r['total'],    2, '.', ''),
+                ucfirst($r['metodo_pago']),
+                ucfirst($r['estado']),
+            ]) . "\n";
+        }
+        // Fila de totales (solo completadas)
+        echo implode($sep, [
+            'TOTAL',
+            '',
+            '"' . count($rData) . ' registros"',
+            '',
+            '',
+            number_format($gran_base,  2, '.', ''),
+            number_format($gran_igv,   2, '.', ''),
+            '',
+            number_format($gran_total, 2, '.', ''),
+            '',
+            'Solo completadas',
+        ]) . "\n";
+        exit;
+    }
+
+    // ── EXPORTAR PDF ──
+    if ($_GET['reporte_export'] === 'pdf') {
+        $empresa_nombre = getConfig('empresa_nombre', $db) ?: APP_NAME;
+        $empresa_ruc    = getConfig('empresa_ruc', $db);
+        $html  = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        $html .= '<style>
+            body{font-family:Arial,sans-serif;font-size:11px;color:#111}
+            h2{margin:0 0 2px;font-size:15px}
+            .sub{color:#555;font-size:10px;margin-bottom:10px}
+            table{width:100%;border-collapse:collapse;margin-top:8px}
+            th{background:#1e293b;color:#fff;padding:5px 6px;text-align:left;font-size:10px}
+            td{padding:4px 6px;border-bottom:1px solid #e5e7eb;font-size:10px}
+            tr:nth-child(even) td{background:#f8fafc}
+            .anulada td{color:#9ca3af;text-decoration:line-through}
+            .text-right{text-align:right}
+            .total-row td{background:#1e293b;color:#fff;font-weight:bold;font-size:11px}
+            .badge-boleta{background:#0ea5e9;color:#fff;padding:1px 5px;border-radius:3px}
+            .badge-factura{background:#6366f1;color:#fff;padding:1px 5px;border-radius:3px}
+        </style></head><body>';
+        $html .= '<h2>' . htmlspecialchars($empresa_nombre) . '</h2>';
+        $html .= '<div class="sub">RUC: ' . htmlspecialchars($empresa_ruc) . ' &nbsp;|&nbsp; Reporte de ventas: ' .
+                 date('d/m/Y', strtotime($r_desde)) . ' al ' . date('d/m/Y', strtotime($r_hasta)) . '</div>';
+        $html .= '<table><thead><tr>
+            <th>#</th><th>N° Documento</th><th>Tipo</th><th>Cliente</th><th>DNI/RUC</th>
+            <th>Fecha</th><th class="text-right">Base</th><th class="text-right">IGV</th>
+            <th class="text-right">Total</th><th>Método</th><th>Estado</th>
+        </tr></thead><tbody>';
+        $num = 1;
+        foreach ($rData as $r) {
+            $ndoc  = ($r['serie_doc'] && $r['num_doc']) ? htmlspecialchars($r['serie_doc'].'-'.$r['num_doc']) : '—';
+            $badge = $r['tipo_doc'] === 'factura' ? 'badge-factura' : 'badge-boleta';
+            $cls   = $r['estado'] === 'anulada' ? ' class="anulada"' : '';
+            $html .= '<tr'.$cls.'>';
+            $html .= '<td>'.$num++.'</td>';
+            $html .= '<td>'.$ndoc.'</td>';
+            $html .= '<td><span class="'.$badge.'">'.strtoupper($r['tipo_doc']).'</span></td>';
+            $html .= '<td>'.htmlspecialchars($r['cliente']).'</td>';
+            $html .= '<td>'.htmlspecialchars($r['ruc_dni']).'</td>';
+            $html .= '<td>'.date('d/m/Y', strtotime($r['created_at'])).'</td>';
+            $html .= '<td class="text-right">S/ '.number_format($r['subtotal'],2).'</td>';
+            $html .= '<td class="text-right">S/ '.number_format($r['igv'],2).'</td>';
+            $html .= '<td class="text-right">S/ '.number_format($r['total'],2).'</td>';
+            $html .= '<td>'.ucfirst($r['metodo_pago']).'</td>';
+            $html .= '<td>'.ucfirst($r['estado']).'</td>';
+            $html .= '</tr>';
+        }
+        $html .= '<tr class="total-row">';
+        $html .= '<td colspan="6">TOTAL ('.count($rData).' registros)</td>';
+        $html .= '<td class="text-right">S/ '.number_format($gran_base,2).'</td>';
+        $html .= '<td class="text-right">S/ '.number_format($gran_igv,2).'</td>';
+        $html .= '<td class="text-right">S/ '.number_format($gran_total,2).'</td>';
+        $html .= '<td colspan="2"></td></tr>';
+        $html .= '</tbody></table>';
+        $html .= '<div style="margin-top:8px;font-size:9px;color:#9ca3af">Generado el '.date('d/m/Y H:i').'</div>';
+        $html .= '</body></html>';
+
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html;
+        exit;
+    }
+}
 $h_desde = $_GET['desde'] ?? date('Y-m-d');
 $h_hasta = $_GET['hasta'] ?? date('Y-m-d');
 $h_q     = trim($_GET['q'] ?? '');
@@ -90,6 +225,7 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <ul class="nav nav-tabs mb-3">
   <li class="nav-item"><button class="nav-link <?= $tab==='historial'?'active':'' ?>" data-bs-toggle="tab" data-bs-target="#tab-historial" type="button">Historial</button></li>
+  <li class="nav-item"><button class="nav-link <?= $tab==='reporte'?'active':'' ?>" data-bs-toggle="tab" data-bs-target="#tab-reporte" type="button"><i data-feather="bar-chart-2" style="width:13px;height:13px" class="me-1"></i>Reporte</button></li>
   <?php if($user['rol']===ROL_ADMIN): ?>
   <li class="nav-item"><button class="nav-link <?= $tab==='sunat'?'active':'' ?>" data-bs-toggle="tab" data-bs-target="#tab-sunat" type="button">Comprobantes SUNAT</button></li>
   <?php endif; ?>
@@ -137,6 +273,153 @@ require_once __DIR__ . '/../../includes/header.php';
           </tr>
           <?php endforeach; ?>
           <?php if(empty($historial)): ?><tr><td colspan="11" class="text-center text-muted py-4">Sin ventas en el período</td></tr><?php endif; ?>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+
+<!-- ── REPORTE ── -->
+<div class="tab-pane fade <?= $tab==='reporte'?'show active':'' ?>" id="tab-reporte">
+  <?php
+  $r_desde  = $_GET['r_desde']  ?? date('Y-m-01');
+  $r_hasta  = $_GET['r_hasta']  ?? date('Y-m-d');
+  $r_tipo   = $_GET['r_tipo']   ?? '';
+  $r_estado = $_GET['r_estado'] ?? '';
+
+  $rWhere  = ['DATE(v.created_at) BETWEEN ? AND ?'];
+  $rParams = [$r_desde, $r_hasta];
+  if ($r_tipo)   { $rWhere[] = 'v.tipo_doc = ?'; $rParams[] = $r_tipo; }
+  if ($r_estado) { $rWhere[] = 'v.estado = ?';   $rParams[] = $r_estado; }
+
+  $rSt = $db->prepare("
+      SELECT v.codigo, v.tipo_doc,
+             COALESCE(NULLIF(v.serie_doc,''), v.serie, '') AS serie_doc,
+             COALESCE(NULLIF(v.num_doc,''),  CASE WHEN v.numero > 0 THEN LPAD(v.numero,8,'0') ELSE '' END, '') AS num_doc,
+             COALESCE(c.nombre,'Consumidor Final') AS cliente,
+             COALESCE(c.ruc_dni,'') AS ruc_dni,
+             v.subtotal, v.igv, v.descuento, v.total,
+             v.metodo_pago, v.estado, v.created_at
+      FROM ventas v
+      LEFT JOIN clientes c ON c.id = v.cliente_id
+      WHERE " . implode(' AND ', $rWhere) . "
+      ORDER BY v.created_at ASC LIMIT 5000
+  ");
+  $rSt->execute($rParams);
+  $rData = $rSt->fetchAll();
+  $gran_total = array_sum(array_map(fn($r) => $r['estado']==='anulada' ? 0 : (float)$r['total'], $rData));
+  $gran_base  = array_sum(array_map(fn($r) => $r['estado']==='anulada' ? 0 : (float)$r['subtotal'], $rData));
+  $gran_igv   = array_sum(array_map(fn($r) => $r['estado']==='anulada' ? 0 : (float)$r['igv'], $rData));
+  $base_export = BASE_URL . 'modules/ventas/index.php?tab=reporte&r_desde=' . $r_desde . '&r_hasta=' . $r_hasta . '&r_tipo=' . urlencode($r_tipo) . '&r_estado=' . urlencode($r_estado);
+  ?>
+  <div class="tr-card mb-3">
+    <div class="tr-card-body py-2">
+      <form method="GET" class="row g-2 align-items-end">
+        <input type="hidden" name="tab" value="reporte"/>
+        <div class="col-md-2"><label class="tr-form-label mb-1">Desde</label><input type="date" name="r_desde" class="form-control form-control-sm" value="<?= $r_desde ?>"/></div>
+        <div class="col-md-2"><label class="tr-form-label mb-1">Hasta</label><input type="date" name="r_hasta" class="form-control form-control-sm" value="<?= $r_hasta ?>"/></div>
+        <div class="col-md-2">
+          <label class="tr-form-label mb-1">Tipo doc.</label>
+          <select name="r_tipo" class="form-select form-select-sm">
+            <option value="">Todos</option>
+            <option value="boleta"  <?= $r_tipo==='boleta'?'selected':'' ?>>Boleta</option>
+            <option value="factura" <?= $r_tipo==='factura'?'selected':'' ?>>Factura</option>
+            <option value="ticket"  <?= $r_tipo==='ticket'?'selected':'' ?>>Ticket</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="tr-form-label mb-1">Estado</label>
+          <select name="r_estado" class="form-select form-select-sm">
+            <option value="">Todos</option>
+            <option value="completada" <?= $r_estado==='completada'?'selected':'' ?>>Completada</option>
+            <option value="anulada"    <?= $r_estado==='anulada'?'selected':'' ?>>Anulada</option>
+          </select>
+        </div>
+        <div class="col-md-1"><label class="tr-form-label mb-1">&nbsp;</label><button type="submit" class="btn btn-primary btn-sm w-100 d-block">Filtrar</button></div>
+        <div class="col-md-3 d-flex gap-2 align-items-end">
+          <a href="<?= $base_export ?>&reporte_export=excel" class="btn btn-success btn-sm">
+            <i data-feather="file-text" style="width:13px;height:13px"></i> Excel
+          </a>
+          <a href="<?= $base_export ?>&reporte_export=pdf" target="_blank" class="btn btn-danger btn-sm">
+            <i data-feather="file" style="width:13px;height:13px"></i> PDF
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="row g-2 mb-3">
+    <div class="col-6 col-md-3">
+      <div class="tr-card text-center py-2">
+        <div class="text-muted small">Registros</div>
+        <div class="fw-bold fs-5"><?= count($rData) ?></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="tr-card text-center py-2">
+        <div class="text-muted small">Base imponible</div>
+        <div class="fw-bold fs-6"><?= formatMoney($gran_base) ?></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="tr-card text-center py-2">
+        <div class="text-muted small">IGV total</div>
+        <div class="fw-bold fs-6"><?= formatMoney($gran_igv) ?></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="tr-card text-center py-2" style="border:2px solid #22c55e">
+        <div class="text-muted small">TOTAL</div>
+        <div class="fw-bold fs-5 text-success"><?= formatMoney($gran_total) ?></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tr-card">
+    <div class="tr-card-body p-0"><div style="overflow-x:auto">
+      <table class="tr-table">
+        <thead>
+          <tr>
+            <th>#</th><th>N° Documento</th><th>Tipo</th><th>Cliente</th><th>DNI/RUC</th>
+            <th>Fecha</th><th class="text-end">Base</th><th class="text-end">IGV</th>
+            <th class="text-end">Total</th><th>Método</th><th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php $num=1; foreach($rData as $r):
+            $ndoc  = ($r['serie_doc'] && $r['num_doc']) ? sanitize($r['serie_doc'].'-'.$r['num_doc']) : '—';
+            $anulada = $r['estado'] === 'anulada';
+          ?>
+          <tr <?= $anulada ? 'style="opacity:.5;text-decoration:line-through"' : '' ?>>
+            <td class="text-muted small"><?= $num++ ?></td>
+            <td class="fw-semibold small"><?= $ndoc ?></td>
+            <td>
+              <span class="badge <?= $r['tipo_doc']==='factura'?'bg-primary':($r['tipo_doc']==='boleta'?'bg-info':'bg-secondary') ?>">
+                <?= strtoupper($r['tipo_doc']) ?>
+              </span>
+            </td>
+            <td class="small"><?= sanitize($r['cliente']) ?></td>
+            <td class="small text-muted"><?= sanitize($r['ruc_dni']) ?></td>
+            <td class="small text-muted"><?= date('d/m/Y', strtotime($r['created_at'])) ?></td>
+            <td class="text-end small"><?= formatMoney($r['subtotal']) ?></td>
+            <td class="text-end small text-muted"><?= formatMoney($r['igv']) ?></td>
+            <td class="text-end fw-bold"><?= formatMoney($r['total']) ?></td>
+            <td class="small"><?= ucfirst($r['metodo_pago']) ?></td>
+            <td><span class="badge bg-<?= $anulada?'danger':'success' ?>"><?= ucfirst($r['estado']) ?></span></td>
+          </tr>
+          <?php endforeach; ?>
+          <?php if(empty($rData)): ?>
+          <tr><td colspan="11" class="text-center text-muted py-4">Sin ventas en el período seleccionado</td></tr>
+          <?php else: ?>
+          <tr style="background:#1e293b; color:#fff; font-weight:bold">
+            <td colspan="6" class="py-2 ps-3">TOTAL (<?= count($rData) ?> registros)</td>
+            <td class="text-end"><?= formatMoney($gran_base) ?></td>
+            <td class="text-end"><?= formatMoney($gran_igv) ?></td>
+            <td class="text-end"><?= formatMoney($gran_total) ?></td>
+            <td colspan="2"></td>
+          </tr>
+          <?php endif; ?>
         </tbody>
       </table>
     </div></div>

@@ -45,6 +45,24 @@ $repuestos = $repuestos->fetchAll();
 // Checklist
 $checklist = $ot['checklist'] ? json_decode($ot['checklist'], true) : [];
 
+// Técnicos múltiples
+try {
+    $stTec = $db->prepare("
+        SELECT CONCAT(u.nombre,' ',u.apellido) AS nombre
+        FROM ot_tecnicos ot JOIN usuarios u ON u.id = ot.tecnico_id
+        WHERE ot.ot_id = ?, u.nombre
+    ");
+    $stTec->execute([$id]);
+    $tecnicos_pdf = $stTec->fetchAll();
+} catch (\Throwable $e) {
+    $tecnicos_pdf = [];
+}
+// Fallback al técnico principal
+if (empty($tecnicos_pdf) && $ot['tecnico_nombre']) {
+    $tecnicos_pdf = [['nombre' => $ot['tecnico_nombre']]];
+}
+$tecnicos_nombres_pdf = implode(', ', array_column($tecnicos_pdf, 'nombre'));
+
 // Config empresa
 $cfg = [];
 $rows = $db->query("SELECT clave,valor FROM configuracion")->fetchAll();
@@ -137,8 +155,8 @@ $notaLegal = "El equipo deberá ser recogido en un plazo máximo de 90 días lue
   .empresa-info p { font-size: 10px; color: #555; line-height: 1.5; }
   .doc-title-block { text-align: right; }
   .doc-title-block .servicio-num {
-    font-size: 18px; font-weight: 800;
-    color: #1a1a2e;
+    font-size: 15px; font-weight: 800;
+    color: #1a1a2e; white-space: nowrap;
   }
   .doc-title-block .servicio-label {
     font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: .05em;
@@ -353,23 +371,52 @@ $notaLegal = "El equipo deberá ser recogido en un plazo máximo de 90 días lue
   </div>
 <?php endif; ?>
   @media print {
-    body { background: #fff; padding: 0; }
-    .page { box-shadow: none; padding: 10mm; width: 100%; }
-    .no-print { display: none !important; }
+    body { background: #fff; padding: 0; margin: 0; }
+    .page {
+      box-shadow: none;
+      padding: 8mm 10mm;
+      width: 100%;
+      margin: 0;
+      min-height: auto;
+    }
+    .no-print { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
+    @page {
+      margin: 0;
+      size: A4;
+    }
   }
+  .no-print-wrap { /* wrapper extra para asegurar ocultado */ }
 </style>
 </head>
 <body>
 
 <!-- Botón imprimir (no se imprime) -->
-<div class="no-print" style="max-width:210mm;margin:0 auto 12px;display:flex;gap:10px">
-  <button onclick="window.print()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">
+<div id="barra-acciones" class="no-print" style="max-width:210mm;margin:0 auto 12px;display:flex;gap:10px">
+  <button onclick="imprimirDoc()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">
     🖨️ Imprimir / Guardar PDF
   </button>
-  <button onclick="window.close()" style="background:#f3f4f6;border:none;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer">
+  <button onclick="history.back()" style="background:#f3f4f6;border:none;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer">
     ← Volver
   </button>
 </div>
+<script>
+function imprimirDoc() {
+  document.getElementById('barra-acciones').style.display = 'none';
+  setTimeout(function() {
+    window.print();
+    setTimeout(function() {
+      document.getElementById('barra-acciones').style.display = 'flex';
+    }, 1000);
+  }, 100);
+}
+// También ocultar si usan Ctrl+P directamente
+window.addEventListener('beforeprint', function() {
+  document.getElementById('barra-acciones').style.display = 'none';
+});
+window.addEventListener('afterprint', function() {
+  document.getElementById('barra-acciones').style.display = 'flex';
+});
+</script>
 
 <div class="page">
   <div class="watermark"><?= $estadoLabel ?></div>
@@ -611,9 +658,9 @@ $notaLegal = "El equipo deberá ser recogido en un plazo máximo de 90 días lue
         Fecha estimada de entrega: <strong><?= date('d/m/Y', strtotime($ot['fecha_estimada'])) ?></strong>
       </div>
       <?php endif; ?>
-      <?php if($ot['tecnico_nombre']): ?>
+      <?php if($tecnicos_nombres_pdf): ?>
       <div style="font-size:10px;color:#6b7280;margin-top:2px">
-        Técnico: <strong><?= htmlspecialchars($ot['tecnico_nombre']) ?></strong>
+        <?= count($tecnicos_pdf) > 1 ? 'Técnicos' : 'Técnico' ?>: <strong><?= htmlspecialchars($tecnicos_nombres_pdf) ?></strong>
       </div>
       <?php endif; ?>
     </div>
@@ -643,7 +690,7 @@ $notaLegal = "El equipo deberá ser recogido en un plazo máximo de 90 días lue
       <div class="firma-label">Recibido por / Técnico</div>
       <div style="height:40px"></div>
       <div class="firma-linea"></div>
-      <div class="firma-nombre"><?= htmlspecialchars($ot['tecnico_nombre'] ?: $ot['creador_nombre']) ?></div>
+      <div class="firma-nombre"><?= htmlspecialchars($tecnicos_nombres_pdf ?: $ot['creador_nombre']) ?></div>
       <div style="font-size:9px;color:#9ca3af"><?= htmlspecialchars($empresa) ?></div>
     </div>
     <div class="firma-box">
