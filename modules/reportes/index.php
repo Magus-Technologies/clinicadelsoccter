@@ -17,8 +17,11 @@ $ventasDia = $ventasDia->fetchAll();
 $otEstado = $db->query("SELECT estado, COUNT(*) as n FROM ordenes_trabajo GROUP BY estado")->fetchAll();
 
 // Top técnicos (OTs completadas)
-$topTec = $db->prepare("SELECT CONCAT(u.nombre,' ',u.apellido) as nombre, COUNT(ot.id) as ots, COALESCE(SUM(ot.precio_final),0) as total FROM ordenes_trabajo ot JOIN usuarios u ON u.id=ot.tecnico_id WHERE ot.estado='entregado' AND DATE(ot.fecha_entrega) BETWEEN ? AND ? GROUP BY u.id ORDER BY ots DESC LIMIT 10");
-$topTec->execute([$desde,$hasta]);
+// El ranking filtraba por estado='entregado', que ya no existe en la
+// configuración: siempre devolvía vacío. Ahora usa los estados de cierre.
+[$phOk, $valOk] = phEstadosCompletados();
+$topTec = $db->prepare("SELECT CONCAT(u.nombre,' ',u.apellido) as nombre, COUNT(ot.id) as ots, COALESCE(SUM(ot.precio_final),0) as total FROM ordenes_trabajo ot JOIN usuarios u ON u.id=ot.tecnico_id WHERE ot.estado IN ($phOk) AND DATE(ot.fecha_entrega) BETWEEN ? AND ? GROUP BY u.id ORDER BY ots DESC LIMIT 10");
+$topTec->execute(array_merge($valOk, [$desde, $hasta]));
 $topTec = $topTec->fetchAll();
 
 // Top productos vendidos

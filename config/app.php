@@ -47,6 +47,55 @@ function getEstadosOT(): array {
 }
 define('ESTADOS_OT', getEstadosOT());
 
+/**
+ * Claves de los estados que cierran una OT (es_final = 1 en `estados_ot`).
+ *
+ * Los estados son configurables desde Administración → Estados OT, pero
+ * varias consultas los tenían escritos a mano como ('entregado','cancelado').
+ * 'entregado' ya no existe en la configuración, así que esos filtros
+ * dejaron de funcionar: las OTs cerradas seguían contándose como activas.
+ * Cualquier consulta que necesite separar abiertas de cerradas debe usar
+ * esta función, nunca una lista fija.
+ */
+function estadosFinalesOT(): array {
+    static $cache = null;
+    if ($cache !== null) return $cache;
+
+    $cache = [];
+    foreach (ESTADOS_OT as $clave => $info) {
+        if (!empty($info['es_final'])) $cache[] = $clave;
+    }
+    // Si la configuración no marca ninguno, 'cancelado' siempre cierra.
+    if (!$cache) $cache = ['cancelado'];
+
+    return $cache;
+}
+
+/**
+ * Placeholders y valores para filtrar por estados finales.
+ * Uso: [$ph, $vals] = phEstadosFinales();  →  "WHERE estado NOT IN ($ph)"
+ */
+function phEstadosFinales(): array {
+    $finales = estadosFinalesOT();
+    return [implode(',', array_fill(0, count($finales), '?')), $finales];
+}
+
+/**
+ * Estados en los que una OT se considera terminada CON ÉXITO.
+ * Son los finales menos 'cancelado': cancelar no es completar un trabajo.
+ * Se usa para métricas de productividad (OTs completadas por técnico).
+ */
+function estadosCompletadosOT(): array {
+    $ok = array_values(array_diff(estadosFinalesOT(), ['cancelado']));
+    return $ok ?: ['archivado'];
+}
+
+/** Placeholders y valores para `estado IN (...)` sobre OTs completadas. */
+function phEstadosCompletados(): array {
+    $ok = estadosCompletadosOT();
+    return [implode(',', array_fill(0, count($ok), '?')), $ok];
+}
+
 // ----------------------------------------------------------
 // Autenticación
 // ----------------------------------------------------------

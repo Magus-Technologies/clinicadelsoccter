@@ -124,11 +124,14 @@ if (isset($_GET['toggle'])) {
 
 // ── LISTADO ─────────────────────────────────────────────────
 $filtroRol = $_GET['rol'] ?? '';
+// 'entregado' ya no existe en `estados_ot`, así que este contador siempre
+// daba 0. Los estados de cierre se leen de la configuración.
+[$phOk, $valOk] = phEstadosCompletados();
 $sql = "SELECT u.*,
           (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id) AS total_ots,
-          (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id AND estado='entregado') AS ots_completadas
+          (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id AND estado IN ($phOk)) AS ots_completadas
         FROM usuarios u";
-$params = [];
+$params = $valOk;
 if ($filtroRol && isset($ROLES[$filtroRol])) { $sql .= " WHERE u.rol = ?"; $params[] = $filtroRol; }
 $sql .= " ORDER BY u.activo DESC, u.nombre";
 $st = $db->prepare($sql); $st->execute($params);

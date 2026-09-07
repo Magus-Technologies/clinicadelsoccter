@@ -9,8 +9,12 @@ $hoy = date('Y-m-d');
 // KPIs
 $kpi = [];
 
-// OTs activas (no entregadas ni canceladas)
-$s = $db->query("SELECT COUNT(*) FROM ordenes_trabajo WHERE estado NOT IN ('entregado','cancelado')");
+// OTs activas: las que no están en un estado final, según `estados_ot`.
+// No se listan los estados a mano: la configuración es la que manda.
+[$phFinales, $valFinales] = phEstadosFinales();
+
+$s = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE estado NOT IN ($phFinales)");
+$s->execute($valFinales);
 $kpi['ot_activas'] = $s->fetchColumn();
 
 // Listas para entregar hoy o antes
@@ -47,13 +51,14 @@ $kpi['ot_mes'] = $s->fetchColumn();
 
 // Conteo EXACTO por estado (independiente de cuántas tarjetas se muestren)
 $conteoPorEstado = [];
-$cst = $db->query("SELECT estado, COUNT(*) as total FROM ordenes_trabajo WHERE estado NOT IN ('entregado','cancelado') GROUP BY estado");
+$cst = $db->prepare("SELECT estado, COUNT(*) as total FROM ordenes_trabajo WHERE estado NOT IN ($phFinales) GROUP BY estado");
+$cst->execute($valFinales);
 foreach ($cst as $r) { $conteoPorEstado[$r['estado']] = (int)$r['total']; }
 
 // OTs por estado para kanban (incluye servicio para colorear)
 // Sin LIMIT global: se trae todo lo activo y se recorta por columna en PHP,
 // así ninguna columna se queda vacía por culpa de OTs más antiguas en otras columnas.
-$stmt = $db->query("
+$stmt = $db->prepare("
   SELECT ot.id, ot.codigo_ot, ot.estado, ot.fecha_estimada,
          CONCAT(c.nombre) as cliente_nombre,
          CONCAT(te.nombre,' ',COALESCE(e.marca,''),' ',COALESCE(e.modelo,'')) as equipo_desc,
@@ -65,15 +70,17 @@ $stmt = $db->query("
   JOIN tipos_equipo te ON te.id = e.tipo_equipo_id
   LEFT JOIN usuarios u ON u.id = ot.tecnico_id
   LEFT JOIN servicios s ON s.id = ot.servicio_id
-  WHERE ot.estado NOT IN ('entregado','cancelado')
+  WHERE ot.estado NOT IN ($phFinales)
   ORDER BY ot.estado, ot.fecha_ingreso DESC
 ");
+$stmt->execute($valFinales);
 $ots_raw = $stmt->fetchAll();
 
 // Agrupar por estado — se traen TODAS las OTs (no se recortan), luego se desglosan en el HTML
 $kanban = [];
+$finalesOT = estadosFinalesOT();
 foreach (ESTADOS_OT as $key => $info) {
-    if (in_array($key, ['entregado','cancelado'])) continue;
+    if (in_array($key, $finalesOT, true)) continue;
     $kanban[$key] = ['info' => $info, 'items' => [], 'total' => $conteoPorEstado[$key] ?? 0];
 }
 foreach ($ots_raw as $ot) {

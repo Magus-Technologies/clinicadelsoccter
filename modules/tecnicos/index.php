@@ -22,12 +22,17 @@ if (isset($_GET['toggle'])) {
     redirect(BASE_URL.'modules/tecnicos/index.php');
 }
 
-$usuarios = $db->query("
+// 'entregado' ya no existe en `estados_ot`, así que este contador siempre
+// daba 0. Los estados de cierre se leen de la configuración.
+[$phOk, $valOk] = phEstadosCompletados();
+$usuarios = $db->prepare("
   SELECT u.*,
     (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id) as total_ots,
-    (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id AND estado='entregado') as ots_completadas
+    (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id AND estado IN ($phOk)) as ots_completadas
   FROM usuarios u ORDER BY u.activo DESC, u.nombre
-")->fetchAll();
+");
+$usuarios->execute($valOk);
+$usuarios = $usuarios->fetchAll();
 
 $pageTitle  = 'Usuarios y técnicos — '.APP_NAME;
 $breadcrumb = [['label'=>'Usuarios','url'=>null]];

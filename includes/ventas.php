@@ -16,20 +16,11 @@ require_once __DIR__ . '/stock_ot.php';
  * `cancelado` se excluye a propósito: cobrar una OT no es cancelarla.
  */
 function estadoCierreOT(PDO $db): string {
-    static $cache = null;
-    if ($cache !== null) return $cache;
-
-    try {
-        $st = $db->query("
-            SELECT clave FROM estados_ot
-            WHERE es_final = 1 AND activo = 1 AND clave <> 'cancelado'
-            ORDER BY orden ASC LIMIT 1
-        ");
-        $cache = $st->fetchColumn() ?: 'archivado';
-    } catch (Throwable $e) {
-        $cache = 'archivado';
-    }
-    return $cache;
+    // Misma fuente que estadosCompletadosOT() en config/app.php, para que
+    // el estado con el que se cierra una OT y los que los reportes cuentan
+    // como completadas no puedan quedar desalineados.
+    $completados = estadosCompletadosOT();
+    return $completados[0] ?? 'archivado';
 }
 
 /**
