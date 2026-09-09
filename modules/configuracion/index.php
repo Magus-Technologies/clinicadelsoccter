@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         'igv_porcentaje','garantia_defecto_dias','whatsapp_api_token','whatsapp_phone_id',
         'smtp_host','smtp_user','smtp_pass','smtp_port','moneda','moneda_simbolo',
         'sunat_usuario_sol','sunat_clave_sol','sunat_modo','terminos_condiciones',
+        'estado_cierre_ot',
     ];
     foreach ($campos as $c) {
         if (isset($_POST[$c])) {
@@ -141,6 +142,21 @@ require_once __DIR__ . '/../../includes/header.php';
           <div class="col-md-4"><label class="tr-form-label">Moneda</label><input type="text" name="moneda" class="form-control" value="<?= cf('moneda') ?>"/></div>
           <div class="col-md-4"><label class="tr-form-label">Símbolo</label><input type="text" name="moneda_simbolo" class="form-control" value="<?= cf('moneda_simbolo') ?>"/></div>
           <div class="col-md-6"><label class="tr-form-label">Garantía por defecto (días)</label><input type="number" name="garantia_defecto_dias" class="form-control" value="<?= cf('garantia_defecto_dias') ?>"/></div>
+          <div class="col-md-6">
+            <label class="tr-form-label">Estado al cobrar una OT</label>
+            <?php $cierreActual = cf('estado_cierre_ot') ?: 'cancelado'; ?>
+            <select name="estado_cierre_ot" class="form-select">
+              <?php foreach (ESTADOS_OT as $k => $v): if (empty($v['es_final'])) continue; ?>
+                <option value="<?= $k ?>" <?= $cierreActual === $k ? 'selected' : '' ?>>
+                  <?= sanitize($v['label']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+            <div class="text-muted" style="font-size:11px">
+              Estado que toma la OT cuando se cobra en el punto de venta.
+              Solo se listan los marcados como finales en Estados OT.
+            </div>
+          </div>
         </div>
       </div>
     </div>

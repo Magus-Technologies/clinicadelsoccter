@@ -124,14 +124,18 @@ if (isset($_GET['toggle'])) {
 
 // ── LISTADO ─────────────────────────────────────────────────
 $filtroRol = $_GET['rol'] ?? '';
-// 'entregado' ya no existe en `estados_ot`, así que este contador siempre
-// daba 0. Los estados de cierre se leen de la configuración.
-[$phOk, $valOk] = phEstadosCompletados();
+// Una OT cuenta como completada si llegó a facturarse, no por el nombre
+// de su estado. El taller usa 'cancelado' para la OT ya cobrada, así que
+// filtrar por estado daba resultados falsos en los dos sentidos.
 $sql = "SELECT u.*,
           (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id) AS total_ots,
-          (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id AND estado IN ($phOk)) AS ots_completadas
+          (SELECT COUNT(*) FROM ordenes_trabajo o
+            WHERE o.tecnico_id = u.id
+              AND EXISTS (SELECT 1 FROM venta_detalle d
+                          JOIN ventas v ON v.id = d.venta_id
+                          WHERE d.ot_id = o.id AND v.estado <> 'anulada')) AS ots_completadas
         FROM usuarios u";
-$params = $valOk;
+$params = [];
 if ($filtroRol && isset($ROLES[$filtroRol])) { $sql .= " WHERE u.rol = ?"; $params[] = $filtroRol; }
 $sql .= " ORDER BY u.activo DESC, u.nombre";
 $st = $db->prepare($sql); $st->execute($params);

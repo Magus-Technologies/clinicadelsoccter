@@ -10,17 +10,33 @@
 require_once __DIR__ . '/stock_ot.php';
 
 /**
- * Estado con el que se cierra una OT cobrada.
+ * Estado con el que se cierra una OT cuando se cobra.
  *
- * Se lee de `estados_ot` para respetar la configuración del negocio.
- * `cancelado` se excluye a propósito: cobrar una OT no es cancelarla.
+ * Se DECLARA en `configuracion.estado_cierre_ot`, no se deduce. En este
+ * rubro "cancelar" significa pagar, así que el taller usa la clave
+ * `cancelado` para la OT cobrada — el mismo nombre que el catálogo usa
+ * para una anulación real. Ninguna heurística puede distinguir esos dos
+ * sentidos: lo define el negocio y el código lo respeta.
+ *
+ * Para saber si una OT terminó en trabajo cobrado NO se mira este estado,
+ * se mira si tiene comprobante (venta_detalle.ot_id). Esa es la señal
+ * que usan los reportes y los contadores de técnicos.
  */
 function estadoCierreOT(PDO $db): string {
-    // Misma fuente que estadosCompletadosOT() en config/app.php, para que
-    // el estado con el que se cierra una OT y los que los reportes cuentan
-    // como completadas no puedan quedar desalineados.
-    $completados = estadosCompletadosOT();
-    return $completados[0] ?? 'archivado';
+    static $cache = null;
+    if ($cache !== null) return $cache;
+
+    $clave = trim((string)getConfig('estado_cierre_ot', $db));
+    if ($clave !== '' && isset(ESTADOS_OT[$clave])) {
+        return $cache = $clave;
+    }
+
+    // Sin configurar: 'cancelado' es la convención de estos talleres.
+    // Si no existiera, cualquier estado final sirve antes que inventar uno.
+    if (isset(ESTADOS_OT['cancelado'])) return $cache = 'cancelado';
+
+    $finales = estadosFinalesOT();
+    return $cache = ($finales[0] ?? 'cancelado');
 }
 
 /**

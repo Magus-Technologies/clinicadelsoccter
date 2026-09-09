@@ -16,12 +16,29 @@ $ventasDia = $ventasDia->fetchAll();
 // OTs por estado
 $otEstado = $db->query("SELECT estado, COUNT(*) as n FROM ordenes_trabajo GROUP BY estado")->fetchAll();
 
-// Top técnicos (OTs completadas)
-// El ranking filtraba por estado='entregado', que ya no existe en la
-// configuración: siempre devolvía vacío. Ahora usa los estados de cierre.
-[$phOk, $valOk] = phEstadosCompletados();
-$topTec = $db->prepare("SELECT CONCAT(u.nombre,' ',u.apellido) as nombre, COUNT(ot.id) as ots, COALESCE(SUM(ot.precio_final),0) as total FROM ordenes_trabajo ot JOIN usuarios u ON u.id=ot.tecnico_id WHERE ot.estado IN ($phOk) AND DATE(ot.fecha_entrega) BETWEEN ? AND ? GROUP BY u.id ORDER BY ots DESC LIMIT 10");
-$topTec->execute(array_merge($valOk, [$desde, $hasta]));
+// Top técnicos (OTs facturadas en el período).
+//
+// El ranking filtraba por estado='entregado' — un estado que no existe en
+// la configuración de este negocio — y ordenaba por `fecha_entrega`, que
+// quedó en NULL en casi todas las OTs. Siempre salía vacío.
+//
+// Ahora una OT cuenta cuando se facturó, no por el nombre de su estado:
+// el taller usa 'cancelado' tanto para la OT cobrada como para la anulada,
+// y solo el comprobante distingue una de otra. El monto también sale de la
+// boleta, que es la fuente de verdad del ingreso.
+$topTec = $db->prepare("
+    SELECT CONCAT(u.nombre,' ',u.apellido) AS nombre,
+           COUNT(DISTINCT ot.id)           AS ots,
+           COALESCE(SUM(d.subtotal),0)     AS total
+    FROM ordenes_trabajo ot
+    JOIN usuarios      u ON u.id = ot.tecnico_id
+    JOIN venta_detalle d ON d.ot_id = ot.id
+    JOIN ventas        v ON v.id = d.venta_id
+    WHERE v.estado <> 'anulada'
+      AND DATE(v.created_at) BETWEEN ? AND ?
+    GROUP BY u.id ORDER BY ots DESC LIMIT 10
+");
+$topTec->execute([$desde, $hasta]);
 $topTec = $topTec->fetchAll();
 
 // Top productos vendidos

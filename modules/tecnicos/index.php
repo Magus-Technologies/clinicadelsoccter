@@ -22,17 +22,20 @@ if (isset($_GET['toggle'])) {
     redirect(BASE_URL.'modules/tecnicos/index.php');
 }
 
-// 'entregado' ya no existe en `estados_ot`, así que este contador siempre
-// daba 0. Los estados de cierre se leen de la configuración.
-[$phOk, $valOk] = phEstadosCompletados();
-$usuarios = $db->prepare("
+// Una OT cuenta como completada si llegó a facturarse, no por el nombre
+// de su estado. El taller usa 'cancelado' para la OT ya cobrada, así que
+// filtrar por estado daba resultados falsos en los dos sentidos: perdía
+// las cobradas y contaba anulaciones reales. El comprobante no miente.
+$usuarios = $db->query("
   SELECT u.*,
     (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id) as total_ots,
-    (SELECT COUNT(*) FROM ordenes_trabajo WHERE tecnico_id=u.id AND estado IN ($phOk)) as ots_completadas
+    (SELECT COUNT(*) FROM ordenes_trabajo o
+      WHERE o.tecnico_id = u.id
+        AND EXISTS (SELECT 1 FROM venta_detalle d
+                    JOIN ventas v ON v.id = d.venta_id
+                    WHERE d.ot_id = o.id AND v.estado <> 'anulada')) as ots_completadas
   FROM usuarios u ORDER BY u.activo DESC, u.nombre
-");
-$usuarios->execute($valOk);
-$usuarios = $usuarios->fetchAll();
+")->fetchAll();
 
 $pageTitle  = 'Usuarios y técnicos — '.APP_NAME;
 $breadcrumb = [['label'=>'Usuarios','url'=>null]];

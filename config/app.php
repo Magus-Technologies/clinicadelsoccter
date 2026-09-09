@@ -80,21 +80,20 @@ function phEstadosFinales(): array {
     return [implode(',', array_fill(0, count($finales), '?')), $finales];
 }
 
-/**
- * Estados en los que una OT se considera terminada CON ÉXITO.
- * Son los finales menos 'cancelado': cancelar no es completar un trabajo.
- * Se usa para métricas de productividad (OTs completadas por técnico).
- */
-function estadosCompletadosOT(): array {
-    $ok = array_values(array_diff(estadosFinalesOT(), ['cancelado']));
-    return $ok ?: ['archivado'];
-}
-
-/** Placeholders y valores para `estado IN (...)` sobre OTs completadas. */
-function phEstadosCompletados(): array {
-    $ok = estadosCompletadosOT();
-    return [implode(',', array_fill(0, count($ok), '?')), $ok];
-}
+// NOTA: acá vivían estadosCompletadosOT() y phEstadosCompletados(), que
+// asumían que 'cancelado' nunca podía ser un trabajo completado. En este
+// rubro "cancelar" significa pagar, así que el taller usa esa misma clave
+// para la OT cobrada y para la anulada. El nombre del estado no alcanza
+// para distinguirlas.
+//
+// Para saber si una OT terminó en trabajo cobrado se pregunta por el
+// comprobante, no por el estado:
+//
+//   EXISTS (SELECT 1 FROM venta_detalle d
+//           JOIN ventas v ON v.id = d.venta_id
+//           WHERE d.ot_id = ot.id AND v.estado <> 'anulada')
+//
+// Así lo hacen Reportes, Técnicos y Usuarios.
 
 // ----------------------------------------------------------
 // Autenticación
