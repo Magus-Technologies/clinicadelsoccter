@@ -27,13 +27,26 @@ ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`);
 
 -- =====================================================================
 -- VERIFICACION
+--
+-- Son dos SELECT separados a proposito. `configuracion` es latin1 y
+-- `estados_ot` es utf8mb4: unirlos con UNION obliga a MySQL/MariaDB a
+-- negociar una collation comun y falla con
+-- "Illegal mix of collations ... for operation 'UNION'".
+-- Tampoco se usan caracteres fuera de ASCII en los literales, por la
+-- misma razon: no existen en latin1.
 -- =====================================================================
-SELECT 'Estado de cierre configurado' AS control, c.valor AS valor
-FROM `configuracion` c WHERE c.clave = 'estado_cierre_ot'
-UNION ALL
-SELECT 'Existe en estados_ot y es final',
-       CASE WHEN EXISTS (
-           SELECT 1 FROM `estados_ot` e
-           JOIN `configuracion` c2 ON c2.clave = 'estado_cierre_ot'
-           WHERE e.clave = c2.valor AND e.es_final = 1 AND e.activo = 1
-       ) THEN 'si' ELSE 'NO — revisar' END;
+
+-- 1) Que quedo guardado.
+SELECT `clave`, `valor`
+FROM `configuracion`
+WHERE `clave` = 'estado_cierre_ot';
+
+-- 2) Que ese estado exista en el catalogo y sea final.
+--    CONVERT() alinea las dos collations antes de comparar.
+SELECT e.`clave`, e.`label`, e.`es_final`, e.`activo`
+FROM `estados_ot` e
+WHERE CONVERT(e.`clave` USING utf8mb4) = (
+    SELECT CONVERT(c.`valor` USING utf8mb4)
+    FROM `configuracion` c
+    WHERE c.`clave` = 'estado_cierre_ot'
+);

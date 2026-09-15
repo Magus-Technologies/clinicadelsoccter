@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../includes/ventas.php';
 requireLogin();
 
 $db  = getDB();
@@ -49,10 +50,14 @@ $s = $db->prepare("SELECT COUNT(*) FROM ordenes_trabajo WHERE DATE_FORMAT(create
 $s->execute([$mes]);
 $kpi['ot_mes'] = $s->fetchColumn();
 
-// Conteo EXACTO por estado (independiente de cuántas tarjetas se muestren)
+// Conteo EXACTO por estado (independiente de cuántas tarjetas se muestren).
+// Alcance del tablero: todo menos el estado de cobro. Ver el armado del
+// kanban más abajo para el porqué.
+$estadoCobro = estadoCierreOT($db);
+
 $conteoPorEstado = [];
-$cst = $db->prepare("SELECT estado, COUNT(*) as total FROM ordenes_trabajo WHERE estado NOT IN ($phFinales) GROUP BY estado");
-$cst->execute($valFinales);
+$cst = $db->prepare("SELECT estado, COUNT(*) as total FROM ordenes_trabajo WHERE estado <> ? GROUP BY estado");
+$cst->execute([$estadoCobro]);
 foreach ($cst as $r) { $conteoPorEstado[$r['estado']] = (int)$r['total']; }
 
 // OTs por estado para kanban (incluye servicio para colorear)
@@ -70,17 +75,22 @@ $stmt = $db->prepare("
   JOIN tipos_equipo te ON te.id = e.tipo_equipo_id
   LEFT JOIN usuarios u ON u.id = ot.tecnico_id
   LEFT JOIN servicios s ON s.id = ot.servicio_id
-  WHERE ot.estado NOT IN ($phFinales)
+  WHERE ot.estado <> ?
   ORDER BY ot.estado, ot.fecha_ingreso DESC
 ");
-$stmt->execute($valFinales);
+$stmt->execute([$estadoCobro]);
 $ots_raw = $stmt->fetchAll();
 
 // Agrupar por estado — se traen TODAS las OTs (no se recortan), luego se desglosan en el HTML
+//
+// Del tablero se oculta UNICAMENTE el estado con el que se cobra una OT.
+// Ese estado acumula tanto el trabajo ya facturado como las anulaciones
+// reales, y es el que llegó a tener cientos de tarjetas tapando el resto.
+// Las demás columnas finales (por ejemplo "Finalizado") sí se muestran:
+// son trabajo terminado que el taller todavía necesita ver.
 $kanban = [];
-$finalesOT = estadosFinalesOT();
 foreach (ESTADOS_OT as $key => $info) {
-    if (in_array($key, $finalesOT, true)) continue;
+    if ($key === $estadoCobro) continue;
     $kanban[$key] = ['info' => $info, 'items' => [], 'total' => $conteoPorEstado[$key] ?? 0];
 }
 foreach ($ots_raw as $ot) {
