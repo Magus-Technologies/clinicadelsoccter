@@ -142,6 +142,113 @@ function sunat_guardar_certificado(string $ruc, string $pemBase64): string {
 }
 
 /**
+ * Valida un RUC por formato y digito verificador (modulo 11).
+ * Sirve tambien para descartar numeros de 11 digitos que no son RUC.
+ */
+function sunat_ruc_valido(string $ruc): bool {
+    if (!preg_match('/^(10|15|16|17|20)\d{9}$/', $ruc)) return false;
+    $pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+    $suma  = 0;
+    for ($i = 0; $i < 10; $i++) $suma += (int)$ruc[$i] * $pesos[$i];
+    return ((11 - ($suma % 11)) % 10) === (int)$ruc[10];
+}
+
+/**
+ * Lee un certificado .pem y devuelve lo que se puede verificar de el.
+ *
+ * - 'valido'  : false si no hay un certificado X.509 legible.
+ * - 'rucs'    : RUC(s) encontrados en el sujeto / SAN del certificado.
+ *               Cada emisora (ECEP) lo pone en un campo distinto
+ *               (serialNumber, OU, CN...), por eso se busca en todos.
+ * - 'vence'   : fecha de vencimiento (d/m/Y) y 'vencido' (bool).
+ * - 'clave'   : true/false si el .pem trae clave privada que corresponde
+ *               al certificado; null si no trae clave o esta cifrada.
+ */
+function sunat_cert_info(string $pem): array {
+    $info = [
+        'valido' => false, 'error' => null, 'rucs' => [], 'sujeto' => '',
+        'vence' => null, 'vencido' => false, 'clave' => null,
+    ];
+
+    if (!function_exists('openssl_x509_read')) {
+        $info['error'] = 'La extensión openssl de PHP no está habilitada en este servidor.';
+        return $info;
+    }
+    if (!preg_match_all('/-----BEGIN CERTIFICATE-----.+?-----END CERTIFICATE-----/s', $pem, $m) || empty($m[0])) {
+        $info['error'] = 'El archivo no contiene un certificado X.509 en formato PEM (falta el bloque BEGIN CERTIFICATE).';
+        return $info;
+    }
+
+    // Si el .pem trae clave privada, se usa para elegir el certificado hoja
+    // (un .pem puede incluir tambien certificados intermedios).
+    $clave = @openssl_pkey_get_private($pem);
+    $elegido = null;
+    foreach ($m[0] as $bloque) {
+        $x509 = @openssl_x509_read($bloque);
+        if ($x509 === false) continue;
+        if ($elegido === null) $elegido = $x509;
+        if ($clave !== false && @openssl_x509_check_private_key($x509, $clave)) {
+            $elegido = $x509;
+            $info['clave'] = true;
+            break;
+        }
+    }
+    if ($elegido === null) {
+        $info['error'] = 'No se pudo leer el certificado: el bloque PEM está dañado.';
+        return $info;
+    }
+    if ($clave !== false && $info['clave'] === null) $info['clave'] = false;
+
+    $parsed = openssl_x509_parse($elegido);
+    if (!is_array($parsed)) {
+        $info['error'] = 'No se pudo interpretar el certificado.';
+        return $info;
+    }
+
+    // Texto donde buscar el RUC: todos los campos del sujeto + SAN.
+    $partes  = [];
+    $sujeto  = $parsed['subject'] ?? [];
+    array_walk_recursive($sujeto, function ($v) use (&$partes) { $partes[] = (string)$v; });
+    $info['sujeto'] = (string)($parsed['name'] ?? '');
+    $partes[] = (string)($parsed['extensions']['subjectAltName'] ?? '');
+    $texto = implode(' | ', $partes);
+
+    if (preg_match_all('/(?<!\d)(?:10|15|16|17|20)\d{9}(?!\d)/', $texto, $r)) {
+        foreach (array_unique($r[0]) as $cand) {
+            if (sunat_ruc_valido($cand)) $info['rucs'][] = $cand;
+        }
+    }
+
+    if (!empty($parsed['validTo_time_t'])) {
+        $info['vence']   = date('d/m/Y', (int)$parsed['validTo_time_t']);
+        $info['vencido'] = (int)$parsed['validTo_time_t'] < time();
+    }
+
+    $info['valido'] = true;
+    return $info;
+}
+
+/**
+ * Compara el certificado con el RUC de la empresa.
+ * Devuelve el mensaje de error, o null si el certificado es utilizable.
+ *
+ * Si no se logra leer ningun RUC dentro del certificado no se bloquea
+ * (no hay forma de verificar): la UI lo muestra como advertencia.
+ */
+function sunat_cert_error(array $info, string $rucEmpresa): ?string {
+    if (!$info['valido']) return $info['error'] ?? 'Certificado inválido.';
+    if ($info['clave'] === false) {
+        return 'La clave privada del archivo no corresponde al certificado.';
+    }
+    if ($info['rucs'] && $rucEmpresa !== '' && !in_array($rucEmpresa, $info['rucs'], true)) {
+        return 'El certificado pertenece al RUC ' . implode(' / ', $info['rucs'])
+             . ' pero la empresa tiene configurado el RUC ' . $rucEmpresa
+             . '. Corrija el RUC de la empresa o cargue el certificado correcto.';
+    }
+    return null;
+}
+
+/**
  * Ruta del certificado .pem para un RUC dado.
  */
 function sunat_cert_path(string $ruc): ?string {

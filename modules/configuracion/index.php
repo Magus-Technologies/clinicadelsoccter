@@ -21,13 +21,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 
-    // Guardar certificado si se envió
+    // Guardar certificado si se envió (solo si el RUC del certificado coincide con el de la empresa)
+    $errCert = null;
     if (!empty($_FILES['certificado']['tmp_name'])) {
-        $certData = base64_encode(file_get_contents($_FILES['certificado']['tmp_name']));
-        $db->prepare("UPDATE configuracion SET valor=? WHERE clave='sunat_certificado'")->execute([$certData]);
+        require_once __DIR__ . '/../../config/sunat.php';
+        $pem        = file_get_contents($_FILES['certificado']['tmp_name']);
+        $rucEmpresa = preg_replace('/\D/', '', (string)$db->query("SELECT valor FROM configuracion WHERE clave='empresa_ruc'")->fetchColumn());
+        $errCert    = sunat_cert_error(sunat_cert_info($pem), $rucEmpresa);
+        if ($errCert === null) {
+            $certData = base64_encode($pem);
+            $db->prepare("UPDATE configuracion SET valor=? WHERE clave='sunat_certificado'")->execute([$certData]);
+        }
     }
 
-    setFlash('success','Configuración guardada correctamente.');
+    if ($errCert !== null) {
+        setFlash('error', 'Configuración guardada, pero el certificado NO se cargó. ' . $errCert);
+    } else {
+        setFlash('success','Configuración guardada correctamente.');
+    }
     redirect(BASE_URL.'modules/configuracion/index.php');
 }
 
@@ -39,8 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'envia
     $cfgMap  = array_column($cfgRows, 'valor', 'clave');
     $ruc  = $cfgMap['empresa_ruc'] ?? '';
     $cert = $cfgMap['sunat_certificado'] ?? '';
+    $errCert = (empty($ruc) || empty($cert))
+        ? null
+        : sunat_cert_error(sunat_cert_info((string)base64_decode($cert)), preg_replace('/\D/', '', $ruc));
     if (empty($ruc) || empty($cert)) {
         setFlash('error', 'Falta RUC o certificado en la configuración.');
+    } elseif ($errCert !== null) {
+        setFlash('error', 'No se envió el certificado. ' . $errCert);
     } else {
         $url = SUNAT_API_URL . '/guardar/certificado/' . $ruc;
         $ch  = curl_init($url);
@@ -127,7 +143,11 @@ require_once __DIR__ . '/../../includes/header.php';
       <div class="tr-card-body">
         <div class="row g-2">
           <div class="col-12"><label class="tr-form-label">Nombre de la empresa</label><input type="text" name="empresa_nombre" class="form-control" value="<?= cf('empresa_nombre') ?>"/></div>
-          <div class="col-md-6"><label class="tr-form-label">RUC</label><input type="text" name="empresa_ruc" class="form-control" value="<?= cf('empresa_ruc') ?>" maxlength="11"/></div>
+          <div class="col-md-6">
+            <label class="tr-form-label">RUC</label>
+            <input type="text" name="empresa_ruc" class="form-control" value="<?= cf('empresa_ruc') ?>" maxlength="11" inputmode="numeric" autocomplete="off"/>
+            <div id="ruc-msg" class="small mt-1"></div>
+          </div>
           <div class="col-md-6"><label class="tr-form-label">Teléfono</label><input type="text" name="empresa_telefono" class="form-control" value="<?= cf('empresa_telefono') ?>"/></div>
           <div class="col-12"><label class="tr-form-label">Dirección</label><input type="text" name="empresa_direccion" class="form-control" value="<?= cf('empresa_direccion') ?>"/></div>
           <div class="col-12"><label class="tr-form-label">Email</label><input type="email" name="empresa_email" class="form-control" value="<?= cf('empresa_email') ?>"/></div>
@@ -201,13 +221,41 @@ require_once __DIR__ . '/../../includes/header.php';
         <?php endif; ?>
         <?php $cert = cf('sunat_certificado'); ?>
         <?php if (!empty($cert) && strlen($cert) > 100): ?>
-          <div class="alert alert-success py-1 small"><i data-feather="check-circle" style="width:13px"></i> Certificado cargado en BD</div>
+          <?php
+            require_once __DIR__ . '/../../config/sunat.php';
+            $certInfo   = sunat_cert_info((string)base64_decode($cert));
+            $rucEmpresa = preg_replace('/\D/', '', $config['empresa_ruc'] ?? '');
+            $certError  = sunat_cert_error($certInfo, $rucEmpresa);
+          ?>
+          <?php if ($certError !== null): ?>
+            <div class="alert alert-danger py-2 small">
+              <i data-feather="x-circle" style="width:13px"></i> <?= sanitize($certError) ?>
+            </div>
+          <?php else: ?>
+            <div class="alert alert-success py-1 small">
+              <i data-feather="check-circle" style="width:13px"></i> Certificado cargado en BD
+              <?php if ($certInfo['rucs']): ?>
+                <br>RUC del certificado: <strong><?= sanitize(implode(' / ', $certInfo['rucs'])) ?></strong> (coincide con la empresa)
+              <?php endif; ?>
+              <?php if ($certInfo['vence']): ?>
+                <br>Vence: <strong><?= sanitize($certInfo['vence']) ?></strong><?= $certInfo['vencido'] ? ' — <span class="text-danger fw-bold">VENCIDO</span>' : '' ?>
+              <?php endif; ?>
+            </div>
+            <?php if (!$certInfo['rucs']): ?>
+              <div class="alert alert-warning py-1 small">
+                <i data-feather="alert-triangle" style="width:13px"></i>
+                No se encontró un RUC dentro del certificado; no se puede verificar que sea de esta empresa.
+              </div>
+            <?php endif; ?>
+          <?php endif; ?>
+          <?php if ($certError === null): ?>
           <form method="POST" class="mb-2">
             <input type="hidden" name="action" value="enviar_certificado"/>
             <button type="submit" class="btn btn-warning btn-sm w-100">
               <i data-feather="upload-cloud" style="width:13px;height:13px"></i> Enviar certificado al servidor SUNAT
             </button>
           </form>
+          <?php endif; ?>
         <?php else: ?>
           <div class="alert alert-warning py-1 small"><i data-feather="alert-triangle" style="width:13px"></i> Sin certificado — la facturación no funcionará</div>
         <?php endif; ?>
@@ -343,6 +391,40 @@ require_once __DIR__ . '/../../includes/header.php';
 
 </div>
 <script>
+// Autocompletar datos de la empresa al escribir el RUC (11 dígitos)
+(function () {
+  const ruc    = document.querySelector('input[name="empresa_ruc"]');
+  const nombre = document.querySelector('input[name="empresa_nombre"]');
+  const dir    = document.querySelector('input[name="empresa_direccion"]');
+  const msg    = document.getElementById('ruc-msg');
+  if (!ruc) return;
+
+  function setMsg(texto, color) { msg.textContent = texto; msg.style.color = color || ''; }
+
+  ruc.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '');
+    clearTimeout(ruc._t);
+    setMsg('');
+    if (this.value.length === 11) ruc._t = setTimeout(() => consultar(this.value), 400);
+  });
+
+  function consultar(doc) {
+    setMsg('Consultando SUNAT…', '#6b7280');
+    fetch(window.BASE_URL + 'modules/clientes/api_documento.php?doc=' + encodeURIComponent(doc))
+      .then(r => r.json())
+      .then(d => {
+        if (ruc.value !== doc) return; // el usuario siguió escribiendo
+        if (!d.ok) { setMsg('RUC no encontrado en SUNAT', '#dc3545'); return; }
+        // El nombre siempre toma la razón social de SUNAT; la dirección solo si está vacía
+        if (nombre) nombre.value = d.razon_social || d.nombre || nombre.value;
+        if (dir && !dir.value.trim() && d.direccion) dir.value = d.direccion;
+        const extra = [d.estado, d.condicion].filter(Boolean).join(' / ');
+        setMsg('Razón social SUNAT: ' + (d.razon_social || d.nombre) + (extra ? ' (' + extra + ')' : ''), '#198754');
+      })
+      .catch(() => setMsg('No se pudo consultar el RUC', '#dc3545'));
+  }
+})();
+
 const txtTerminos = document.querySelector('textarea[name="terminos_condiciones"]');
 const contador    = document.getElementById('contador-terminos');
 const preview     = document.getElementById('preview-terminos');

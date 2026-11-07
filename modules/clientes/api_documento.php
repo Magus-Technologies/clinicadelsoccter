@@ -66,5 +66,15 @@ if (strlen($doc) === 8) {
         $tipo   = 'empresa';
     }
 
-    echo json_encode(['ok' => true, 'nombre' => $nombre, 'tipo' => $tipo]);
+    echo json_encode([
+        'ok'           => true,
+        'nombre'       => $nombre,
+        'tipo'         => $tipo,
+        // Datos extra del RUC (los usa Configuracion para autocompletar la empresa)
+        'razon_social' => $razon,
+        'direccion'    => trim((string)($data['direccion'] ?? '')),
+        'estado'       => $data['estado'] ?? null,
+        'condicion'    => $data['condicion'] ?? null,
+        'ubigeo'       => $data['ubigeo'] ?? null,
+    ]);
 }
