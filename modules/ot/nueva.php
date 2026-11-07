@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $tiposEquipo    = $db->query("SELECT * FROM tipos_equipo WHERE activo=1 ORDER BY nombre")->fetchAll();
 $marcas         = $db->query("SELECT * FROM marcas_equipo WHERE activo=1 ORDER BY nombre")->fetchAll();
 $tecnicos       = $db->query("SELECT id,CONCAT(nombre,' ',apellido) as nombre FROM usuarios WHERE rol='tecnico' AND activo=1")->fetchAll();
-$clientes       = $db->query("SELECT id,codigo,nombre,telefono FROM clientes WHERE activo=1 ORDER BY nombre")->fetchAll();
+$clientes       = $db->query("SELECT id,codigo,nombre,telefono,ruc_dni,num_doc FROM clientes WHERE activo=1 ORDER BY nombre")->fetchAll();
 $checklistItems = $db->query("SELECT * FROM checklist_items WHERE activo=1 ORDER BY orden")->fetchAll();
 
 // Agrupar por categoría en un orden de despliegue fijo y lógico
@@ -328,7 +328,7 @@ body.tablet-mode #checklist-container > .mt-2 { display: none; } /* ocultamos la
           <select name="cliente_id" id="sel-cliente" style="display:none">
             <option value="">— Seleccionar cliente —</option>
             <?php foreach($clientes as $c): ?>
-            <option value="<?= $c['id'] ?>"><?= sanitize($c['codigo'].' — '.$c['nombre']) ?><?= $c['telefono'] ? ' ('.$c['telefono'].')' : '' ?></option>
+            <option value="<?= $c['id'] ?>"><?= sanitize($c['codigo'].' — '.$c['nombre'].(($d = trim((string)($c['num_doc'] ?? '')) ?: trim((string)($c['ruc_dni'] ?? ''))) ? ' — '.$d : '')) ?><?= $c['telefono'] ? ' ('.$c['telefono'].')' : '' ?></option>
             <?php endforeach; ?>
           </select>
           <!-- Input visible de búsqueda -->
@@ -570,7 +570,7 @@ body.tablet-mode #checklist-container > .mt-2 { display: none; } /* ocultamos la
           <div class="text-muted small mt-1">El primero marcado será el técnico principal</div>
         </div>
         <div class="mb-2"><label class="tr-form-label">Fecha estimada de entrega</label><input type="date" name="fecha_estimada" class="form-control form-control-sm" min="<?= date('Y-m-d') ?>"/></div>
-        <div class="mb-2"><label class="tr-form-label">Garantía (días)</label><input type="number" name="garantia_dias" class="form-control form-control-sm" value="30" min="0"/></div>
+        <div class="mb-2"><label class="tr-form-label">Garantía (días)</label><input type="number" name="garantia_dias" class="form-control form-control-sm" value="15" min="0"/></div>
       </div>
     </div>
 

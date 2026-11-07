@@ -165,6 +165,11 @@ $eInfo = ESTADOS_OT[$estado] ?? ['label'=>ucfirst(str_replace('_',' ',$estado)),
     <a href="<?= BASE_URL ?>modules/ot/pdf.php?id=<?= $id ?>" target="_blank" class="btn btn-outline-danger btn-sm">
       <i data-feather="file-text" style="width:14px;height:14px"></i> PDF / Imprimir
     </a>
+<a href="<?= BASE_URL ?>modules/ot/informe.php?ot_id=<?= $id ?>" class="btn btn-outline-danger btn-sm">
+  <i data-feather="clipboard" style="width:14px;height:14px"></i> Informe Técnico
+</a>
+   <a href="<?= BASE_URL ?>modules/ot/ia_resumen.php?ot_id=<?= $id ?>" class="btn btn-outline-primary btn-sm">✨ Resumen IA</a>
+
     <?php if ($ot['whatsapp']): ?>
     <a href="https://wa.me/<?= preg_replace('/\D/','',$ot['whatsapp']) ?>?text=Hola+<?= urlencode($ot['cliente_nombre']) ?>%2C+su+equipo+est%C3%A1+<?= urlencode(isset(ESTADOS_OT[$estado]) ? ESTADOS_OT[$estado]['label'] : ucfirst(str_replace('_',' ',$estado))) ?>+%28OT:+<?= $ot['codigo_ot'] ?>%29"
        target="_blank" class="btn btn-success btn-sm">

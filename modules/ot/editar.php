@@ -71,6 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $servicioId = $_POST['servicio_id'] ? (int)$_POST['servicio_id'] : null;
     $estado     = $_POST['estado'] ?? $ot['estado'];
 
+    // ── Historial de servicios: si el servicio cambió, registrar el ANTERIOR ──
+    $servicioPrevio = !empty($ot['servicio_id']) ? (int)$ot['servicio_id'] : null;
+    if ($servicioPrevio && $servicioPrevio !== $servicioId) {
+        try {
+            $snap = $db->prepare("SELECT nombre FROM servicios WHERE id=?");
+            $snap->execute([$servicioPrevio]);
+            $nomPrev = $snap->fetchColumn() ?: '';
+            $db->prepare("INSERT INTO ot_servicios_historial (ot_id, servicio_id, servicio_nombre, usuario_id) VALUES (?,?,?,?)")
+               ->execute([$id, $servicioPrevio, $nomPrev, (int)($user['id'] ?? 0)]);
+        } catch (\Throwable $e) { /* la tabla puede no existir todavía: no romper el guardado */ }
+    }
+
     $db->prepare("
         UPDATE ordenes_trabajo SET
             tecnico_id          = ?,
@@ -526,6 +538,22 @@ require_once __DIR__ . '/../../includes/header.php';
             <?php endforeach; ?>
           </select>
           <div class="text-muted small mt-1">Al seleccionar, se precargará el precio y los repuestos del servicio.</div>
+          <?php
+          // Historial de servicios por los que pasó esta OT
+          try {
+              $histSvc = $db->prepare("SELECT servicio_nombre, servicio_id, created_at FROM ot_servicios_historial WHERE ot_id=? ORDER BY created_at DESC");
+              $histSvc->execute([$id]);
+              $histSvc = $histSvc->fetchAll();
+          } catch (\Throwable $e) { $histSvc = []; }
+          ?>
+          <?php if (!empty($histSvc)): ?>
+          <div class="mt-2 p-2 rounded" style="background:#f8fafc;border:1px solid #eef0f4">
+            <div class="text-muted small mb-1"><i data-feather="clock" style="width:12px;height:12px"></i> Servicios anteriores de esta OT:</div>
+            <?php foreach ($histSvc as $h): ?>
+            <span class="badge bg-light text-dark border me-1 mb-1" title="Cambiado el <?= function_exists('formatDateTime') ? formatDateTime($h['created_at']) : $h['created_at'] ?>"><?= sanitize($h['servicio_nombre'] ?: ('Servicio #'.$h['servicio_id'])) ?></span>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
         </div>
         <div class="mb-2">
           <label class="tr-form-label">Costo repuestos (S/)</label>
